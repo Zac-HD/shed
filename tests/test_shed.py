@@ -13,17 +13,20 @@ from hypothesis import HealthCheck, assume, given, settings, strategies as st
 import shed
 
 
-@given(hypothesmith.from_grammar(), st.sampled_from(list(shed._version_map)))
+@given(
+    source_code=hypothesmith.from_grammar(),
+    provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
+)
 @settings(suppress_health_check=HealthCheck.all())
-def test_shed_is_idempotent(source_code, min_version):
+def test_shed_is_idempotent(source_code, provides):
     # Given any syntatically-valid source code, shed should not crash.
     # This tests doesn't check that we do the *right* thing,
     # just that we don't crash on valid-if-poorly-styled code!
     try:
-        result = shed.shed(source_code=source_code, min_version=min_version)
+        result = shed.shed(source_code=source_code, first_party_imports=provides)
     except (IndentationError, black.InvalidInput, blib2to3.pgen2.tokenize.TokenError):
         assume(False)
-    assert result == shed.shed(source_code=result, min_version=min_version)
+    assert result == shed.shed(source_code=result, first_party_imports=provides)
 
 
 python_files = []

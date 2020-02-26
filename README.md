@@ -15,24 +15,26 @@ automate.
 
 There are no configuration options at all, but if the defaults aren't for you
 that's OK - you can still use the underlying tools directly and get most of
-the same effect.
+the same effect... though you'll have to configure them yourself.
 
-Only works in git repos, because version control is great and so is `git ls-files`.
+Only works in git repos, because version control is great and so is `git ls-files`,
+or in single-file mode.
 
-## Current status
-Thin wrapper + big dreams + lots of bugs.  Ready to `shed` like an old snakeskin!
+## Features
+`shed`...
 
-Still follows whatever `isort` config is in your environment, even if it's not
-Black-compatible :sob:
-
-## Wishlist
-- Convenient interface to all four of the tools above
-- Autodetect minimum Python version from greater of `python_requires` metadata
-  or per-file syntax or Python 3.6
-- Canonicalise **everything possible**, ignoring input format.
-  If that means bigger diffs, so be it.
+1. Runs `autoflake`, to remove unused imports and variables, and expand star-imports
+2. Runs `isort` (configuration support waiting on 5.0), with autodetected first-party imports
+3. Runs `pyupgrade`, with autodetected minimum version >= py36
+4. Runs `black`, with autodetected minimum version >= py36
+5. (WIP) Runs some custom fixers based on `flake8-bugbear`
+6. Iterates those steps until the source code stops changing.
 
 ## Changelog
+
+#### 0.0.2 - 2020-02-26
+- usable CLI
+- better isort autoconfig
 
 #### 0.0.1 - 2020-02-15
 - project kickoff
