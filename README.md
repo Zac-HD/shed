@@ -32,7 +32,7 @@ or in single-file mode.
 
 ## Changelog
 
-#### 0.0.2 - 2020-02-26
+#### 0.0.2 - 2020-03-08
 - usable CLI
 - better isort autoconfig
 
