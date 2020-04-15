@@ -1,0 +1,5 @@
+- id: shed
+  name: Shed
+  entry: shed
+  language: python
+  files: .*\.py

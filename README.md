@@ -39,6 +39,18 @@ first-party import.  [`src` layout](https://hynek.me/articles/testing-packaging/
 packages are also automatically detected, i.e. the `foo` in any paths like
 `.../src/foo/__init__.py`.
 
+## Using with pre-commit
+If you use [pre-commit](https://pre-commit.com/), you can use it with Shed by
+adding the following to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+- repo: https://github.com/Zac-HD/shed
+  rev: 0.1.3
+  hooks:
+  - id: shed
+```
+
 ## Changelog
 
 Patch notes [can be found in `CHANGELOG.md`](https://github.com/Zac-HD/shed/blob/master/CHANGELOG.md).
