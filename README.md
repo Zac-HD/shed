@@ -30,6 +30,19 @@ or in single-file mode.
 5. (WIP) Runs some custom fixers based on `flake8-bugbear`
 6. Iterates those steps until the source code stops changing.
 
+## Using with pre-commit
+
+If you use [pre-commit](https://pre-commit.com/), you can use it with Shed by
+adding the following to your `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+- repo: https://github.com/Zac-HD/shed.git
+  rev: 0.0.3
+  hooks:
+  - id: shed
+```
+
 ## Changelog
 
 #### 0.0.2 - 2020-03-08
