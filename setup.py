@@ -1,8 +1,13 @@
 import setuptools
 
+with open("src/shed/__init__.py") as o:
+    for line in o:
+        if line.startswith("__version__ = "):
+            _, __version__, _ = line.split('"')
+
 setuptools.setup(
     name="shed",
-    version="0.0.1",
+    version=__version__,
     author="Zac Hatfield-Dodds",
     author_email="zac@zhd.dev",
     packages=setuptools.find_packages("src"),
@@ -16,7 +21,7 @@ setuptools.setup(
         "autoflake >= 1.3.1",
         "black >= 19.10b0",
         "isort >= 4.3.21",
-        "pyupgrade >= 1.26.2",
+        "pyupgrade >= 2.2.1",
     ],
     python_requires=">=3.6",
     classifiers=[

@@ -32,6 +32,9 @@ or in single-file mode.
 
 ## Changelog
 
+#### 0.0.3 - 2020-04-23
+- compatible with pyupgrade==2.2
+
 #### 0.0.2 - 2020-03-08
 - usable CLI
 - better isort autoconfig
