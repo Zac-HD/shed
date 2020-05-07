@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 __all__ = ["shed"]
 
 _version_map = {
@@ -70,7 +70,6 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     )
     source_code = pyupgrade._fix_percent_format(source_code)
     source_code = pyupgrade._fix_py3_plus(source_code)
-    source_code = pyupgrade._fix_fstrings(source_code)
 
     # and finally Black!
     source_code = black.format_str(
