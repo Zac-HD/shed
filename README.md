@@ -24,13 +24,16 @@ or in single-file mode.
 `shed`...
 
 1. Runs `autoflake`, to remove unused imports and variables, and expand star-imports
-2. Runs `isort` (configuration support waiting on 5.0), with autodetected first-party imports
-3. Runs `pyupgrade`, with autodetected minimum version >= py36
+2. Runs `pyupgrade`, with autodetected minimum version >= py36
+3. Runs `isort` (configuration support waiting on 5.0), with autodetected first-party imports
 4. Runs `black`, with autodetected minimum version >= py36
 5. (WIP) Runs some custom fixers based on `flake8-bugbear`
 6. Iterates those steps until the source code stops changing.
 
 ## Changelog
+
+#### 0.0.4 - 2020-05-13
+- compatible with pyupgrade==2.4
 
 #### 0.0.3 - 2020-04-23
 - compatible with pyupgrade==2.2

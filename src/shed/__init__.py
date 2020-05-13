@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 __all__ = ["shed"]
 
 _version_map = {
@@ -45,6 +45,7 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
         if v.value >= black.TargetVersion.PY36.value
     }
     assert target_versions
+    min_version = _version_map[min(target_versions, key=attrgetter("value"))]
 
     input_code = source_code
     # Autoflake first:
@@ -56,20 +57,17 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
         remove_unused_variables=True,
     )
 
+    # Now pyupgrade - see pyupgrade._fix_file
+    source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
+    source_code = pyupgrade._fix_percent_format(source_code)
+    source_code = pyupgrade._fix_py3_plus(source_code, min_version=min_version)
+
     # Then isort...
     # TODO: swap as soon as 5.0 is released for black compat & clean config handling
     # source_code = isort.api.sorted_imports(
     #     file_contents=source_code, known_first_party=first_party_imports,
     # )
     source_code = isort.SortImports(file_contents=source_code).output
-
-    # Now pyupgrade - see pyupgrade._fix_file
-    source_code = pyupgrade._fix_tokens(
-        source_code,
-        min_version=_version_map[min(target_versions, key=attrgetter("value"))],
-    )
-    source_code = pyupgrade._fix_percent_format(source_code)
-    source_code = pyupgrade._fix_py3_plus(source_code)
 
     # and finally Black!
     source_code = black.format_str(
