@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __all__ = ["shed"]
 
 _version_map = {
@@ -131,13 +131,13 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         all_filenames = [f for f in all_filenames if autoflake.is_python_file(f)]
 
     for fname in all_filenames:
-        with open(fname) as handle:
-            on_disk = handle.read()
+        try:
+            with open(fname) as handle:
+                on_disk = handle.read()
+        except OSError:
+            continue  # Permissions issue, or file deleted since last commit.
         result = shed(source_code=on_disk, first_party_imports=first_party_imports)
         if result == on_disk:
             continue
-        assert result == shed(
-            source_code=result, first_party_imports=first_party_imports
-        )
         with open(fname, mode="w") as fh:
             fh.write(result)

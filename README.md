@@ -32,6 +32,9 @@ or in single-file mode.
 
 ## Changelog
 
+#### 0.0.5 - 2020-05-29
+- better handling of permissions issues or deleted files
+
 #### 0.0.4 - 2020-05-13
 - compatible with pyupgrade==2.4
 
