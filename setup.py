@@ -25,7 +25,7 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Programming Language :: Python :: 3 :: Only",
     ],
