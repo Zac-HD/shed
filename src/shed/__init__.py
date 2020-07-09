@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.0.5"
+__version__ = "0.1.0"
 __all__ = ["shed"]
 
 _version_map = {
@@ -63,11 +63,9 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     source_code = pyupgrade._fix_py3_plus(source_code, min_version=min_version)
 
     # Then isort...
-    # TODO: swap as soon as 5.0 is released for black compat & clean config handling
-    # source_code = isort.api.sorted_imports(
-    #     file_contents=source_code, known_first_party=first_party_imports,
-    # )
-    source_code = isort.SortImports(file_contents=source_code).output
+    source_code = isort.code(
+        source_code, known_first_party=first_party_imports, profile="black"
+    )
 
     # and finally Black!
     source_code = black.format_str(

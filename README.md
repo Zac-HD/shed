@@ -25,12 +25,25 @@ or in single-file mode.
 
 1. Runs `autoflake`, to remove unused imports and variables, and expand star-imports
 2. Runs `pyupgrade`, with autodetected minimum version >= py36
-3. Runs `isort` (configuration support waiting on 5.0), with autodetected first-party imports
+3. Runs `isort`, with autodetected first-party imports
 4. Runs `black`, with autodetected minimum version >= py36
 5. (WIP) Runs some custom fixers based on `flake8-bugbear`
 6. Iterates those steps until the source code stops changing.
 
+The version detection logic is provided by `black`, with an extra step to discard
+versions before Python 3.6.
+
+First-party import detection is disabled in single-file mode.  If you run `shed`
+in a Git repository, the name of the root directory is assumed to be a
+first-party import.  [`src` layout](https://hynek.me/articles/testing-packaging/)
+packages are also automatically detected, i.e. the `foo` in any paths like
+`.../src/foo/__init__.py`.
+
 ## Changelog
+
+#### 0.1.0 - 2020-07-09
+- automatic and isolated `isort` configuration.
+  I am now happy to recommend that you try `shed`!
 
 #### 0.0.5 - 2020-05-29
 - better handling of permissions issues or deleted files
