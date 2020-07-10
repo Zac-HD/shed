@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = ["shed"]
 
 _version_map = {
@@ -64,7 +64,10 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
 
     # Then isort...
     source_code = isort.code(
-        source_code, known_first_party=first_party_imports, profile="black"
+        source_code,
+        known_first_party=first_party_imports,
+        profile="black",
+        combine_as_imports=True,
     )
 
     # and finally Black!

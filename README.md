@@ -25,7 +25,7 @@ or in single-file mode.
 
 1. Runs `autoflake`, to remove unused imports and variables, and expand star-imports
 2. Runs `pyupgrade`, with autodetected minimum version >= py36
-3. Runs `isort`, with autodetected first-party imports
+3. Runs `isort`, with autodetected first-party imports and `--ca --profile=black` args
 4. Runs `black`, with autodetected minimum version >= py36
 5. (WIP) Runs some custom fixers based on `flake8-bugbear`
 6. Iterates those steps until the source code stops changing.
@@ -40,6 +40,9 @@ packages are also automatically detected, i.e. the `foo` in any paths like
 `.../src/foo/__init__.py`.
 
 ## Changelog
+
+#### 0.1.1 - 2020-07-10
+- combine "as" imports with `isort` on a single line
 
 #### 0.1.0 - 2020-07-09
 - automatic and isolated `isort` configuration.
