@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __all__ = ["shed"]
 
 _version_map = {
@@ -61,6 +61,7 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
     source_code = pyupgrade._fix_percent_format(source_code)
     source_code = pyupgrade._fix_py3_plus(source_code, min_version=min_version)
+    source_code = pyupgrade._fix_py36_plus(source_code)
 
     # Then isort...
     source_code = isort.code(
@@ -135,10 +136,11 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         try:
             with open(fname) as handle:
                 on_disk = handle.read()
-        except OSError:
-            continue  # Permissions issue, or file deleted since last commit.
-        result = shed(source_code=on_disk, first_party_imports=first_party_imports)
-        if result == on_disk:
+        except (OSError, UnicodeError) as err:
+            # Permissions or encoding issue, or file deleted since last commit.
+            print(f"skipping {fname!r} due to {err}")
             continue
-        with open(fname, mode="w") as fh:
-            fh.write(result)
+        result = shed(source_code=on_disk, first_party_imports=first_party_imports)
+        if result != on_disk:
+            with open(fname, mode="w") as fh:
+                fh.write(result)

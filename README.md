@@ -41,6 +41,10 @@ packages are also automatically detected, i.e. the `foo` in any paths like
 
 ## Changelog
 
+#### 0.1.2 - 2020-07-13
+- run `pyupgrade --py36-plus` logic too
+- print each file skipped due to permissions or encoding issues
+
 #### 0.1.1 - 2020-07-10
 - combine "as" imports with `isort` on a single line
 
