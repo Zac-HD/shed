@@ -37,7 +37,7 @@ adding the following to your `.pre-commit-config.yaml`:
 
 ```yaml
 repos:
-- repo: https://github.com/Zac-HD/shed.git
+- repo: https://github.com/Zac-HD/shed
   rev: 0.0.3
   hooks:
   - id: shed
