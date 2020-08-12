@@ -8,6 +8,8 @@ from typing import NamedTuple
 
 import shed
 
+CHANGELOG = Path(__file__).parent.parent / "CHANGELOG.md"
+
 
 class Version(NamedTuple):
     major: int
@@ -22,12 +24,11 @@ class Version(NamedTuple):
 @lru_cache()
 def get_releases():
     pattern = re.compile(r"^#### (\d+\.\d+\.\d+) - (\d\d\d\d-\d\d-\d\d)$")
-    with open(Path(__file__).parent.parent / "README.md") as f:
-        return tuple(
-            (Version.from_string(match.group(1)), match.group(2))
-            for match in map(pattern.match, f)
-            if match is not None
-        )
+    return tuple(
+        (Version.from_string(match.group(1)), match.group(2))
+        for match in map(pattern.match, CHANGELOG.read_text().splitlines())
+        if match is not None
+    )
 
 
 def test_last_release_against_changelog():
