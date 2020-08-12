@@ -90,4 +90,4 @@ if __name__ == "__main__":
         repo = git.Repo(CHANGELOG.parent)
         if last_version not in repo.tags:
             repo.create_tag(str(last_version))
-            repo.push(str(last_version))
+            repo.remotes.origin.push(str(last_version))
