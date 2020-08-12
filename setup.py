@@ -22,6 +22,7 @@ setuptools.setup(
         "black >= 19.10b0",
         "isort >= 5.0.6",
         "pyupgrade >= 2.2.1",
+        "teyit >= 0.3.2 ; python_version >= '3.9'",
     ],
     python_requires=">=3.6",
     classifiers=[

@@ -23,11 +23,17 @@ or explicitly passed a list of files to format on the command-line.
 ## Features
 `shed`...
 
-1. Runs `autoflake`, to remove unused imports and variables, and expand star-imports
-2. Runs `pyupgrade`, with autodetected minimum version >= py36
-3. Runs `isort`, with autodetected first-party imports and `--ca --profile=black` args
-4. Runs `black`, with autodetected minimum version >= py36
-6. Iterates those steps until the source code stops changing.
+- Runs [`autoflake`](https://pypi.org/project/autoflake/),
+  to remove unused imports and variables
+- Runs [`teyit`](https://pypi.org/project/teyit/), on Python 3.9 or later,
+  to replace deprecated `unittest` methods with the new aliases
+- Runs [`pyupgrade`](https://pypi.org/project/pyupgrade/),
+  with autodetected minimum version >= py36
+- Runs [`isort`](https://pypi.org/project/isort/),
+  with autodetected first-party imports and `--ca --profile=black` args
+- Runs [`black`](https://pypi.org/project/black/),
+  with autodetected minimum version >= py36
+- Iterates those steps until the source code stops changing.
 
 The version detection logic is provided by `black`, with an extra step to discard
 versions before Python 3.6.

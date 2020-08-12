@@ -18,6 +18,15 @@ import black
 import isort
 import pyupgrade
 
+try:
+    from teyit import rewrite_source as _teyit_rewrite_source
+except ImportError:
+    assert sys.version_info < (3, 9)
+
+    def _teyit_rewrite_source(source: str) -> str:
+        return source
+
+
 __version__ = "0.1.3"
 __all__ = ["shed"]
 
@@ -56,6 +65,9 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
         remove_duplicate_keys=True,
         remove_unused_variables=True,
     )
+
+    # Use teyit to replace old unittest.assertX methods on Python 3.9+
+    source_code = _teyit_rewrite_source(source_code)
 
     # Now pyupgrade - see pyupgrade._fix_file
     source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
