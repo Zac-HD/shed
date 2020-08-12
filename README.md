@@ -17,8 +17,8 @@ There are no configuration options at all, but if the defaults aren't for you
 that's OK - you can still use the underlying tools directly and get most of
 the same effect... though you'll have to configure them yourself.
 
-Only works in git repos, because version control is great and so is `git ls-files`,
-or in single-file mode.
+`shed` must either be run in a git repo to auto-detect the files to format,
+or explicitly passed a list of files to format on the command-line.
 
 ## Features
 `shed`...
@@ -27,14 +27,12 @@ or in single-file mode.
 2. Runs `pyupgrade`, with autodetected minimum version >= py36
 3. Runs `isort`, with autodetected first-party imports and `--ca --profile=black` args
 4. Runs `black`, with autodetected minimum version >= py36
-5. (WIP) Runs some custom fixers based on `flake8-bugbear`
 6. Iterates those steps until the source code stops changing.
 
 The version detection logic is provided by `black`, with an extra step to discard
 versions before Python 3.6.
 
-First-party import detection is disabled in single-file mode.  If you run `shed`
-in a Git repository, the name of the root directory is assumed to be a
+If you run `shed` in a Git repository, the name of the root directory is assumed to be a
 first-party import.  [`src` layout](https://hynek.me/articles/testing-packaging/)
 packages are also automatically detected, i.e. the `foo` in any paths like
 `.../src/foo/__init__.py`.
