@@ -9,6 +9,7 @@ attrs==19.3.0             # via black, flake8-bugbear
 autoflake==1.3.1          # via shed (setup.py)
 black==19.10b0            # via shed (setup.py)
 click==7.1.2              # via black
+docformatter==1.3.1       # via shed (setup.py)
 flake8-bugbear==20.1.4    # via -r deps/check.in
 flake8-builtins==1.5.3    # via -r deps/check.in
 flake8-comprehensions==3.2.3  # via -r deps/check.in
@@ -34,4 +35,5 @@ tokenize-rt==4.0.0        # via pyupgrade
 toml==0.10.1              # via black
 typed-ast==1.4.1          # via black, mypy
 typing-extensions==3.7.4.2  # via mypy
+untokenize==0.1.1         # via docformatter
 zipp==3.1.0               # via importlib-metadata

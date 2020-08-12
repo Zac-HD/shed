@@ -27,6 +27,8 @@ or explicitly passed a list of files to format on the command-line.
   to remove unused imports and variables
 - Runs [`teyit`](https://pypi.org/project/teyit/), on Python 3.9 or later,
   to replace deprecated `unittest` methods with the new aliases
+- Runs [`docformatter`](https://pypi.org/project/docformatter/),
+  to format and rewrap docstrings
 - Runs [`pyupgrade`](https://pypi.org/project/pyupgrade/),
   with autodetected minimum version >= py36
 - Runs [`isort`](https://pypi.org/project/isort/),

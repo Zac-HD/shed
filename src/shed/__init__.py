@@ -1,8 +1,7 @@
-"""
-Shed canoncalises your code.
+"""Shed canoncalises your code.
 
-It works on all Python files in the current git repository;
-or you can pass the names of specific files to format instead.
+It works on all Python files in the current git repository; or you can
+pass the names of specific files to format instead.
 """
 
 import argparse
@@ -15,6 +14,7 @@ from typing import FrozenSet
 
 import autoflake
 import black
+import docformatter
 import isort
 import pyupgrade
 
@@ -69,6 +69,9 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     # Use teyit to replace old unittest.assertX methods on Python 3.9+
     source_code = _teyit_rewrite_source(source_code)
 
+    # Docformatter fixes up docstring formatting
+    source_code = docformatter.format_code(source_code)
+
     # Now pyupgrade - see pyupgrade._fix_file
     source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
     source_code = pyupgrade._fix_percent_format(source_code)
@@ -96,7 +99,7 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
 
 
 def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
-    """Try to work out the name of the current package for first-party imports."""
+    """Guess the name of the current package for first-party imports."""
     try:
         base = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
