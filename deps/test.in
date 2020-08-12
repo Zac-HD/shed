@@ -1,0 +1,6 @@
+# Top-level dependencies for `tox -e test`
+hypothesis
+hypothesmith
+pytest
+pytest-cov
+pytest-xdist
