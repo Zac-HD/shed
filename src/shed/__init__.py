@@ -18,7 +18,7 @@ import black
 import isort
 import pyupgrade
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __all__ = ["shed"]
 
 _version_map = {
@@ -83,6 +83,23 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     return shed(source_code=source_code, first_party_imports=first_party_imports)
 
 
+def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
+    """Try to work out the name of the current package for first-party imports."""
+    try:
+        base = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            check=True,
+            timeout=10,
+            stdout=subprocess.PIPE,
+            universal_newlines=True,
+            cwd=cwd,
+        ).stdout.strip()
+    except subprocess.SubprocessError:
+        return frozenset()
+    provides = {init.name for init in Path(base).glob("**/src/*/__init__.py")}
+    return frozenset(p for p in {Path(base).name} | provides if p.isidentifier())
+
+
 def cli() -> None:  # pragma: no cover  # mutates things in-place, will test later.
     """Execute the `shed` CLI."""
     # TODO: make this provide useful CLI help and usage hints
@@ -97,48 +114,35 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
     args = parser.parse_args()
 
     if args.files:
-        first_party_imports: FrozenSet[str] = frozenset()
         all_filenames = args.files
         for f in all_filenames:
             if not autoflake.is_python_file(f):
                 print(f"{f!r} does not seem to be a Python file")  # noqa
                 sys.exit(1)
     else:
-        # Try to work out the name of the current package for first-party imports
+        # Get all tracked files from `git ls-files`
         try:
-            base = subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"],
+            all_filenames = subprocess.run(
+                ["git", "ls-files"],
                 check=True,
                 timeout=10,
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
-            ).stdout.strip()
+            ).stdout.splitlines()
         except subprocess.SubprocessError:
             print("Doesn't seem to be a git repo; pass filenames to format.")  # noqa
             sys.exit(1)
 
-        provides = {Path(base).name} | {
-            init.name for init in Path(base).glob("**/src/*/__init__.py")
-        }
-        first_party_imports = frozenset(p for p in provides if p.isidentifier())
-
-        # Get all tracked files from `git ls-files`
-        all_filenames = subprocess.run(
-            ["git", "ls-files"],
-            check=True,
-            timeout=10,
-            stdout=subprocess.PIPE,
-            universal_newlines=True,
-        ).stdout.splitlines()
         all_filenames = [f for f in all_filenames if autoflake.is_python_file(f)]
 
+    first_party_imports = _guess_first_party_modules()
     for fname in all_filenames:
         try:
             with open(fname) as handle:
                 on_disk = handle.read()
         except (OSError, UnicodeError) as err:
             # Permissions or encoding issue, or file deleted since last commit.
-            print(f"skipping {fname!r} due to {err}")
+            print(f"skipping {fname!r} due to {err}")  # noqa
             continue
         result = shed(source_code=on_disk, first_party_imports=first_party_imports)
         if result != on_disk:

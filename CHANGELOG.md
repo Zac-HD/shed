@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.1.3 - 2020-08-12
+- detect first-party imports in single-file mode as well as all-repo mode
+
 #### 0.1.2 - 2020-07-13
 - run `pyupgrade --py36-plus` logic too
 - print each file skipped due to permissions or encoding issues

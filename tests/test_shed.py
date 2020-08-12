@@ -29,6 +29,14 @@ def test_shed_is_idempotent(source_code, provides):
     assert result == shed.shed(source_code=result, first_party_imports=provides)
 
 
+def test_guesses_shed_is_first_party():
+    assert shed._guess_first_party_modules() == frozenset(["shed"])
+
+
+def test_guesses_empty_for_non_repo_dirs():
+    assert shed._guess_first_party_modules("../..") == frozenset()
+
+
 python_files = []
 for base in sorted(set(site.PREFIXES)):
     for dirname, _, files in os.walk(base):
