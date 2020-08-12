@@ -67,3 +67,15 @@ if __name__ == "__main__":
     if Version.from_string(SHED_VERSION) != last_version:
         subs = (f'__version__ = "{SHED_VERSION}"', f'__version__ = "{last_version}"')
         INIT_FILE.write_text(INIT_FILE.read_text().replace(*subs))
+
+    # For our release automation, ensure that we've tagged the latest version.
+    # This is only ever expected to run in CI, just before uploading to PyPI.
+    import sys
+
+    if "--ensure-tag" in sys.argv:
+        import git
+
+        repo = git.Repo(CHANGELOG.parent)
+        if last_version not in repo.tags:
+            repo.create_tag(str(last_version))
+            repo.push(str(last_version))
