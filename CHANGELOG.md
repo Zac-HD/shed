@@ -1,5 +1,13 @@
 # Changelog
 
+#### 0.2.0 - 2020-08-12
+- use [`pybetter`](https://pypi.org/project/pybetter/) codemods
+- use [`teyit`](https://pypi.org/project/teyit/) to replace deprecated
+  `unittest` methods with the new aliases (if running on Python 3.9+)
+- use [`docformatter`](https://pypi.org/project/docformatter/) to format docstrings
+- new logic inspired by [`blacken-docs`](https://pypi.org/project/blacken-docs/)
+  to format code in docstrings, via the new `shed.docshed` function
+
 #### 0.1.3 - 2020-08-12
 - detect first-party imports in single-file mode as well as all-repo mode
 

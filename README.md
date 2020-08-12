@@ -2,14 +2,9 @@
 `shed` canonicalises Python code.  Shed your legacy, stop bikeshedding, and move on.  Black++
 
 ## What does it do?
-`shed` is basically [`black`](https://pypi.org/project/black/)
-plus [`autoflake`](https://pypi.org/project/autoflake/)
-plus [`isort`](https://pypi.org/project/isort/)
-plus [`pyupgrade`](https://pypi.org/project/pyupgrade/)
-plus some custom fixers.
-
-`shed` is *all about* [convention over configuration](https://en.wikipedia.org/wiki/Convention_over_configuration).
-It's designed to be a single opinionated tool that fully canonicalises my
+`shed` is the *maximally opinionated* autoformatting tool.  It's *all about*
+[convention over configuration](https://en.wikipedia.org/wiki/Convention_over_configuration),
+and designed to be a single opinionated tool that fully canonicalises my
 code - formatting, imports, updates, and every other fix I can possibly
 automate.
 
@@ -33,6 +28,8 @@ or explicitly passed a list of files to format on the command-line.
   with autodetected minimum version >= py36
 - Runs [`isort`](https://pypi.org/project/isort/),
   with autodetected first-party imports and `--ca --profile=black` args
+- Runs [`pybetter`](https://pypi.org/project/pybetter/),
+  applying [`libCST`](https://pypi.org/project/libCST/)-based codemods
 - Runs [`black`](https://pypi.org/project/black/),
   with autodetected minimum version >= py36
 - Runs logic inspired by [`blacken-docs`](https://pypi.org/project/blacken-docs/)
@@ -54,7 +51,7 @@ adding the following to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.1.3
+  rev: 0.2.0
   hooks:
   - id: shed
 ```

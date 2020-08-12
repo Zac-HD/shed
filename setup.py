@@ -22,6 +22,7 @@ setuptools.setup(
         "black >= 19.10b0",
         "docformatter >= 1.3.1",
         "isort >= 5.0.6",
+        "pybetter >= 0.3.5",
         "pyupgrade >= 2.2.1",
         "teyit >= 0.3.2 ; python_version >= '3.9'",
     ],

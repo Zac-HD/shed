@@ -9,7 +9,7 @@ f"no substitutions"
 
 x, y = 1, 2
 
-f"no substitutions"
+"no substitutions"
 "A{b}".format(b=2)
 "{}, {!r}".format(12, 34)
 f"{x}, {y!r}"

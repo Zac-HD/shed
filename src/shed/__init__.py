@@ -18,6 +18,8 @@ import autoflake
 import black
 import docformatter
 import isort
+import pybetter.cli
+import pybetter.improvements
 import pyupgrade
 
 try:
@@ -29,7 +31,7 @@ except ImportError:
         return source
 
 
-__version__ = "0.1.3"
+__version__ = "0.2.0"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -89,6 +91,13 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
         known_first_party=first_party_imports,
         profile="black",
         combine_as_imports=True,
+    )
+
+    # Then apply pybetter's fixes with libcst
+    source_code, _ = pybetter.cli.process_file(
+        source_code,
+        improvements=set(pybetter.cli.ALL_IMPROVEMENTS)
+        - {pybetter.improvements.FixMissingAllAttribute},
     )
 
     # and finally Black!
