@@ -12,7 +12,7 @@ import sys
 import textwrap
 from operator import attrgetter
 from pathlib import Path
-from typing import FrozenSet, Match
+from typing import FrozenSet, Match, Tuple
 
 import autoflake
 import black
@@ -24,11 +24,11 @@ import pyupgrade
 
 try:
     from teyit import rewrite_source as _teyit_rewrite_source
-except ImportError:
+except ImportError:  # pragma: no cover  # on Python 3.9
     assert sys.version_info < (3, 9)
 
-    def _teyit_rewrite_source(source: str) -> str:
-        return source
+    def _teyit_rewrite_source(source: str) -> Tuple[str, object]:
+        return source, None
 
 
 __version__ = "0.2.0"
@@ -61,6 +61,7 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     min_version = _version_map[min(target_versions, key=attrgetter("value"))]
 
     input_code = source_code
+    source_code += "\n"
     # Autoflake first:
     source_code = autoflake.fix_code(
         source_code,
@@ -71,7 +72,7 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     )
 
     # Use teyit to replace old unittest.assertX methods on Python 3.9+
-    source_code = _teyit_rewrite_source(source_code)
+    source_code, _ = _teyit_rewrite_source(source_code)
 
     # Docformatter fixes up docstring formatting
     source_code = docformatter.format_code(source_code)
