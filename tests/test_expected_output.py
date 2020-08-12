@@ -8,7 +8,7 @@ import shed
 
 
 @pytest.mark.parametrize(
-    "filename", (pathlib.Path(__file__).parent / "recorded").glob("*.txt")
+    "filename", (pathlib.Path(__file__).parent / "recorded").glob("*.txt"), ids=repr
 )
 def test_saved_examples(filename):
     """Replay and save expected outputs from `shed`.

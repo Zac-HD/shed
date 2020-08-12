@@ -1,0 +1,44 @@
+'''
+
+Summary line.
+
+.. code:: python
+
+    print(
+        'hello world'
+               )
+
+```python
+import b
+import a
+import c
+
+def x(foo:int="bar"
+):
+ a.foo(b.bar(
+\
+ ))
+
+
+```
+
+
+'''
+
+================================================================================
+
+"""Summary line.
+
+.. code:: python
+
+    print("hello world")
+
+```python
+import a
+import b
+
+
+def x(foo: int = "bar"):
+    a.foo(b.bar())
+```
+"""
