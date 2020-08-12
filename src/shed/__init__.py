@@ -6,11 +6,13 @@ pass the names of specific files to format instead.
 
 import argparse
 import functools
+import re
 import subprocess
 import sys
+import textwrap
 from operator import attrgetter
 from pathlib import Path
-from typing import FrozenSet
+from typing import FrozenSet, Match
 
 import autoflake
 import black
@@ -28,7 +30,7 @@ except ImportError:
 
 
 __version__ = "0.1.3"
-__all__ = ["shed"]
+__all__ = ["shed", "docshed"]
 
 _version_map = {
     black.TargetVersion.PY36: (3, 6),
@@ -72,6 +74,9 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     # Docformatter fixes up docstring formatting
     source_code = docformatter.format_code(source_code)
 
+    # Then shed.docshed (below) formats any code blocks in documentation
+    source_code = docshed(source=source_code, first_party_imports=first_party_imports)
+
     # Now pyupgrade - see pyupgrade._fix_file
     source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
     source_code = pyupgrade._fix_percent_format(source_code)
@@ -91,11 +96,60 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
         source_code, mode=black.FileMode(target_versions=target_versions)
     )
 
+    # Remove any extra trailing whitespace
+    source_code = source_code.rstrip() + "\n"
+
     if source_code == input_code:
         return source_code
     # If we've modified the code, iterate to a fixpoint.
     # e.g. "pass;#" -> "pass\n#\n" -> "#\n"
     return shed(source_code=source_code, first_party_imports=first_party_imports)
+
+
+@functools.lru_cache()
+def docshed(*, source: str, first_party_imports: FrozenSet[str] = frozenset()) -> str:
+    """Process Python code blocks embedded in documentation."""
+    # Inspired by the blacken-docs package.
+    assert isinstance(source, str)
+    assert isinstance(first_party_imports, frozenset)
+    assert all(isinstance(name, str) for name in first_party_imports)
+    assert all(name.isidentifier() for name in first_party_imports)
+    markdown_pattern = re.compile(
+        r"(?P<before>^(?P<indent> *)```python\n)"
+        r"(?P<code>.*?)"
+        r"(?P<after>^(?P=indent)```\s*$)",
+        flags=re.DOTALL | re.MULTILINE,
+    )
+    rst_pattern = re.compile(
+        r"(?P<before>"
+        r"^(?P<indent> *)\.\. (jupyter-execute::|(code|code-block|sourcecode|ipython):: "
+        r"(python|py|sage|python3|py3|numpy))\n"
+        r"((?P=indent) +:.*\n)*"
+        r"\n*"
+        r")"
+        r"(?P<code>(^((?P=indent) +.*)?\n)+)",
+        flags=re.MULTILINE,
+    )
+
+    def _md_match(match: Match[str]) -> str:
+        code = textwrap.dedent(match["code"])
+        code = shed(source_code=code, first_party_imports=first_party_imports)
+        code = textwrap.indent(code, match["indent"])
+        return f'{match["before"]}{code}{match["after"]}'
+
+    def _rst_match(match: Match[str]) -> str:
+        indent_pattern = re.compile("^ +(?=[^ ])", re.MULTILINE)
+        trailing_newline_pattern = re.compile(r"\n+\Z", re.MULTILINE)
+        min_indent = min(indent_pattern.findall(match["code"]))
+        trailing_ws_match = trailing_newline_pattern.search(match["code"])
+        assert trailing_ws_match
+        trailing_ws = trailing_ws_match.group()
+        code = textwrap.dedent(match["code"])
+        code = shed(source_code=code, first_party_imports=first_party_imports)
+        code = textwrap.indent(code, min_indent)
+        return f'{match["before"]}{code.rstrip()}{trailing_ws}'
+
+    return rst_pattern.sub(_rst_match, markdown_pattern.sub(_md_match, source))
 
 
 def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
@@ -148,7 +202,11 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
             print("Doesn't seem to be a git repo; pass filenames to format.")  # noqa
             sys.exit(1)
 
-        all_filenames = [f for f in all_filenames if autoflake.is_python_file(f)]
+        all_filenames = [
+            f
+            for f in all_filenames
+            if f.endswith((".md", ".rst")) or autoflake.is_python_file(f)
+        ]
 
     first_party_imports = _guess_first_party_modules()
     for fname in all_filenames:
@@ -159,7 +217,10 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
             # Permissions or encoding issue, or file deleted since last commit.
             print(f"skipping {fname!r} due to {err}")  # noqa
             continue
-        result = shed(source_code=on_disk, first_party_imports=first_party_imports)
+        if fname.endswith((".md", ".rst")):
+            result = docshed(source=on_disk, first_party_imports=first_party_imports)
+        else:
+            result = shed(source_code=on_disk, first_party_imports=first_party_imports)
         if result != on_disk:
             with open(fname, mode="w") as fh:
                 fh.write(result)

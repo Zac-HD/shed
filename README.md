@@ -35,6 +35,8 @@ or explicitly passed a list of files to format on the command-line.
   with autodetected first-party imports and `--ca --profile=black` args
 - Runs [`black`](https://pypi.org/project/black/),
   with autodetected minimum version >= py36
+- Runs logic inspired by [`blacken-docs`](https://pypi.org/project/blacken-docs/)
+  to format code in docstrings (via the `shed.docshed` function)
 - Iterates those steps until the source code stops changing.
 
 The version detection logic is provided by `black`, with an extra step to discard
