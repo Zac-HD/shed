@@ -68,6 +68,18 @@ if __name__ == "__main__":
         subs = (f'__version__ = "{SHED_VERSION}"', f'__version__ = "{last_version}"')
         INIT_FILE.write_text(INIT_FILE.read_text().replace(*subs))
 
+    # Similarly, update the pre-commit config example in the README
+    README = CHANGELOG.parent / "README.md"
+    current = README.read_text()
+    wanted = re.sub(
+        pattern=r"^  rev: (\d+\.\d+\.\d+)$",
+        repl=f"  rev: {last_version}",
+        string=current,
+        flags=re.MULTILINE,
+    )
+    if current != wanted:
+        README.write_text(wanted)
+
     # For our release automation, ensure that we've tagged the latest version.
     # This is only ever expected to run in CI, just before uploading to PyPI.
     import sys
