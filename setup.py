@@ -20,10 +20,9 @@ setuptools.setup(
     install_requires=[
         "autoflake >= 1.3.1",
         "black >= 19.10b0",
-        "docformatter >= 1.3.1",
-        "isort >= 5.0.6",
+        "isort >= 5.4.0",
         "pybetter >= 0.3.5",
-        "pyupgrade >= 2.2.1",
+        "pyupgrade >= 2.7.2",
         "teyit >= 0.3.2 ; python_version >= '3.9'",
     ],
     python_requires=">=3.6",

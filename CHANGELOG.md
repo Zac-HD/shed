@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.2.1 - 2020-08-13
+- drop `docformatter` due to poor performance
+- reorganise remaining passes for speed and split out `--refactor` passes
+
 #### 0.2.0 - 2020-08-12
 - use [`pybetter`](https://pypi.org/project/pybetter/) codemods
 - use [`teyit`](https://pypi.org/project/teyit/) to replace deprecated

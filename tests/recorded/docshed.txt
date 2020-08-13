@@ -1,5 +1,4 @@
 '''
-
 Summary line.
 
 .. code:: python
@@ -21,13 +20,12 @@ def x(foo:int="bar"
 
 
 ```
-
-
 '''
 
 ================================================================================
 
-"""Summary line.
+"""
+Summary line.
 
 .. code:: python
 

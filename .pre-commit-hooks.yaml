@@ -2,4 +2,5 @@
   name: shed
   entry: shed
   language: python
-  types: [file, python]
+  types: [file]
+  files: .*\.(py|md|rst)

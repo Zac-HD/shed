@@ -1,0 +1,28 @@
+not (x in y)
+z == None
+a == True
+a == False
+
+with a:
+    with b:
+        pass
+
+with a:
+    # comment
+    with b:
+        pass
+
+================================================================================
+
+x not in y
+z is None
+a
+not a
+
+with a, b:
+    pass
+
+with a:
+    # comment
+    with b:
+        pass

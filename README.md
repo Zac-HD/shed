@@ -20,21 +20,17 @@ or explicitly passed a list of files to format on the command-line.
 
 - Runs [`autoflake`](https://pypi.org/project/autoflake/),
   to remove unused imports and variables
-- Runs [`teyit`](https://pypi.org/project/teyit/), on Python 3.9 or later,
-  to replace deprecated `unittest` methods with the new aliases
-- Runs [`docformatter`](https://pypi.org/project/docformatter/),
-  to format and rewrap docstrings
 - Runs [`pyupgrade`](https://pypi.org/project/pyupgrade/),
   with autodetected minimum version >= py36
 - Runs [`isort`](https://pypi.org/project/isort/),
   with autodetected first-party imports and `--ca --profile=black` args
-- Runs [`pybetter`](https://pypi.org/project/pybetter/),
-  applying [`libCST`](https://pypi.org/project/libCST/)-based codemods
 - Runs [`black`](https://pypi.org/project/black/),
   with autodetected minimum version >= py36
 - Runs logic inspired by [`blacken-docs`](https://pypi.org/project/blacken-docs/)
-  to format code in docstrings (via the `shed.docshed` function)
-- Iterates those steps until the source code stops changing.
+  to format code in docstrings, markdown, and restructured text docs.
+- If `shed --refactor`, also runs [`pybetter`](https://pypi.org/project/pybetter/)
+  codemods and users [`teyit`](https://pypi.org/project/teyit/) to replace deprecated
+  `unittest` methods with the new aliases on Python 3.9 or later.
 
 The version detection logic is provided by `black`, with an extra step to discard
 versions before Python 3.6.
@@ -51,10 +47,13 @@ adding the following to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.2.0
+  rev: 0.2.1
   hooks:
   - id: shed
 ```
+
+This is often considerably faster for large projects, because `pre-commit`
+can avoid running `shed` on unchanged files.
 
 ## Changelog
 

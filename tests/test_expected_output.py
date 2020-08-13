@@ -23,7 +23,7 @@ def test_saved_examples(filename):
     """
     joiner = "\n\n" + "=" * 80 + "\n\n"
     input_, expected, *_ = map(str.strip, (filename.read_text() + joiner).split(joiner))
-    result = shed.shed(source_code=input_)
+    result = shed.shed(source_code=input_, refactor=True)
     if result.strip() != expected:
         filename.write_text(joiner.join([input_, result]))
         raise AssertionError(filename.name + " changed formatting")

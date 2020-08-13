@@ -16,11 +16,14 @@ from typing import FrozenSet, Match, Tuple
 
 import autoflake
 import black
-import docformatter
 import isort
-import pybetter.cli
-import pybetter.improvements
+import libcst
 import pyupgrade
+from pybetter.cli import (
+    ALL_IMPROVEMENTS,
+    FixMissingAllAttribute,
+    FixParenthesesInReturn,
+)
 
 try:
     from teyit import rewrite_source as _teyit_rewrite_source
@@ -31,7 +34,7 @@ except ImportError:  # pragma: no cover  # on Python 3.9
         return source, None
 
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -39,12 +42,22 @@ _version_map = {
     black.TargetVersion.PY37: (3, 7),
     black.TargetVersion.PY38: (3, 8),
 }
+_pybetter_fixers = tuple(
+    fix().improve
+    for fix in set(ALL_IMPROVEMENTS) - {FixMissingAllAttribute, FixParenthesesInReturn}
+)
 
 
 @functools.lru_cache()
-def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset()) -> str:
+def shed(
+    source_code: str,
+    *,
+    refactor: bool = False,
+    first_party_imports: FrozenSet[str] = frozenset(),
+) -> str:
     """Process the source code of a single module."""
     assert isinstance(source_code, str)
+    assert isinstance(refactor, bool)
     assert isinstance(first_party_imports, frozenset)
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)
@@ -60,64 +73,57 @@ def shed(*, source_code: str, first_party_imports: FrozenSet[str] = frozenset())
     assert target_versions
     min_version = _version_map[min(target_versions, key=attrgetter("value"))]
 
-    input_code = source_code
-    source_code += "\n"
-    # Autoflake first:
-    source_code = autoflake.fix_code(
-        source_code,
-        expand_star_imports=True,
-        remove_all_unused_imports=True,
-        remove_duplicate_keys=True,
-        remove_unused_variables=True,
-    )
-
-    # Use teyit to replace old unittest.assertX methods on Python 3.9+
-    source_code, _ = _teyit_rewrite_source(source_code)
-
-    # Docformatter fixes up docstring formatting
-    source_code = docformatter.format_code(source_code)
-
+    if refactor:
+        # Some tools assume that the file is multi-line, but empty files are valid input.
+        source_code += "\n"
+        # Use teyit to replace old unittest.assertX methods on Python 3.9+
+        source_code, _ = _teyit_rewrite_source(source_code)
+        # Then apply pybetter's fixes with libcst
+        tree = libcst.parse_module(source_code)
+        for fixer in _pybetter_fixers:
+            tree = fixer(tree)
+        source_code = tree.code
     # Then shed.docshed (below) formats any code blocks in documentation
     source_code = docshed(source=source_code, first_party_imports=first_party_imports)
-
-    # Now pyupgrade - see pyupgrade._fix_file
+    # And pyupgrade - see pyupgrade._fix_file - is our last stable fixer
     source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
     source_code = pyupgrade._fix_percent_format(source_code)
     source_code = pyupgrade._fix_py3_plus(source_code, min_version=min_version)
     source_code = pyupgrade._fix_py36_plus(source_code)
 
-    # Then isort...
-    source_code = isort.code(
-        source_code,
-        known_first_party=first_party_imports,
-        profile="black",
-        combine_as_imports=True,
-    )
-
-    # Then apply pybetter's fixes with libcst
-    source_code, _ = pybetter.cli.process_file(
-        source_code,
-        improvements=set(pybetter.cli.ALL_IMPROVEMENTS)
-        - {pybetter.improvements.FixMissingAllAttribute},
-    )
-
-    # and finally Black!
-    source_code = black.format_str(
-        source_code, mode=black.FileMode(target_versions=target_versions)
-    )
+    # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
+    # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore loop until
+    # neither of them have made a change in the last loop body, trusting that
+    # `black` itself is idempotent because that's tested upstream.
+    prev = ""
+    black_mode = black.FileMode(target_versions=target_versions)
+    while prev != source_code:
+        prev = source_code = black.format_str(source_code, mode=black_mode)
+        source_code = autoflake.fix_code(
+            source_code,
+            expand_star_imports=True,
+            remove_all_unused_imports=True,
+            remove_duplicate_keys=True,
+            remove_unused_variables=True,
+        )
+        source_code = isort.code(
+            source_code,
+            known_first_party=first_party_imports,
+            profile="black",
+            combine_as_imports=True,
+        )
 
     # Remove any extra trailing whitespace
-    source_code = source_code.rstrip() + "\n"
-
-    if source_code == input_code:
-        return source_code
-    # If we've modified the code, iterate to a fixpoint.
-    # e.g. "pass;#" -> "pass\n#\n" -> "#\n"
-    return shed(source_code=source_code, first_party_imports=first_party_imports)
+    return source_code.rstrip() + "\n"
 
 
 @functools.lru_cache()
-def docshed(*, source: str, first_party_imports: FrozenSet[str] = frozenset()) -> str:
+def docshed(
+    source: str,
+    *,
+    refactor: bool = False,
+    first_party_imports: FrozenSet[str] = frozenset(),
+) -> str:
     """Process Python code blocks embedded in documentation."""
     # Inspired by the blacken-docs package.
     assert isinstance(source, str)
@@ -143,7 +149,7 @@ def docshed(*, source: str, first_party_imports: FrozenSet[str] = frozenset()) -
 
     def _md_match(match: Match[str]) -> str:
         code = textwrap.dedent(match["code"])
-        code = shed(source_code=code, first_party_imports=first_party_imports)
+        code = shed(code, refactor=refactor, first_party_imports=first_party_imports)
         code = textwrap.indent(code, match["indent"])
         return f'{match["before"]}{code}{match["after"]}'
 
@@ -155,7 +161,7 @@ def docshed(*, source: str, first_party_imports: FrozenSet[str] = frozenset()) -
         assert trailing_ws_match
         trailing_ws = trailing_ws_match.group()
         code = textwrap.dedent(match["code"])
-        code = shed(source_code=code, first_party_imports=first_party_imports)
+        code = shed(code, refactor=refactor, first_party_imports=first_party_imports)
         code = textwrap.indent(code, min_indent)
         return f'{match["before"]}{code.rstrip()}{trailing_ws}'
 
@@ -184,6 +190,11 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
     # TODO: make this provide useful CLI help and usage hints
     # TODO: single-file mode with optional min_version support
     parser = argparse.ArgumentParser(prog="shed", description=__doc__.strip())
+    parser.add_argument(
+        "--refactor",
+        action="store_true",
+        help="Run additional passes to refactor code",
+    )
     parser.add_argument(
         nargs="*",
         metavar="file",
@@ -227,10 +238,11 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
             # Permissions or encoding issue, or file deleted since last commit.
             print(f"skipping {fname!r} due to {err}")  # noqa
             continue
+        kwargs = {"refactor": args.refactor, "first_party_imports": first_party_imports}
         if fname.endswith((".md", ".rst")):
-            result = docshed(source=on_disk, first_party_imports=first_party_imports)
+            result = docshed(on_disk, **kwargs)
         else:
-            result = shed(source_code=on_disk, first_party_imports=first_party_imports)
+            result = shed(on_disk, **kwargs)
         if result != on_disk:
             with open(fname, mode="w") as fh:
                 fh.write(result)
