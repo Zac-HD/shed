@@ -26,11 +26,11 @@ or explicitly passed a list of files to format on the command-line.
   with autodetected first-party imports and `--ca --profile=black` args
 - Runs [`black`](https://pypi.org/project/black/),
   with autodetected minimum version >= py36
-- Runs logic inspired by [`blacken-docs`](https://pypi.org/project/blacken-docs/)
-  to format code in docstrings, markdown, and restructured text docs.
+- Formats code blocks in docstrings, markdown, and restructured text docs
+  (like [`blacken-docs`](https://pypi.org/project/blacken-docs/)).
 - If `shed --refactor`, also runs [`pybetter`](https://pypi.org/project/pybetter/)
-  codemods and users [`teyit`](https://pypi.org/project/teyit/) to replace deprecated
-  `unittest` methods with the new aliases on Python 3.9 or later.
+  to fix style issues, and uses [`teyit`](https://pypi.org/project/teyit/)
+  to update deprecated `unittest` methods.
 
 The version detection logic is provided by `black`, with an extra step to discard
 versions before Python 3.6.
