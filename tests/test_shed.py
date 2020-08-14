@@ -2,6 +2,7 @@
 
 import os
 import site
+import tempfile
 from pathlib import Path
 
 import black
@@ -35,6 +36,47 @@ def test_guesses_shed_is_first_party():
 
 def test_guesses_empty_for_non_repo_dirs():
     assert shed._guess_first_party_modules("../..") == frozenset()
+
+
+@pytest.mark.parametrize(
+    "fname,should",
+    [("a.md", True), ("a.rst", True), ("a.py", True), ("does not exist", False)],
+)
+def test_should_format_autodetection(fname, should):
+    assert shed._should_format(fname) == should
+
+
+@pytest.mark.parametrize(
+    "fname,contents,changed",
+    [
+        ("a.md", "Lorem ipsum...", False),
+        ("a.rst", "Lorem ipsum...", False),
+        ("a.py", "# A comment\n", False),
+        ("a.md", "```python\nprint(\n'hello world')\n```", True),
+        ("a.rst", ".. code-block:: python\n\n    'single quotes'\n", True),
+        ("a.py", "print(\n'hello world')\n", True),
+        ("from shebang", "#! python3\nprint(\n'hello world')\n", True),
+    ],
+)
+def test_rewrite_on_disk(fname, contents, changed):
+    kwargs = {"refactor": True, "first_party_imports": frozenset()}
+    with tempfile.TemporaryDirectory() as dirname:
+        f = Path(dirname) / fname
+        f.write_text(contents)
+        ret = shed._rewrite_on_disk(str(f), **kwargs)
+        result = f.read_text()
+    assert ret == changed
+    assert changed == (contents != result)
+
+
+def test_rewrite_returns_error_message_for_nonexistent_file():
+    kwargs = {"refactor": True, "first_party_imports": frozenset()}
+    with tempfile.TemporaryDirectory() as dirname:
+        f = Path(dirname) / "nonexistent"
+        result = shed._rewrite_on_disk(str(f), **kwargs)
+        assert isinstance(result, str)
+        f.write_text("# comment\n")
+        assert shed._rewrite_on_disk(str(f), **kwargs) is False
 
 
 python_files = []

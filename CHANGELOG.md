@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.2.2 - 2020-08-14
+- use multiple processes if formatting many files (ncpus times faster!)
+
 #### 0.2.1 - 2020-08-13
 - drop `docformatter` due to poor performance
 - reorganise remaining passes for speed and split out `--refactor` passes

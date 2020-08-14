@@ -6,13 +6,14 @@ pass the names of specific files to format instead.
 
 import argparse
 import functools
+import multiprocessing
 import re
 import subprocess
 import sys
 import textwrap
 from operator import attrgetter
 from pathlib import Path
-from typing import FrozenSet, Match, Tuple
+from typing import FrozenSet, Match, Tuple, Union
 
 import autoflake
 import black
@@ -34,7 +35,7 @@ except ImportError:  # pragma: no cover  # on Python 3.9
         return source, None
 
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -168,6 +169,7 @@ def docshed(
     return rst_pattern.sub(_rst_match, markdown_pattern.sub(_md_match, source))
 
 
+@functools.lru_cache()
 def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
     """Guess the name of the current package for first-party imports."""
     try:
@@ -185,10 +187,32 @@ def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
     return frozenset(p for p in {Path(base).name} | provides if p.isidentifier())
 
 
+@functools.lru_cache(maxsize=None)
+def _should_format(fname: str) -> bool:
+    return fname.endswith((".md", ".rst")) or autoflake.is_python_file(fname)
+
+
+def _rewrite_on_disk(
+    fname: str, **kwargs: Union[bool, FrozenSet[str]]
+) -> Union[bool, str]:
+    """Return either bool(rewrote the file), or an error message string."""
+    try:
+        with open(fname) as handle:
+            on_disk = handle.read()
+    except (OSError, UnicodeError) as err:
+        # Permissions or encoding issue, or file deleted since last commit.
+        return f"skipping {fname!r} due to {err}"
+    writer = docshed if fname.endswith((".md", ".rst")) else shed
+    result = writer(on_disk, **kwargs)
+    if result != on_disk:
+        with open(fname, mode="w") as fh:
+            fh.write(result)
+    return result != on_disk
+
+
 def cli() -> None:  # pragma: no cover  # mutates things in-place, will test later.
     """Execute the `shed` CLI."""
     # TODO: make this provide useful CLI help and usage hints
-    # TODO: single-file mode with optional min_version support
     parser = argparse.ArgumentParser(prog="shed", description=__doc__.strip())
     parser.add_argument(
         "--refactor",
@@ -205,10 +229,6 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
 
     if args.files:
         all_filenames = args.files
-        for f in all_filenames:
-            if not autoflake.is_python_file(f):
-                print(f"{f!r} does not seem to be a Python file")  # noqa
-                sys.exit(1)
     else:
         # Get all tracked files from `git ls-files`
         try:
@@ -222,27 +242,21 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         except subprocess.SubprocessError:
             print("Doesn't seem to be a git repo; pass filenames to format.")  # noqa
             sys.exit(1)
+        all_filenames = [f for f in all_filenames if _should_format(f)]
 
-        all_filenames = [
-            f
-            for f in all_filenames
-            if f.endswith((".md", ".rst")) or autoflake.is_python_file(f)
-        ]
+    rewrite = functools.partial(
+        _rewrite_on_disk,
+        first_party_imports=_guess_first_party_modules(),
+        refactor=args.refactor,
+    )
 
-    first_party_imports = _guess_first_party_modules()
-    for fname in all_filenames:
-        try:
-            with open(fname) as handle:
-                on_disk = handle.read()
-        except (OSError, UnicodeError) as err:
-            # Permissions or encoding issue, or file deleted since last commit.
-            print(f"skipping {fname!r} due to {err}")  # noqa
-            continue
-        kwargs = {"refactor": args.refactor, "first_party_imports": first_party_imports}
-        if fname.endswith((".md", ".rst")):
-            result = docshed(on_disk, **kwargs)
-        else:
-            result = shed(on_disk, **kwargs)
-        if result != on_disk:
-            with open(fname, mode="w") as fh:
-                fh.write(result)
+    if len(all_filenames) <= 4:
+        # If we're only formatting a few files, starting up a process pool
+        # probably takes up more time that it saves.
+        for fname in all_filenames:
+            rewrite(fname)
+    else:
+        with multiprocessing.Pool() as pool:
+            for error_msg in pool.imap_unordered(rewrite, all_filenames):
+                if isinstance(error_msg, str):
+                    print(error_msg)  # noqa
