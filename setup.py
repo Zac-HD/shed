@@ -20,6 +20,7 @@ setuptools.setup(
     install_requires=[
         "autoflake >= 1.3.1",
         "black >= 19.10b0",
+        "com2ann >= 0.1.1 ; python_version >= '3.8'",
         "isort >= 5.4.0",
         "pybetter >= 0.3.5",
         "pyupgrade >= 2.7.2",

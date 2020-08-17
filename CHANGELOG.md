@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.2.3 - 2020-08-17
+- add [`com2ann`](https://pypi.org/project/com2ann/) to `--refactor` on Python 3.8+
+
 #### 0.2.2 - 2020-08-14
 - use multiple processes if formatting many files (ncpus times faster!)
 

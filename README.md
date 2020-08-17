@@ -29,8 +29,9 @@ or explicitly passed a list of files to format on the command-line.
 - Formats code blocks in docstrings, markdown, and restructured text docs
   (like [`blacken-docs`](https://pypi.org/project/blacken-docs/)).
 - If `shed --refactor`, also runs [`pybetter`](https://pypi.org/project/pybetter/)
-  to fix style issues, and uses [`teyit`](https://pypi.org/project/teyit/)
-  to update deprecated `unittest` methods.
+  to fix style issues, [`teyit`](https://pypi.org/project/teyit/) to update
+  deprecated `unittest` methods, and [`com2ann`](https://pypi.org/project/com2ann/)
+  to convert type comments to annotations.
 
 The version detection logic is provided by `black`, with an extra step to discard
 versions before Python 3.6.
@@ -47,7 +48,7 @@ adding the following to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.2.2
+  rev: 0.2.3
   hooks:
   - id: shed
 ```

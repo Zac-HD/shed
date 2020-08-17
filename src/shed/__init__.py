@@ -26,16 +26,27 @@ from pybetter.cli import (
     FixParenthesesInReturn,
 )
 
+
+def _fallback(source: str, **kw: object) -> Tuple[str, object]:
+    return source, None  # pragma: no cover
+
+
 try:
     from teyit import rewrite_source as _teyit_rewrite_source
 except ImportError:  # pragma: no cover  # on Python 3.9
     assert sys.version_info < (3, 9)
+    _teyit_rewrite_source = _fallback
 
-    def _teyit_rewrite_source(source: str) -> Tuple[str, object]:
-        return source, None
+# We can't use a try-except here because com2ann does not declare python_requires,
+# and so it is entirely possible to install it on a Python version that it does
+# not support, and nothing goes wrong until you call the function.  We therefore
+# explicitly check the Python version, while waiting on an upstream fix.
+com2ann = _fallback
+if sys.version_info[:2] >= (3, 8):  # pragma: no cover
+    from com2ann import com2ann
 
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -77,6 +88,13 @@ def shed(
     if refactor:
         # Some tools assume that the file is multi-line, but empty files are valid input.
         source_code += "\n"
+        # Use com2ann to comvert type comments to annotations on Python 3.8+
+        source_code, _ = com2ann(
+            source_code,
+            drop_ellipsis=True,
+            silent=True,
+            python_minor_version=min_version[1],
+        )
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
         source_code, _ = _teyit_rewrite_source(source_code)
         # Then apply pybetter's fixes with libcst
