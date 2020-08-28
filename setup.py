@@ -18,8 +18,8 @@ setuptools.setup(
     license="AGPL-3.0",
     description="`shed` canonicalises Python code.",
     install_requires=[
-        "autoflake >= 1.3.1",
-        "black >= 19.10b0",
+        "autoflake >= 1.4",
+        "black >= 20.8b1",
         "com2ann >= 0.1.1 ; python_version >= '3.8'",
         "isort >= 5.4.0",
         "pybetter >= 0.3.5",

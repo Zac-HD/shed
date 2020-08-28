@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.2.4 - 2020-08-28
+- requires newer dependencies - `black` 20.8b1 or later, `autoflake` 1.4 or later
+
 #### 0.2.3 - 2020-08-17
 - add [`com2ann`](https://pypi.org/project/com2ann/) to `--refactor` on Python 3.8+
 
