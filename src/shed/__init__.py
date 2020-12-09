@@ -32,10 +32,10 @@ def _fallback(source: str, **kw: object) -> Tuple[str, object]:
 
 
 try:
-    from teyit import rewrite_source as _teyit_rewrite_source
+    from teyit import refactor_until_deterministic as _teyit_refactor
 except ImportError:  # pragma: no cover  # on Python 3.9
     assert sys.version_info < (3, 9)
-    _teyit_rewrite_source = _fallback
+    _teyit_refactor = _fallback
 
 # We can't use a try-except here because com2ann does not declare python_requires,
 # and so it is entirely possible to install it on a Python version that it does
@@ -96,7 +96,7 @@ def shed(
             python_minor_version=min_version[1],
         )
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
-        source_code, _ = _teyit_rewrite_source(source_code)
+        source_code, _ = _teyit_refactor(source_code)
         # Then apply pybetter's fixes with libcst
         tree = libcst.parse_module(source_code)
         for fixer in _pybetter_fixers:

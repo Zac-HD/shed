@@ -9,9 +9,15 @@ import black
 import blib2to3
 import hypothesmith
 import pytest
-from hypothesis import HealthCheck, assume, given, settings, strategies as st
+from hypothesis import HealthCheck, assume, example, given, settings, strategies as st
 
 import shed
+
+TEYIT_TWO_PASS = """
+import unittest
+
+unittest.assertIs(a > b, True)
+"""
 
 
 @given(
@@ -19,6 +25,7 @@ import shed
     refactor=st.booleans(),
     provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
 )
+@example(source_code=TEYIT_TWO_PASS, refactor=True, provides=frozenset())
 @settings(suppress_health_check=HealthCheck.all(), deadline=None)
 def test_shed_is_idempotent(source_code, refactor, provides):
     # Given any syntatically-valid source code, shed should not crash.
