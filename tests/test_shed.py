@@ -16,18 +16,23 @@ import shed
 
 @given(
     source_code=hypothesmith.from_grammar(),
+    refactor=st.booleans(),
     provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
 )
 @settings(suppress_health_check=HealthCheck.all(), deadline=None)
-def test_shed_is_idempotent(source_code, provides):
+def test_shed_is_idempotent(source_code, refactor, provides):
     # Given any syntatically-valid source code, shed should not crash.
     # This tests doesn't check that we do the *right* thing,
     # just that we don't crash on valid-if-poorly-styled code!
     try:
-        result = shed.shed(source_code=source_code, first_party_imports=provides)
+        result = shed.shed(
+            source_code=source_code, refactor=refactor, first_party_imports=provides
+        )
     except (IndentationError, black.InvalidInput, blib2to3.pgen2.tokenize.TokenError):
         assume(False)
-    assert result == shed.shed(source_code=result, first_party_imports=provides)
+    assert result == shed.shed(
+        source_code=result, refactor=refactor, first_party_imports=provides
+    )
 
 
 def test_guesses_shed_is_first_party():
