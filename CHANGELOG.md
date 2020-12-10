@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.2.5 - 2020-12-10
+- supports Python-3.9-only files
+- improved idempotence in `--refactor` mode with Teyit
+
 #### 0.2.4 - 2020-08-28
 - requires newer dependencies - `black` 20.8b1 or later, `autoflake` 1.4 or later
 
