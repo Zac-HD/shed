@@ -50,9 +50,9 @@ __version__ = "0.2.4"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
-    black.TargetVersion.PY36: (3, 6),
-    black.TargetVersion.PY37: (3, 7),
-    black.TargetVersion.PY38: (3, 8),
+    k: (int(k.name[2]), int(k.name[3:]))
+    for k in black.TargetVersion
+    if k.value >= black.TargetVersion.PY36.value
 }
 _pybetter_fixers = tuple(
     fix().improve
@@ -105,9 +105,11 @@ def shed(
     # Then shed.docshed (below) formats any code blocks in documentation
     source_code = docshed(source=source_code, first_party_imports=first_party_imports)
     # And pyupgrade - see pyupgrade._fix_file - is our last stable fixer
-    source_code = pyupgrade._fix_tokens(source_code, min_version=min_version)
+    # Calculate separate minver because pyupgrade doesn't have py39-specific logic yet
+    pyupgrade_min_ver = min(min_version, max(pyupgrade.IMPORT_REMOVALS.keys()))
+    source_code = pyupgrade._fix_tokens(source_code, min_version=pyupgrade_min_ver)
     source_code = pyupgrade._fix_percent_format(source_code)
-    source_code = pyupgrade._fix_py3_plus(source_code, min_version=min_version)
+    source_code = pyupgrade._fix_py3_plus(source_code, min_version=pyupgrade_min_ver)
     source_code = pyupgrade._fix_py36_plus(source_code)
 
     # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
