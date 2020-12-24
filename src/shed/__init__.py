@@ -223,7 +223,11 @@ def _rewrite_on_disk(
         # Permissions or encoding issue, or file deleted since last commit.
         return f"skipping {fname!r} due to {err}"
     writer = docshed if fname.endswith((".md", ".rst")) else shed
-    result = writer(on_disk, **kwargs)
+    try:
+        result = writer(on_disk, **kwargs)
+    except:
+        print(f"failed for file {fname!r}")
+        raise
     if result != on_disk:
         with open(fname, mode="w") as fh:
             fh.write(result)
