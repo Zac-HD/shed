@@ -240,7 +240,13 @@ def _rewrite_on_disk(
         # Permissions or encoding issue, or file deleted since last commit.
         return f"skipping {fname!r} due to {err}"
     writer = docshed if fname.endswith((".md", ".rst")) else shed
-    result = writer(on_disk, **kwargs)
+    try:
+        result = writer(on_disk, **kwargs)
+    except Exception as err:  # pragma: no cover  # bugs are unknown xor fixed ;-)
+        return (
+            f"Internal error formatting {fname!r}: {err}\n"
+            "    Please report this to https://github.com/Zac-HD/shed/issues"
+        )
     if result != on_disk:
         with open(fname, mode="w") as fh:
             fh.write(result)
