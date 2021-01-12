@@ -110,11 +110,12 @@ def shed(
         # Then apply pybetter's fixes with libcst
         tree = libcst.parse_module(source_code)
         for fixer in _pybetter_fixers:
-            newtree = fixer(tree)
             try:
+                # Might raise e.g. https://github.com/Instagram/LibCST/issues/446
+                newtree = fixer(tree)
                 # Catches e.g. https://github.com/lensvol/pybetter/issues/60
                 compile(newtree.code, "<string>", "exec")
-            except SyntaxError:
+            except Exception:
                 pass
             else:
                 tree = newtree
