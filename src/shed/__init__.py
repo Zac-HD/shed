@@ -297,7 +297,9 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         # If we're only formatting a few files, starting up a process pool
         # probably takes up more time that it saves.
         for fname in all_filenames:
-            rewrite(fname)
+            error_msg = rewrite(fname)
+            if isinstance(error_msg, str):
+                print(error_msg)  # noqa
     else:
         with multiprocessing.Pool() as pool:
             for error_msg in pool.imap_unordered(rewrite, all_filenames):
