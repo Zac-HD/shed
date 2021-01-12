@@ -21,7 +21,7 @@ unittest.assertIs(a > b, True)
 
 
 @given(
-    source_code=hypothesmith.from_grammar(),
+    source_code=hypothesmith.from_grammar() | hypothesmith.from_node(),
     refactor=st.booleans(),
     provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
 )
