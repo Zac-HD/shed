@@ -1,5 +1,11 @@
 # Changelog
 
+#### 0.3.0 - 2021-01-12
+- integrates [`hypothesis codemod`](https://hypothesis.readthedocs.io/en/latest/extras.html#hypothesis-codemods)
+  in `--refactor` mode (optional dependency)
+- improved reporting for internal errors
+- work around known errors in pybetter and libcst
+
 #### 0.2.5 - 2020-12-10
 - supports Python-3.9-only files
 - improved idempotence in `--refactor` mode with Teyit
