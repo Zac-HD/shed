@@ -110,7 +110,14 @@ def shed(
         # Then apply pybetter's fixes with libcst
         tree = libcst.parse_module(source_code)
         for fixer in _pybetter_fixers:
-            tree = fixer(tree)
+            newtree = fixer(tree)
+            try:
+                # Catches e.g. https://github.com/lensvol/pybetter/issues/60
+                compile(newtree.code, "<string>", "exec")
+            except SyntaxError:
+                pass
+            else:
+                tree = newtree
         source_code = tree.code
     # Then shed.docshed (below) formats any code blocks in documentation
     source_code = docshed(source=source_code, first_party_imports=first_party_imports)

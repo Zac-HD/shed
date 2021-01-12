@@ -1,0 +1,13 @@
+f"""
+no substitutions
+"""
+
+f'contains " double-quote char'
+
+================================================================================
+
+f"""
+no substitutions
+"""
+
+f'contains " double-quote char'
