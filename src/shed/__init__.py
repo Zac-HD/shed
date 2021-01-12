@@ -37,6 +37,14 @@ except ImportError:  # pragma: no cover  # on Python 3.9
     assert sys.version_info < (3, 9)
     _teyit_refactor = _fallback
 
+try:
+    from hypothesis.extra.codemods import refactor as _hypothesis_refactor
+except ImportError:  # pragma: no cover  # optional integration
+
+    def _hypothesis_refactor(source_code: str) -> str:
+        return source_code
+
+
 # We can't use a try-except here because com2ann does not declare python_requires,
 # and so it is entirely possible to install it on a Python version that it does
 # not support, and nothing goes wrong until you call the function.  We therefore
@@ -97,6 +105,8 @@ def shed(
         )
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
         source_code, _ = _teyit_refactor(source_code)
+        # Apply Hypothesis codemods to fix any deprecated code
+        source_code = _hypothesis_refactor(source_code)
         # Then apply pybetter's fixes with libcst
         tree = libcst.parse_module(source_code)
         for fixer in _pybetter_fixers:
