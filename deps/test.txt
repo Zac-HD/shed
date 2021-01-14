@@ -29,7 +29,7 @@ coverage==5.3.1
     # via pytest-cov
 execnet==1.7.1
     # via pytest-xdist
-hypothesis==6.0.0
+hypothesis==6.0.1
     # via
     #   -r deps/test.in
     #   hypothesmith
@@ -49,6 +49,7 @@ libcst==0.3.16
     # via
     #   hypothesmith
     #   pybetter
+    #   shed (setup.py)
 mypy-extensions==0.4.3
     # via
     #   black
@@ -63,7 +64,7 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pybetter==0.3.5
+pybetter==0.3.6
     # via shed (setup.py)
 pyemojify==0.2.0
     # via pybetter

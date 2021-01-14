@@ -45,7 +45,9 @@ importlib-metadata==3.4.0
 isort==5.7.0
     # via shed (setup.py)
 libcst==0.3.16
-    # via pybetter
+    # via
+    #   pybetter
+    #   shed (setup.py)
 mccabe==0.6.1
     # via flake8
 mypy-extensions==0.4.3
@@ -59,7 +61,7 @@ pathspec==0.8.1
     # via black
 pep8-naming==0.11.1
     # via -r deps/check.in
-pybetter==0.3.5
+pybetter==0.3.6
     # via shed (setup.py)
 pycodestyle==2.6.0
     # via

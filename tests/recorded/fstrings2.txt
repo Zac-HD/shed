@@ -6,8 +6,8 @@ f'contains " double-quote char'
 
 ================================================================================
 
-f"""
+"""
 no substitutions
 """
 
-f'contains " double-quote char'
+'contains " double-quote char'
