@@ -55,13 +55,13 @@ mypy-extensions==0.4.3
     #   black
     #   mypy
     #   typing-inspect
-mypy==0.790
+mypy==0.800
     # via -r deps/check.in
 pathspec==0.8.1
     # via black
 pep8-naming==0.11.1
     # via -r deps/check.in
-pybetter==0.3.6
+pybetter==0.3.6.1
     # via shed (setup.py)
 pycodestyle==2.6.0
     # via
@@ -79,15 +79,15 @@ pygments==2.7.4
     # via pybetter
 pyupgrade==2.7.4
     # via shed (setup.py)
-pyyaml==5.3.1
+pyyaml==5.4.1
     # via libcst
 regex==2020.11.13
     # via black
 six==1.15.0
     # via flake8-print
-snowballstemmer==2.0.0
+snowballstemmer==2.1.0
     # via pydocstyle
-tokenize-rt==4.0.0
+tokenize-rt==4.1.0
     # via pyupgrade
 toml==0.10.2
     # via black

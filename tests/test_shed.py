@@ -26,6 +26,7 @@ unittest.assertIs(a > b, True)
     provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
 )
 @example(source_code=TEYIT_TWO_PASS, refactor=True, provides=frozenset())
+@example(source_code="class A:\n\x0c pass\n", refactor=True, provides=frozenset())
 @settings(suppress_health_check=HealthCheck.all(), deadline=None)
 def test_shed_is_idempotent(source_code, refactor, provides):
     # Given any syntatically-valid source code, shed should not crash.

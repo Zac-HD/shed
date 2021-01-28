@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.3.1 - 2021-01-28
+- sort `tests` imports as a `known_local_folder` with [`isort`](https://pypi.org/project/isort/)
+- increase minimum dependency versions
+
 #### 0.3.0 - 2021-01-12
 - integrates [`hypothesis codemod`](https://hypothesis.readthedocs.io/en/latest/extras.html#hypothesis-codemods)
   in `--refactor` mode (optional dependency)

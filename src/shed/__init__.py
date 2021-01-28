@@ -54,7 +54,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -148,6 +148,7 @@ def shed(
         source_code = isort.code(
             source_code,
             known_first_party=first_party_imports,
+            known_local_folder={"tests"},
             profile="black",
             combine_as_imports=True,
         )
