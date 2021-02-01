@@ -19,7 +19,7 @@ import autoflake
 import black
 import isort
 import libcst
-import pyupgrade
+import pyupgrade._main
 from pybetter.cli import (
     ALL_IMPROVEMENTS,
     FixMissingAllAttribute,
@@ -54,7 +54,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -122,13 +122,14 @@ def shed(
         source_code = tree.code
     # Then shed.docshed (below) formats any code blocks in documentation
     source_code = docshed(source=source_code, first_party_imports=first_party_imports)
-    # And pyupgrade - see pyupgrade._fix_file - is our last stable fixer
-    # Calculate separate minver because pyupgrade doesn't have py39-specific logic yet
-    pyupgrade_min_ver = min(min_version, max(pyupgrade.IMPORT_REMOVALS.keys()))
-    source_code = pyupgrade._fix_tokens(source_code, min_version=pyupgrade_min_ver)
-    source_code = pyupgrade._fix_percent_format(source_code)
-    source_code = pyupgrade._fix_py3_plus(source_code, min_version=pyupgrade_min_ver)
-    source_code = pyupgrade._fix_py36_plus(source_code)
+    # And pyupgrade - see pyupgrade._main._fix_file - is our last stable fixer
+    # Calculate separate minver because pyupgrade can take a little while to update
+    pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
+    source_code = pyupgrade._main._fix_plugins(
+        source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
+    )
+    source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
+    source_code = pyupgrade._main._fix_py36_plus(source_code)
 
     # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
     # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore loop until

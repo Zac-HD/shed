@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.3.2 - 2021-02-01
+- support, and require, `pyupgrade` >= 2.8.0
+
 #### 0.3.1 - 2021-01-28
 - sort `tests` imports as a `known_local_folder` with [`isort`](https://pypi.org/project/isort/)
 - increase minimum dependency versions

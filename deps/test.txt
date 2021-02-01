@@ -29,7 +29,7 @@ coverage==5.4
     # via pytest-cov
 execnet==1.8.0
     # via pytest-xdist
-hypothesis==6.0.4
+hypothesis==6.1.1
     # via
     #   -r deps/test.in
     #   hypothesmith
@@ -54,7 +54,7 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   typing-inspect
-packaging==20.8
+packaging==20.9
     # via pytest
 pathspec==0.8.1
     # via black
@@ -86,7 +86,7 @@ pytest==6.2.2
     #   pytest-cov
     #   pytest-forked
     #   pytest-xdist
-pyupgrade==2.7.4
+pyupgrade==2.8.0
     # via shed (setup.py)
 pyyaml==5.4.1
     # via libcst

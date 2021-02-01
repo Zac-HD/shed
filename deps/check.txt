@@ -77,7 +77,7 @@ pyflakes==2.2.0
     #   flake8
 pygments==2.7.4
     # via pybetter
-pyupgrade==2.7.4
+pyupgrade==2.8.0
     # via shed (setup.py)
 pyyaml==5.4.1
     # via libcst

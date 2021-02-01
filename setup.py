@@ -24,7 +24,7 @@ setuptools.setup(
         "isort >= 5.7.0",
         "libcst >= 0.3.16",
         "pybetter >= 0.3.6.1",
-        "pyupgrade >= 2.7.4",
+        "pyupgrade >= 2.8.0",
         "teyit >= 0.3.2 ; python_version >= '3.9'",
     ],
     python_requires=">=3.6",
