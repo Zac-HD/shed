@@ -1,7 +1,5 @@
 """Tests for the `shed` library."""
 
-import os
-import site
 import tempfile
 from pathlib import Path
 
@@ -11,7 +9,8 @@ import hypothesmith
 import pytest
 from hypothesis import HealthCheck, assume, example, given, settings, strategies as st
 
-import shed
+from shed import shed
+from shed._cli import _guess_first_party_modules, _rewrite_on_disk, _should_format
 
 TEYIT_TWO_PASS = """
 import unittest
@@ -33,22 +32,22 @@ def test_shed_is_idempotent(source_code, refactor, provides):
     # This tests doesn't check that we do the *right* thing,
     # just that we don't crash on valid-if-poorly-styled code!
     try:
-        result = shed.shed(
+        result = shed(
             source_code=source_code, refactor=refactor, first_party_imports=provides
         )
     except (IndentationError, black.InvalidInput, blib2to3.pgen2.tokenize.TokenError):
         assume(False)
-    assert result == shed.shed(
+    assert result == shed(
         source_code=result, refactor=refactor, first_party_imports=provides
     )
 
 
 def test_guesses_shed_is_first_party():
-    assert shed._guess_first_party_modules() == frozenset(["shed"])
+    assert _guess_first_party_modules() == frozenset(["shed"])
 
 
 def test_guesses_empty_for_non_repo_dirs():
-    assert shed._guess_first_party_modules("../..") == frozenset()
+    assert _guess_first_party_modules("../..") == frozenset()
 
 
 @pytest.mark.parametrize(
@@ -56,7 +55,7 @@ def test_guesses_empty_for_non_repo_dirs():
     [("a.md", True), ("a.rst", True), ("a.py", True), ("does not exist", False)],
 )
 def test_should_format_autodetection(fname, should):
-    assert shed._should_format(fname) == should
+    assert _should_format(fname) == should
 
 
 @pytest.mark.parametrize(
@@ -76,7 +75,7 @@ def test_rewrite_on_disk(fname, contents, changed):
     with tempfile.TemporaryDirectory() as dirname:
         f = Path(dirname) / fname
         f.write_text(contents)
-        ret = shed._rewrite_on_disk(str(f), **kwargs)
+        ret = _rewrite_on_disk(str(f), **kwargs)
         result = f.read_text()
     assert ret == changed
     assert changed == (contents != result)
@@ -86,16 +85,17 @@ def test_rewrite_returns_error_message_for_nonexistent_file():
     kwargs = {"refactor": True, "first_party_imports": frozenset()}
     with tempfile.TemporaryDirectory() as dirname:
         f = Path(dirname) / "nonexistent"
-        result = shed._rewrite_on_disk(str(f), **kwargs)
+        result = _rewrite_on_disk(str(f), **kwargs)
         assert isinstance(result, str)
         f.write_text("# comment\n")
-        assert shed._rewrite_on_disk(str(f), **kwargs) is False
+        assert _rewrite_on_disk(str(f), **kwargs) is False
 
 
 python_files = []
-for base in sorted(set(site.PREFIXES)):
-    for dirname, _, files in os.walk(base):
-        python_files.extend(Path(dirname) / f for f in files if f.endswith(".py"))
+# import os, site
+# for base in sorted(set(site.PREFIXES)):
+#     for dirname, _, files in os.walk(base):
+#         python_files.extend(Path(dirname) / f for f in files if f.endswith(".py"))
 
 
 # NOTE: this test is disabled by default because it takes several minutes
@@ -110,7 +110,7 @@ def est_on_site_code(py_file):
         pytest.xfail(reason="encoding problem")
 
     try:
-        result = shed.shed(source_code=source_code)
+        result = shed(source_code=source_code)
     except (IndentationError, black.InvalidInput, blib2to3.pgen2.tokenize.TokenError):
         pytest.xfail(reason="Black can't handle that")
-    assert result == shed.shed(source_code=result)
+    assert result == shed(source_code=result)

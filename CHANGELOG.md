@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.3.3 - 2021-03-18
+- support running via `python -m shed`
+- stop merging nested `with`-statements (ugly when multiline on Python <= 3.9)
+
 #### 0.3.2 - 2021-02-01
 - support, and require, `pyupgrade` >= 2.8.0
 

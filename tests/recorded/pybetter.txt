@@ -19,8 +19,9 @@ z is None
 a
 not a
 
-with a, b:
-    pass
+with a:
+    with b:
+        pass
 
 with a:
     # comment
