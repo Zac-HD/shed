@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.3.4 - 2021-04-12
+- avoid new duplicate work when running `shed` (without `python -m`)
+
 #### 0.3.3 - 2021-03-18
 - support running via `python -m shed`
 - stop merging nested `with`-statements (ugly when multiline on Python <= 3.9)
