@@ -144,7 +144,7 @@ def shed(
             remove_duplicate_keys=True,
             remove_unused_variables=True,
         )
-        source_code = isort.code(
+        source_code = isort.code(  # type: ignore
             source_code,
             known_first_party=first_party_imports,
             known_local_folder={"tests"},

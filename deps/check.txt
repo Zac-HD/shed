@@ -17,13 +17,13 @@ click==7.1.2
     #   black
     #   pybetter
     #   pyemojify
-flake8-bugbear==21.3.2
+flake8-bugbear==21.4.3
     # via -r deps/check.in
 flake8-builtins==1.5.3
     # via -r deps/check.in
-flake8-comprehensions==3.3.1
+flake8-comprehensions==3.4.0
     # via -r deps/check.in
-flake8-docstrings==1.5.0
+flake8-docstrings==1.6.0
     # via -r deps/check.in
 flake8-polyfill==1.0.2
     # via pep8-naming
@@ -38,13 +38,13 @@ flake8==3.9.0
     #   flake8-docstrings
     #   flake8-polyfill
     #   flake8-print
-importlib-metadata==3.7.3
+importlib-metadata==3.10.0
     # via
     #   flake8
     #   flake8-comprehensions
-isort==5.7.0
+isort==5.8.0
     # via shed (setup.py)
-libcst==0.3.17
+libcst==0.3.18
     # via
     #   pybetter
     #   shed (setup.py)
@@ -67,21 +67,21 @@ pycodestyle==2.7.0
     # via
     #   flake8
     #   flake8-print
-pydocstyle==5.1.1
+pydocstyle==6.0.0
     # via flake8-docstrings
 pyemojify==0.2.0
     # via pybetter
-pyflakes==2.3.0
+pyflakes==2.3.1
     # via
     #   autoflake
     #   flake8
 pygments==2.8.1
     # via pybetter
-pyupgrade==2.10.1
+pyupgrade==2.12.0
     # via shed (setup.py)
 pyyaml==5.4.1
     # via libcst
-regex==2021.3.17
+regex==2021.4.4
     # via black
 six==1.15.0
     # via flake8-print
@@ -91,7 +91,7 @@ tokenize-rt==4.1.0
     # via pyupgrade
 toml==0.10.2
     # via black
-typed-ast==1.4.2
+typed-ast==1.4.3
     # via
     #   black
     #   mypy

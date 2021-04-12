@@ -10,6 +10,6 @@ f"no substitutions"
 x, y = 1, 2
 
 "no substitutions"
-"A{b}".format(b=2)
-"{}, {!r}".format(12, 34)
+f"A{2}"
+f"{12}, {34!r}"
 f"{x}, {y!r}"
