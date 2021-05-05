@@ -14,12 +14,16 @@ setuptools.setup(
     package_dir={"": "src"},
     package_data={"": ["py.typed"]},
     url="https://github.com/Zac-HD/shed",
-    project_urls={"Funding": "https://github.com/sponsors/Zac-HD"},
+    project_urls={
+        "Source": "https://github.com/Zac-HD/shed/",
+        "Changelog": "https://github.com/Zac-HD/shed/blob/master/CHANGELOG.md",
+        "Funding": "https://github.com/sponsors/Zac-HD",
+    },
     license="AGPL-3.0",
     description="`shed` canonicalises Python code.",
     install_requires=[
         "autoflake >= 1.4",
-        "black >= 20.8b1",
+        "black >= 21.5b0",
         "com2ann >= 0.1.1 ; python_version >= '3.8'",
         "isort >= 5.7.0",
         "libcst >= 0.3.16",

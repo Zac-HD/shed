@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.3.5 - 2021-05-05
+- require [`black >= 21.5b0`](https://github.com/psf/black/blob/master/CHANGES.md#215b0)
+  to avoid version-detection bug
+
 #### 0.3.4 - 2021-04-12
 - avoid new duplicate work when running `shed` (without `python -m`)
 
