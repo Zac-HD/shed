@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.3.6 - 2021-05-23
+- leave empty files empty, instead of adding a blank line (which triggered `flake8` W391)
+
 #### 0.3.5 - 2021-05-05
 - require [`black >= 21.5b0`](https://github.com/psf/black/blob/master/CHANGES.md#215b0)
   to avoid version-detection bug

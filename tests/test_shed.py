@@ -91,6 +91,12 @@ def test_rewrite_returns_error_message_for_nonexistent_file():
         assert _rewrite_on_disk(str(f), **kwargs) is False
 
 
+@pytest.mark.parametrize("refactor", [True, False])
+def test_empty_stays_empty(refactor):
+    assert shed(source_code="", refactor=refactor) == ""
+    assert shed(source_code="", refactor=refactor) == ""
+
+
 python_files = []
 # import os, site
 # for base in sorted(set(site.PREFIXES)):

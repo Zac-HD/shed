@@ -16,6 +16,8 @@ import black
 import isort
 import libcst
 import pyupgrade._main
+from black.mode import TargetVersion
+from black.parsing import lib2to3_parse
 from pybetter.cli import (
     ALL_IMPROVEMENTS,
     FixMissingAllAttribute,
@@ -51,13 +53,13 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.3.5"
+__version__ = "0.3.6"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
     k: (int(k.name[2]), int(k.name[3:]))
-    for k in black.TargetVersion
-    if k.value >= black.TargetVersion.PY36.value
+    for k in TargetVersion
+    if k.value >= TargetVersion.PY36.value
 }
 _pybetter_fixers = tuple(
     fix().improve
@@ -80,13 +82,16 @@ def shed(
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)
 
+    if source_code == "":
+        return ""
+
     # Use black to autodetect our target versions
     target_versions = {
         v
         for v in black.detect_target_versions(
-            black.lib2to3_parse(source_code.lstrip(), set(_version_map))
+            lib2to3_parse(source_code.lstrip(), set(_version_map))
         )
-        if v.value >= black.TargetVersion.PY36.value
+        if v.value >= TargetVersion.PY36.value
     }
     assert target_versions
     min_version = _version_map[min(target_versions, key=attrgetter("value"))]
@@ -111,12 +116,12 @@ def shed(
             try:
                 # Might raise e.g. https://github.com/Instagram/LibCST/issues/446
                 newtree = fixer(tree)
-                # Catches e.g. https://github.com/lensvol/pybetter/issues/60
-                compile(newtree.code, "<string>", "exec")
             except Exception:
                 pass
             else:
                 tree = newtree
+                # Catches e.g. https://github.com/lensvol/pybetter/issues/60
+                compile(newtree.code, "<string>", "exec")
         source_code = tree.code
     # Then shed.docshed (below) formats any code blocks in documentation
     source_code = docshed(source=source_code, first_party_imports=first_party_imports)
