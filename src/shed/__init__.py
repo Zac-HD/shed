@@ -53,7 +53,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.3.6"
+__version__ = "0.3.7"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -132,14 +132,14 @@ def shed(
         source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
     )
     source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
-    source_code = pyupgrade._main._fix_py36_plus(source_code)
+    source_code = pyupgrade._main._fix_py36_plus(source_code, min_version=pyupgrade_min)
 
     # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
     # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore loop until
     # neither of them have made a change in the last loop body, trusting that
     # `black` itself is idempotent because that's tested upstream.
     prev = ""
-    black_mode = black.FileMode(target_versions=target_versions)
+    black_mode = black.Mode(target_versions=target_versions)  # type: ignore
     while prev != source_code:
         prev = source_code = black.format_str(source_code, mode=black_mode)
         source_code = autoflake.fix_code(
@@ -149,7 +149,7 @@ def shed(
             remove_duplicate_keys=True,
             remove_unused_variables=True,
         )
-        source_code = isort.code(  # type: ignore
+        source_code = isort.code(
             source_code,
             known_first_party=first_party_imports,
             known_local_folder={"tests"},

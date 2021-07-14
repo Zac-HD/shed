@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.3.7 - 2021-07-14
+- require [`black >= 21.6b0`](https://github.com/psf/black/blob/master/CHANGES.md#216b0)
+- support, and require, [`pyupgrade >= 2.21`](https://pypi.org/project/pyupgrade/)
+
 #### 0.3.6 - 2021-05-23
 - leave empty files empty, instead of adding a blank line (which triggered `flake8` W391)
 
