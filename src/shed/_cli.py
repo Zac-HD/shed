@@ -29,7 +29,7 @@ def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
             universal_newlines=True,
             cwd=cwd,
         ).stdout.strip()
-    except subprocess.SubprocessError:
+    except (subprocess.SubprocessError, FileNotFoundError):
         return frozenset()
     provides = {init.name for init in Path(base).glob("**/src/*/__init__.py")}
     return frozenset(p for p in {Path(base).name} | provides if p.isidentifier())

@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.3.8 - 2021-08-11
+- Fix a `FileNotFoundError` on Windows, if `git` is not installed.
+
 #### 0.3.7 - 2021-07-14
 - require [`black >= 21.6b0`](https://github.com/psf/black/blob/master/CHANGES.md#216b0)
 - support, and require, [`pyupgrade >= 2.21`](https://pypi.org/project/pyupgrade/)
