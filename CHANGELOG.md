@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.3.9 - 2021-08-18
+- Fix the *other* `FileNotFoundError` on Windows, if `git` is not installed.
+
 #### 0.3.8 - 2021-08-11
 - Fix a `FileNotFoundError` on Windows, if `git` is not installed.
 

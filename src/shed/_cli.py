@@ -93,7 +93,7 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
                 stdout=subprocess.PIPE,
                 universal_newlines=True,
             ).stdout.splitlines()
-        except subprocess.SubprocessError:
+        except (subprocess.SubprocessError, FileNotFoundError):
             print("Doesn't seem to be a git repo; pass filenames to format.")  # noqa
             sys.exit(1)
         all_filenames = [f for f in all_filenames if _should_format(f)]

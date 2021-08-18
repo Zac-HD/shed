@@ -48,7 +48,7 @@ adding the following to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.3.8
+  rev: 0.3.9
   hooks:
   - id: shed
 ```
