@@ -14,7 +14,7 @@ attrs==21.2.0
     #   pytest
 autoflake==1.4
     # via shed (setup.py)
-black==21.6b0
+black==21.7b0
     # via shed (setup.py)
 click==7.1.2
     # via
@@ -27,23 +27,23 @@ coverage==5.5
     # via pytest-cov
 execnet==1.9.0
     # via pytest-xdist
-hypothesis==6.14.2
+hypothesis==6.14.9
     # via
     #   -r deps/test.in
     #   hypothesmith
-hypothesmith==0.1.8
+hypothesmith==0.1.9
     # via -r deps/test.in
-importlib-metadata==4.6.1
+importlib-metadata==4.6.4
     # via
     #   pluggy
     #   pytest
 iniconfig==1.1.1
     # via pytest
-isort==5.9.2
+isort==5.9.3
     # via shed (setup.py)
 lark-parser==0.11.3
     # via hypothesmith
-libcst==0.3.19
+libcst==0.3.20
     # via
     #   hypothesmith
     #   pybetter
@@ -54,7 +54,7 @@ mypy-extensions==0.4.3
     #   typing-inspect
 packaging==21.0
     # via pytest
-pathspec==0.8.1
+pathspec==0.9.0
     # via black
 pluggy==0.13.1
     # via pytest
@@ -68,7 +68,7 @@ pyemojify==0.2.0
     # via pybetter
 pyflakes==2.3.1
     # via autoflake
-pygments==2.9.0
+pygments==2.10.0
     # via pybetter
 pyparsing==2.4.7
     # via packaging
@@ -84,11 +84,11 @@ pytest-forked==1.3.0
     # via pytest-xdist
 pytest-xdist==2.3.0
     # via -r deps/test.in
-pyupgrade==2.21.0
+pyupgrade==2.24.0
     # via shed (setup.py)
 pyyaml==5.4.1
     # via libcst
-regex==2021.7.6
+regex==2021.8.3
     # via black
 sortedcontainers==2.4.0
     # via hypothesis
@@ -96,9 +96,10 @@ tokenize-rt==4.1.0
     # via pyupgrade
 toml==0.10.2
     # via
-    #   black
     #   pytest
     #   pytest-cov
+tomli==1.2.1
+    # via black
 typed-ast==1.4.3
     # via black
 typing-extensions==3.10.0.0

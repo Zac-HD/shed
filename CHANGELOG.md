@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.3.10 - 2021-08-21
+- require latest versions of all dependencies; variously fixing some upstream bugs,
+  avoiding installation problems, and adding some refactoring features.
+
 #### 0.3.9 - 2021-08-18
 - Fix the *other* `FileNotFoundError` on Windows, if `git` is not installed.
 
