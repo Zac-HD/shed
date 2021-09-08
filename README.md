@@ -41,6 +41,12 @@ first-party import.  [`src` layout](https://hynek.me/articles/testing-packaging/
 packages are also automatically detected, i.e. the `foo` in any paths like
 `.../src/foo/__init__.py`.
 
+### Jupyter Notebook support
+We recommend [using `jupytext` to save your notebooks in `.py` or `.md` files](https://jupytext.readthedocs.io/en/latest/),
+in which case `shed` supports them natively.  For a quick-and-dirty workflow,
+you can [use `nbqa shed notebook.ipynb`](https://nbqa.readthedocs.io/en/latest/readme.html) -
+`nbqa` works for any linter or formatter.
+
 ## Using with pre-commit
 If you use [pre-commit](https://pre-commit.com/), you can use it with Shed by
 adding the following to your `.pre-commit-config.yaml`:
@@ -55,6 +61,11 @@ repos:
 
 This is often considerably faster for large projects, because `pre-commit`
 can avoid running `shed` on unchanged files.
+
+## See also
+`shed` inherits `pyupgrade`'s careful approach to converting string formatting
+code.  If you want a more aggressive refactoring tool and don't mind checking
+for breaking changes, [check out `flynt`](https://github.com/ikamensh/flynt).
 
 ## Changelog
 
