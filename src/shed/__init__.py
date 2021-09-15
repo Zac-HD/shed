@@ -53,7 +53,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.3.11"
+__version__ = "0.4.0"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -61,6 +61,7 @@ _version_map = {
     for k in TargetVersion
     if k.value >= TargetVersion.PY36.value
 }
+_default_min_version = min(_version_map.values())
 _pybetter_fixers = tuple(
     fix().improve
     for fix in set(ALL_IMPROVEMENTS)
@@ -74,6 +75,7 @@ def shed(
     *,
     refactor: bool = False,
     first_party_imports: FrozenSet[str] = frozenset(),
+    min_version: Tuple[int, int] = _default_min_version,
 ) -> str:
     """Process the source code of a single module."""
     assert isinstance(source_code, str)
@@ -81,18 +83,17 @@ def shed(
     assert isinstance(first_party_imports, frozenset)
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)
+    assert min_version in _version_map.values()
 
     if source_code == "":
         return ""
 
     # Use black to autodetect our target versions
-    target_versions = {
-        v
-        for v in black.detect_target_versions(
+    target_versions = set(_version_map).intersection(
+        black.detect_target_versions(
             lib2to3_parse(source_code.lstrip(), set(_version_map))
         )
-        if v.value >= TargetVersion.PY36.value
-    }
+    )
     assert target_versions
     min_version = _version_map[min(target_versions, key=attrgetter("value"))]
 
@@ -124,7 +125,11 @@ def shed(
                 compile(newtree.code, "<string>", "exec")
         source_code = tree.code
     # Then shed.docshed (below) formats any code blocks in documentation
-    source_code = docshed(source=source_code, first_party_imports=first_party_imports)
+    source_code = docshed(
+        source=source_code,
+        first_party_imports=first_party_imports,
+        min_version=min_version,
+    )
     # And pyupgrade - see pyupgrade._main._fix_file - is our last stable fixer
     # Calculate separate minver because pyupgrade can take a little while to update
     pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
@@ -163,6 +168,7 @@ def docshed(
     *,
     refactor: bool = False,
     first_party_imports: FrozenSet[str] = frozenset(),
+    min_version: Tuple[int, int] = _default_min_version,
 ) -> str:
     """Process Python code blocks embedded in documentation."""
     # Inspired by the blacken-docs package.
@@ -170,6 +176,7 @@ def docshed(
     assert isinstance(first_party_imports, frozenset)
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)
+    assert min_version in _version_map.values()
     markdown_pattern = re.compile(
         r"(?P<before>^(?P<indent> *)```python\n)"
         r"(?P<code>.*?)"
@@ -189,7 +196,12 @@ def docshed(
 
     def _md_match(match: Match[str]) -> str:
         code = textwrap.dedent(match["code"])
-        code = shed(code, refactor=refactor, first_party_imports=first_party_imports)
+        code = shed(
+            code,
+            refactor=refactor,
+            first_party_imports=first_party_imports,
+            min_version=min_version,
+        )
         code = textwrap.indent(code, match["indent"])
         return f'{match["before"]}{code}{match["after"]}'
 
@@ -201,7 +213,12 @@ def docshed(
         assert trailing_ws_match
         trailing_ws = trailing_ws_match.group()
         code = textwrap.dedent(match["code"])
-        code = shed(code, refactor=refactor, first_party_imports=first_party_imports)
+        code = shed(
+            code,
+            refactor=refactor,
+            first_party_imports=first_party_imports,
+            min_version=min_version,
+        )
         code = textwrap.indent(code, min_indent)
         return f'{match["before"]}{code.rstrip()}{trailing_ws}'
 

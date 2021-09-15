@@ -1,6 +1,7 @@
 # Changelog
 
 #### 0.4.0 - 2021-09-15
+- Add new `--py-37-plus` (etc) arguments to select the minimum Python version
 - disable `autoflake`'s remove-unused-variables; allow linters to warn about probable bugs
 
 #### 0.3.10 - 2021-08-21

@@ -52,11 +52,14 @@ If you use [pre-commit](https://pre-commit.com/), you can use it with Shed by
 adding the following to your `.pre-commit-config.yaml`:
 
 ```yaml
+minimum_pre_commit_version: '2.9.0'
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.3.10
+  rev: 0.4.0
   hooks:
   - id: shed
+    # args: [--refactor, --py39-plus]
+  types_or: [python, markdown, rst]
 ```
 
 This is often considerably faster for large projects, because `pre-commit`

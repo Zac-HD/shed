@@ -14,7 +14,7 @@ from typing import FrozenSet, Union
 
 import autoflake
 
-from . import docshed, shed
+from . import _version_map, docshed, shed
 
 
 @functools.lru_cache()
@@ -79,6 +79,16 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         dest="files",
         help="File(s) to format, instead of autodetection",
     )
+    min_version_group = parser.add_mutually_exclusive_group()
+    oldest, *rest = sorted(_version_map.values())
+    parser.set_defaults(min_version=oldest)
+    for version in rest:
+        min_version_group.add_argument(
+            f"--py3{version[1]}-plus",
+            action="store_const",
+            dest="min_version",
+            const=version,
+        )
     args = parser.parse_args()
 
     if args.files:
@@ -102,6 +112,7 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         _rewrite_on_disk,
         first_party_imports=_guess_first_party_modules(),
         refactor=args.refactor,
+        min_version=args.min_version,
     )
 
     if len(all_filenames) <= 4:
