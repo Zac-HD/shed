@@ -1,0 +1,9 @@
+"""This is invalid syntax without a close quote.
+
+Shed doesn't crash, nor does it make any changes.
+
+================================================================================
+
+"""This is invalid syntax without a close quote.
+
+Shed doesn't crash, nor does it make any changes.

@@ -53,7 +53,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -89,13 +89,18 @@ def shed(
         return ""
 
     # Use black to autodetect our target versions
-    target_versions = set(_version_map).intersection(
-        black.detect_target_versions(
-            lib2to3_parse(source_code.lstrip(), set(_version_map))
-        )
-    )
+    try:
+        parsed = lib2to3_parse(source_code.lstrip(), set(_version_map))
+    except Exception:
+        # black.InvalidInput, blib2to3.pgen2.tokenize.TokenError, SyntaxError...
+        # for forwards-compatibility I'm just going general here.
+        return source_code
+    target_versions = set(_version_map) & set(black.detect_target_versions(parsed))
     assert target_versions
-    min_version = _version_map[min(target_versions, key=attrgetter("value"))]
+    min_version = max(
+        min_version,
+        _version_map[min(target_versions, key=attrgetter("value"))],
+    )
 
     if refactor:
         # Some tools assume that the file is multi-line, but empty files are valid input.
