@@ -53,7 +53,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.3.10"
+__version__ = "0.3.11"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -143,11 +143,7 @@ def shed(
     while prev != source_code:
         prev = source_code = black.format_str(source_code, mode=black_mode)
         source_code = autoflake.fix_code(
-            source_code,
-            expand_star_imports=True,
-            remove_all_unused_imports=True,
-            remove_duplicate_keys=True,
-            remove_unused_variables=True,
+            source_code, expand_star_imports=True, remove_all_unused_imports=True
         )
         source_code = isort.code(
             source_code,

@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.4.0 - 2021-09-15
+- disable `autoflake`'s remove-unused-variables; allow linters to warn about probable bugs
+
 #### 0.3.10 - 2021-08-21
 - require latest versions of all dependencies; variously fixing some upstream bugs,
   avoiding installation problems, and adding some refactoring features.
