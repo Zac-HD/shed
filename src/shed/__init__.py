@@ -8,6 +8,7 @@ import functools
 import re
 import sys
 import textwrap
+import warnings
 from operator import attrgetter
 from typing import FrozenSet, Match, Tuple
 
@@ -53,7 +54,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -67,6 +68,15 @@ _pybetter_fixers = tuple(
     for fix in set(ALL_IMPROVEMENTS)
     - {FixMissingAllAttribute, FixParenthesesInReturn, FixTrivialNestedWiths}
 )
+_SUGGESTIONS = (
+    # If we fail on invalid syntax, check for detectable wrong-codeblock types
+    (r"^(>>> | In [\d+]: )", "pycon"),
+    (r"^Traceback \(most recent call last\):$", "python-traceback"),
+)
+
+
+class ShedSyntaxWarning(SyntaxWarning):
+    """Warns that shed has been called on something with invalid syntax."""
 
 
 @functools.lru_cache()
@@ -76,6 +86,7 @@ def shed(
     refactor: bool = False,
     first_party_imports: FrozenSet[str] = frozenset(),
     min_version: Tuple[int, int] = _default_min_version,
+    _location: str = "string passed to shed.shed()",
 ) -> str:
     """Process the source code of a single module."""
     assert isinstance(source_code, str)
@@ -88,13 +99,31 @@ def shed(
     if source_code == "":
         return ""
 
+    format_docs = functools.partial(
+        docshed,
+        refactor=refactor,
+        first_party_imports=first_party_imports,
+        min_version=min_version,
+        _location=_location,
+    )
+
     # Use black to autodetect our target versions
     try:
         parsed = lib2to3_parse(source_code.lstrip(), set(_version_map))
-    except Exception:
         # black.InvalidInput, blib2to3.pgen2.tokenize.TokenError, SyntaxError...
         # for forwards-compatibility I'm just going general here.
-        return source_code
+    except Exception:
+        msg = f"Could not parse {_location}"
+        for pattern, blocktype in _SUGGESTIONS:
+            if re.search(pattern, source_code, flags=re.MULTILINE):
+                msg += f"\n    Perhaps you should use a {blocktype!r} block instead?"
+        warnings.warn(
+            ShedSyntaxWarning(msg),
+            stacklevel=_location.count(" block in ") + 2,
+        )
+        # Even if the code itself has invalid syntax, we might be able to
+        # regex-match and therefore reformat code embedded in docstrings.
+        return format_docs(source_code)
     target_versions = set(_version_map) & set(black.detect_target_versions(parsed))
     assert target_versions
     min_version = max(
@@ -129,12 +158,6 @@ def shed(
                 # Catches e.g. https://github.com/lensvol/pybetter/issues/60
                 compile(newtree.code, "<string>", "exec")
         source_code = tree.code
-    # Then shed.docshed (below) formats any code blocks in documentation
-    source_code = docshed(
-        source=source_code,
-        first_party_imports=first_party_imports,
-        min_version=min_version,
-    )
     # And pyupgrade - see pyupgrade._main._fix_file - is our last stable fixer
     # Calculate separate minver because pyupgrade can take a little while to update
     pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
@@ -163,6 +186,8 @@ def shed(
             combine_as_imports=True,
         )
 
+    # Then shed.docshed (below) formats any code blocks in documentation
+    source_code = format_docs(source_code)
     # Remove any extra trailing whitespace
     return source_code.rstrip() + "\n"
 
@@ -174,6 +199,7 @@ def docshed(
     refactor: bool = False,
     first_party_imports: FrozenSet[str] = frozenset(),
     min_version: Tuple[int, int] = _default_min_version,
+    _location: str = "string passed to shed.docshed()",
 ) -> str:
     """Process Python code blocks embedded in documentation."""
     # Inspired by the blacken-docs package.
@@ -182,6 +208,13 @@ def docshed(
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)
     assert min_version in _version_map.values()
+    format_code = functools.partial(
+        shed,
+        refactor=refactor,
+        first_party_imports=first_party_imports,
+        min_version=min_version,
+    )
+
     markdown_pattern = re.compile(
         r"(?P<before>^(?P<indent> *)```python\n)"
         r"(?P<code>.*?)"
@@ -190,7 +223,8 @@ def docshed(
     )
     rst_pattern = re.compile(
         r"(?P<before>"
-        r"^(?P<indent> *)\.\. (jupyter-execute::|(code|code-block|sourcecode|ipython):: "
+        r"^(?P<indent> *)\.\. "
+        r"(?P<block>jupyter-execute::|(code|code-block|sourcecode|ipython):: "
         r"(python|py|sage|python3|py3|numpy))\n"
         r"((?P=indent) +:.*\n)*"
         r"\n*"
@@ -201,12 +235,7 @@ def docshed(
 
     def _md_match(match: Match[str]) -> str:
         code = textwrap.dedent(match["code"])
-        code = shed(
-            code,
-            refactor=refactor,
-            first_party_imports=first_party_imports,
-            min_version=min_version,
-        )
+        code = format_code(code, _location=f"```python markdown block in {_location}")
         code = textwrap.indent(code, match["indent"])
         return f'{match["before"]}{code}{match["after"]}'
 
@@ -218,11 +247,8 @@ def docshed(
         assert trailing_ws_match
         trailing_ws = trailing_ws_match.group()
         code = textwrap.dedent(match["code"])
-        code = shed(
-            code,
-            refactor=refactor,
-            first_party_imports=first_party_imports,
-            min_version=min_version,
+        code = format_code(
+            code, _location=f"{match['block']!r} rst block in {_location}"
         )
         code = textwrap.indent(code, min_indent)
         return f'{match["before"]}{code.rstrip()}{trailing_ws}'

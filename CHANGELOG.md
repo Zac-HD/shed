@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.4.2 - 2021-09-16
+- Warn on invalid syntax, and try to format docstrings anyway
+  ([#23](https://github.com/Zac-HD/shed/issues/23))
+
 #### 0.4.1 - 2021-09-15
 - Skip files or code-blocks with invalid syntax
   ([#23](https://github.com/Zac-HD/shed/issues/23))

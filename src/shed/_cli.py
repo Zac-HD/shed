@@ -9,12 +9,13 @@ import functools
 import multiprocessing
 import subprocess
 import sys
+import warnings
 from pathlib import Path
 from typing import FrozenSet, Union
 
 import autoflake
 
-from . import _version_map, docshed, shed
+from . import ShedSyntaxWarning, _version_map, docshed, shed
 
 
 @functools.lru_cache()
@@ -51,17 +52,26 @@ def _rewrite_on_disk(
         # Permissions or encoding issue, or file deleted since last commit.
         return f"skipping {fname!r} due to {err}"
     writer = docshed if fname.endswith((".md", ".rst")) else shed
+    msg = ""
     try:
-        result = writer(on_disk, **kwargs)
+        with warnings.catch_warnings(record=True) as record:
+            result = writer(on_disk, _location=f"file {fname!r}", **kwargs)
     except Exception as err:  # pragma: no cover  # bugs are unknown xor fixed ;-)
         return (
             f"Internal error formatting {fname!r}: {type(err).__name__}: {err}\n"
             "    Please report this to https://github.com/Zac-HD/shed/issues"
         )
+    else:
+        msg = "\n".join(
+            str(w.message) for w in record if issubclass(w.category, ShedSyntaxWarning)
+        )
+        for w in record:  # pragma: no cover  # just being careful not to hide anything
+            if not issubclass(w.category, ShedSyntaxWarning):
+                warnings.warn(w.message, category=w.category, stacklevel=2)
     if result != on_disk:
         with open(fname, mode="w") as fh:
             fh.write(result)
-    return result != on_disk
+    return msg or result != on_disk
 
 
 def cli() -> None:  # pragma: no cover  # mutates things in-place, will test later.

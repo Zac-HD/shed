@@ -55,11 +55,11 @@ adding the following to your `.pre-commit-config.yaml`:
 minimum_pre_commit_version: '2.9.0'
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.4.1
+  rev: 0.4.2
   hooks:
-  - id: shed
-    # args: [--refactor, --py39-plus]
-  types_or: [python, markdown, rst]
+    - id: shed
+      # args: [--refactor, --py39-plus]
+      types_or: [python, markdown, rst]
 ```
 
 This is often considerably faster for large projects, because `pre-commit`

@@ -1,0 +1,29 @@
+.. code-block:: python
+
+    1/0
+
+    def f():
+        """
+        The inner markdown block is not valid syntax
+        ```python
+        Traceback (most recent call last):
+            File "<string>", line 1, in <module>
+        ZeroDivisionError: division by zero
+        ```
+        """
+
+================================================================================
+
+.. code-block:: python
+
+    1/0
+
+    def f():
+        """
+        The inner markdown block is not valid syntax
+        ```python
+        Traceback (most recent call last):
+            File "<string>", line 1, in <module>
+        ZeroDivisionError: division by zero
+        ```
+        """

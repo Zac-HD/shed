@@ -1,0 +1,41 @@
+```python
+1/ # invalid syntax
+
+def f():
+    """
+    .. code-block:: python
+
+        1/0
+        def f():
+            """
+            ```python
+            >>> range(10)
+            range(10)
+            ```
+            """
+
+    """
+```
+
+================================================================================
+
+```python
+1/ # invalid syntax
+
+def f():
+    """
+    .. code-block:: python
+
+        1 / 0
+
+
+        def f():
+            """
+            ```python
+            >>> range(10)
+            range(10)
+            ```
+            """
+
+    """
+```
