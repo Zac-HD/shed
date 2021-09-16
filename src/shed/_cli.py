@@ -55,7 +55,7 @@ def _rewrite_on_disk(
         result = writer(on_disk, **kwargs)
     except Exception as err:  # pragma: no cover  # bugs are unknown xor fixed ;-)
         return (
-            f"Internal error formatting {fname!r}: {err}\n"
+            f"Internal error formatting {fname!r}: {type(err).__name__}: {err}\n"
             "    Please report this to https://github.com/Zac-HD/shed/issues"
         )
     if result != on_disk:
