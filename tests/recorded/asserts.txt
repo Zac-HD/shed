@@ -1,0 +1,30 @@
+# unchanged because test is not a literal
+assert not True
+assert not True, "message"
+
+# changed to `raise` statements because literal is falsey
+assert False
+assert None
+assert "", "message"
+
+# removed because literal is truthy
+assert True
+assert True, "message"
+assert ("", "message")
+
+# not an exception, replaced with NotImplementedError
+raise NotImplemented
+
+================================================================================
+
+# unchanged because test is not a literal
+assert not True
+assert not True, "message"
+
+# changed to `raise` statements because literal is falsey
+raise AssertionError
+raise AssertionError
+raise AssertionError("message")
+
+# not an exception, replaced with NotImplementedError
+raise NotImplementedError

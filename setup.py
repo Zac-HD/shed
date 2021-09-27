@@ -27,7 +27,6 @@ setuptools.setup(
         "com2ann >= 0.3.0 ; python_version >= '3.8'",
         "isort >= 5.9.3",
         "libcst >= 0.3.20",
-        "pybetter >= 0.3.7",
         "pyupgrade >= 2.24.0",
         "teyit >= 0.3.2 ; python_version >= '3.9'",
     ],

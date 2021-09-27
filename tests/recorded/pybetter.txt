@@ -16,8 +16,8 @@ with a:
 
 x not in y
 z is None
-a
-not a
+a == True
+a == False
 
 with a:
     with b:

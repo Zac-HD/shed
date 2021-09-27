@@ -9,7 +9,7 @@ f"no substitutions"
 
 x, y = 1, 2
 
-"no substitutions"
+f"no substitutions"
 f"A{2}"
 f"{12}, {34!r}"
 f"{x}, {y!r}"
