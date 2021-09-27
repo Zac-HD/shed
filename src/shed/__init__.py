@@ -224,8 +224,9 @@ def docshed(
     rst_pattern = re.compile(
         r"(?P<before>"
         r"^(?P<indent> *)\.\. "
-        r"(?P<block>jupyter-execute::|(code|code-block|sourcecode|ipython):: "
-        r"(python|py|sage|python3|py3|numpy))\n"
+        r"(?P<block>jupyter-execute::|"
+        r"invisible-code-block: python|"  # magic rst comment for Sybil doctests
+        r"(code|code-block|sourcecode|ipython):: (python|py|sage|python3|py3|numpy))\n"
         r"((?P=indent) +:.*\n)*"
         r"\n*"
         r")"
