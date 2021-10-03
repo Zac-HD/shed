@@ -69,6 +69,7 @@ def shed(
     first_party_imports: FrozenSet[str] = frozenset(),
     min_version: Tuple[int, int] = _default_min_version,
     _location: str = "string passed to shed.shed()",
+    _remove_unused_imports: bool = True,
 ) -> str:
     """Process the source code of a single module."""
     assert isinstance(source_code, str)
@@ -151,7 +152,9 @@ def shed(
     while prev != source_code:
         prev = source_code = black.format_str(source_code, mode=black_mode)
         source_code = autoflake.fix_code(
-            source_code, expand_star_imports=True, remove_all_unused_imports=True
+            source_code,
+            expand_star_imports=True,
+            remove_all_unused_imports=_remove_unused_imports,
         )
         source_code = isort.code(
             source_code,
@@ -188,6 +191,7 @@ def docshed(
         refactor=refactor,
         first_party_imports=first_party_imports,
         min_version=min_version,
+        _remove_unused_imports=False,
     )
 
     markdown_pattern = re.compile(
