@@ -9,7 +9,7 @@ import hypothesmith
 import pytest
 from hypothesis import HealthCheck, assume, example, given, settings, strategies as st
 
-from shed import shed
+from shed import ShedSyntaxWarning, shed
 from shed._cli import _guess_first_party_modules, _rewrite_on_disk, _should_format
 
 TEYIT_TWO_PASS = """
@@ -36,7 +36,12 @@ def test_shed_is_idempotent(source_code, refactor, provides):
         result = shed(
             source_code=source_code, refactor=refactor, first_party_imports=provides
         )
-    except (IndentationError, black.InvalidInput, blib2to3.pgen2.tokenize.TokenError):
+    except (
+        IndentationError,
+        black.InvalidInput,
+        blib2to3.pgen2.tokenize.TokenError,
+        ShedSyntaxWarning,
+    ):
         assume(False)
     assert result == shed(
         source_code=result, refactor=refactor, first_party_imports=provides
@@ -95,7 +100,20 @@ def test_rewrite_returns_error_message_for_nonexistent_file():
 @pytest.mark.parametrize("refactor", [True, False])
 def test_empty_stays_empty(refactor):
     assert shed(source_code="", refactor=refactor) == ""
-    assert shed(source_code="", refactor=refactor) == ""
+
+
+@pytest.mark.parametrize(
+    "source_code",
+    [
+        "this isn't valid Python",
+        # We request a bug report for valid unhandled syntax, i.e. (upstream) bugs
+        "class A:\\\r# type: ignore\n pass\n",
+    ],
+)
+@pytest.mark.parametrize("refactor", [True, False])
+def test_error_on_invalid_syntax(source_code, refactor):
+    with pytest.raises(Exception):
+        assert shed(source_code=source_code, refactor=refactor)
 
 
 python_files = []

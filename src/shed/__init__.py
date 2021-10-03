@@ -99,6 +99,12 @@ def shed(
         for pattern, blocktype in _SUGGESTIONS:
             if re.search(pattern, source_code, flags=re.MULTILINE):
                 msg += f"\n    Perhaps you should use a {blocktype!r} block instead?"
+        try:
+            compile(source_code, "<string>", "exec")
+        except SyntaxError:
+            pass
+        else:
+            msg += "\n    The syntax is valid Python, so please report this as a bug."
         warnings.warn(
             ShedSyntaxWarning(msg),
             stacklevel=_location.count(" block in ") + 2,
