@@ -1,5 +1,15 @@
 # Changelog
 
+#### 0.5.0 - 2021-10-03
+- Stop removing "unused" imports in code blocks; often they're used in later blocks
+- Use custom LibCST refactoring passes instead of `pybetter`; because these are faster
+  they're also enabled outside of `--refactor` mode
+- Replace `raise NotImplemented` with `raise NotImplementedError`
+- Replace `assert False [, msg]` with `raise AssertionError [(msg)]`, for all falsey
+  literals, to avoid surprising behaviour with `PYTHONOPTIMIZE`
+  (use `if __debug__` if you need such behaviour)
+- Remove `assert True`, or other truthy literals, which can never fail
+
 #### 0.4.2 - 2021-09-16
 - Warn on invalid syntax, and try to format docstrings anyway
   ([#23](https://github.com/Zac-HD/shed/issues/23))
