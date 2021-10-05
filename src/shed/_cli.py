@@ -125,15 +125,23 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
         min_version=args.min_version,
     )
 
-    if len(all_filenames) <= 4:
-        # If we're only formatting a few files, starting up a process pool
-        # probably takes up more time that it saves.
-        for fname in all_filenames:
-            error_msg = rewrite(fname)
-            if isinstance(error_msg, str):
-                print(error_msg)  # noqa
-    else:
-        with multiprocessing.Pool() as pool:
-            for error_msg in pool.imap_unordered(rewrite, all_filenames):
-                if isinstance(error_msg, str):
-                    print(error_msg)  # noqa
+    if len(all_filenames) > 4:
+        # If we're formatting more than a few files, the improved throughput
+        # of a process pool probably covers the startup cost.
+        try:
+            with multiprocessing.Pool() as pool:
+                for error_msg in pool.imap_unordered(rewrite, all_filenames):
+                    if isinstance(error_msg, str):
+                        print(error_msg)  # noqa
+            return
+        except BlockingIOError as err:  # pragma: no cover
+            # This can occur when `os.fork()` fails due to limited available
+            # memory or number-of-processes.  In this case, we fall back to
+            # the slow path; and reprocess whatever we've already done for
+            # simplicity.  See https://stackoverflow.com/q/44534288/
+            print(f"Error: {err!r}\n    Falling back to serial mode.")  # noqa
+
+    for fname in all_filenames:
+        error_msg = rewrite(fname)
+        if isinstance(error_msg, str):
+            print(error_msg)  # noqa

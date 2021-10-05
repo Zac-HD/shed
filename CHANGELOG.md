@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.5.1 - 2021-10-05
+- Continue in a single process if `os.fork()` fails with `BlockingIOError`
+
 #### 0.5.0 - 2021-10-03
 - Stop removing "unused" imports in code blocks; often they're used in later blocks
 - Use custom LibCST refactoring passes instead of `pybetter`; because these are faster
