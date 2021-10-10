@@ -6,9 +6,11 @@ nitpicks about typing unions and literals.
 """
 
 from ast import literal_eval
+from typing import Tuple
 
 import libcst as cst
 import libcst.matchers as m
+from libcst._parser.types.config import _pick_compatible_python_version
 from libcst.codemod import VisitorBasedCodemodCommand
 
 try:
@@ -22,10 +24,17 @@ else:
     hypothesis_fixers = [Hy1, Hy2]
 
 
-def _run_codemods(code: str, refactor: bool) -> str:
+def _run_codemods(code: str, refactor: bool, min_version: Tuple[int, int]) -> str:
     """Run all Shed fixers on a code string."""
     context = cst.codemod.CodemodContext()
-    mod = cst.parse_module(code)
+
+    # We want LibCST to parse the code as if running on our target minimum version,
+    # but fall back to the latest version it supports (currently 3.8) if our target
+    # version is newer than that.
+    v = _pick_compatible_python_version(".".join(map(str, min_version)))
+    config = cst.PartialParserConfig(python_version=f"{v.major}.{v.minor}")
+    mod = cst.parse_module(code, config)
+
     for fixer in [ShedFixers] + refactor * hypothesis_fixers:
         mod = fixer(context).transform_module(mod)
     return mod.code
@@ -42,7 +51,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
     """
 
     DESCRIPTION = "Fix `raise NotImplemented` and `assert False` statements."
-    METADATA_DEPENDENCIES = (cst.metadata.QualifiedNameProvider,)
 
     @m.call_if_inside(m.Raise(exc=m.Name(value="NotImplemented")))
     def leave_Name(self, _, updated_node):  # noqa

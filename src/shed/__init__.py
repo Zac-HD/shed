@@ -133,7 +133,7 @@ def shed(
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
         source_code, _ = _teyit_refactor(source_code)
     # Apply all our libcst-based codemods
-    source_code = _run_codemods(source_code, refactor=refactor)
+    source_code = _run_codemods(source_code, refactor=refactor, min_version=min_version)
     # And pyupgrade - see pyupgrade._main._fix_file - is our last stable fixer
     # Calculate separate minver because pyupgrade can take a little while to update
     pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
