@@ -1,15 +1,17 @@
 """Tests for the `shed` library."""
 
+import os
 import tempfile
 from pathlib import Path
 
 import black
 import blib2to3
 import hypothesmith
+import libcst
 import pytest
-from hypothesis import HealthCheck, assume, example, given, settings, strategies as st
+from hypothesis import HealthCheck, example, given, reject, settings, strategies as st
 
-from shed import ShedSyntaxWarning, shed
+from shed import ShedSyntaxWarning, _default_min_version, _version_map, shed
 from shed._cli import _guess_first_party_modules, _rewrite_on_disk, _should_format
 
 TEYIT_TWO_PASS = """
@@ -19,33 +21,57 @@ unittest.assertIs(a > b, True)
 """
 
 
-@given(
-    source_code=hypothesmith.from_grammar(auto_target=False)
-    | hypothesmith.from_node(auto_target=False),
-    refactor=st.booleans(),
-    provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
-)
-@example(source_code=TEYIT_TWO_PASS, refactor=True, provides=frozenset())
-@example(source_code="class A:\n\x0c pass\n", refactor=True, provides=frozenset())
-@settings(suppress_health_check=HealthCheck.all(), deadline=None)
-def test_shed_is_idempotent(source_code, refactor, provides):
+def check(
+    source_code,
+    *,
+    refactor,
+    provides=frozenset(),
+    min_version=_default_min_version,
+    except_=reject,
+):
     # Given any syntatically-valid source code, shed should not crash.
     # This tests doesn't check that we do the *right* thing,
     # just that we don't crash on valid-if-poorly-styled code!
     try:
         result = shed(
-            source_code=source_code, refactor=refactor, first_party_imports=provides
+            source_code=source_code,
+            refactor=refactor,
+            first_party_imports=provides,
+            min_version=min_version,
         )
     except (
         IndentationError,
         black.InvalidInput,
         blib2to3.pgen2.tokenize.TokenError,
+        libcst.ParserSyntaxError,
         ShedSyntaxWarning,
     ):
-        assume(False)
+        except_()
     assert result == shed(
-        source_code=result, refactor=refactor, first_party_imports=provides
+        source_code=result,
+        refactor=refactor,
+        first_party_imports=provides,
+        min_version=min_version,
     )
+    assert result == shed(source_code=result, first_party_imports=provides)
+    return result
+
+
+example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 8)}
+
+
+@given(
+    source_code=hypothesmith.from_grammar(auto_target=False)
+    | hypothesmith.from_node(auto_target=False),
+    refactor=st.booleans(),
+    provides=st.frozensets(st.from_regex(r"\A[\w\d_]+\Z").filter(str.isidentifier)),
+    min_version=st.sampled_from(sorted(_version_map.values())),
+)
+@example(source_code=TEYIT_TWO_PASS, **example_kwargs)
+@example(source_code="class A:\n\x0c pass\n", **example_kwargs)
+@settings(suppress_health_check=HealthCheck.all(), deadline=None)
+def test_shed_is_idempotent(source_code, refactor, provides, min_version):
+    check(source_code, refactor=refactor, min_version=min_version, provides=provides)
 
 
 def test_guesses_shed_is_first_party():
@@ -117,15 +143,17 @@ def test_error_on_invalid_syntax(source_code, refactor):
 
 
 python_files = []
-# import os, site
-# for base in sorted(set(site.PREFIXES)):
-#     for dirname, _, files in os.walk(base):
-#         python_files.extend(Path(dirname) / f for f in files if f.endswith(".py"))
+if "SHED_SLOW_TESTS" in os.environ:
+    # When I say slow I'm not kidding, testing all site code takes almost an hour!
+    import site
+
+    for base in sorted(site.PREFIXES):
+        python_files.extend(Path(base).glob("**/*.py"))
+    python_files = sorted(set(python_files), key=str)
 
 
-# NOTE: this test is disabled by default because it takes several minutes
 @pytest.mark.parametrize("py_file", python_files, ids=str)
-def est_on_site_code(py_file):
+def test_on_site_code(py_file):
     # Because the generator isn't perfect, we'll also test on all the code
     # we can easily find in our current Python environment - this includes
     # the standard library, and all installed packages.
@@ -133,9 +161,15 @@ def est_on_site_code(py_file):
         source_code = py_file.read_text()
     except UnicodeDecodeError:
         pytest.xfail(reason="encoding problem")
-
     try:
-        result = shed(source_code=source_code)
-    except (IndentationError, black.InvalidInput, blib2to3.pgen2.tokenize.TokenError):
-        pytest.xfail(reason="Black can't handle that")
-    assert result == shed(source_code=result)
+        compile(source_code, str(py_file), "exec")
+    except Exception:
+        pytest.xfail(reason="invalid source code")
+    for refactor in [False, True]:
+        for min_version in sorted(_version_map.values()):
+            check(
+                source_code,
+                refactor=refactor,
+                min_version=min_version,
+                except_=lambda: pytest.xfail(reason="Black can't handle that"),
+            )

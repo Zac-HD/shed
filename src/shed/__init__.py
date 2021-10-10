@@ -124,12 +124,16 @@ def shed(
         # Some tools assume that the file is multi-line, but empty files are valid input.
         source_code += "\n"
         # Use com2ann to comvert type comments to annotations on Python 3.8+
-        source_code, _ = com2ann(
+        annotated = com2ann(
             source_code,
             drop_ellipsis=True,
             silent=True,
-            python_minor_version=min_version[1],
+            python_minor_version=min(min_version[1], sys.version_info[1]),
         )
+        if annotated:  # pragma: no branch
+            # This can only be None if ast.parse() raises a SyntaxError,
+            # which is possible but rare after the parsing checks above.
+            source_code, _ = annotated
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
         source_code, _ = _teyit_refactor(source_code)
     # Apply all our libcst-based codemods

@@ -7,9 +7,11 @@ import pytest
 
 import shed
 
+from .test_shed import check
+
 
 @pytest.mark.parametrize(
-    "filename", (pathlib.Path(__file__).parent / "recorded").glob("*.txt"), ids=repr
+    "filename", pathlib.Path(__file__).parent.glob("recorded/**/*.txt"), ids=repr
 )
 def test_saved_examples(filename):
     """Replay and save expected outputs from `shed`.
@@ -26,7 +28,7 @@ def test_saved_examples(filename):
     input_, expected, *_ = map(str.strip, (filename.read_text() + joiner).split(joiner))
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", shed.ShedSyntaxWarning)
-        result = shed.shed(source_code=input_, refactor=True)
+        result = check(source_code=input_, refactor=True)
     if result.strip() != expected:
         filename.write_text(joiner.join([input_, result]))
         raise AssertionError(filename.name + " changed formatting")
