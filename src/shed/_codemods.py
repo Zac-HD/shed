@@ -90,3 +90,12 @@ class ShedFixers(VisitorBasedCodemodCommand):
             rpar=updated_node.rpar,
             comparisons=[expr.comparisons[0].with_changes(operator=cst.NotIn())],
         )
+
+    @m.leave(
+        m.Call(
+            lpar=[m.AtLeastN(n=1, matcher=m.LeftParen())],
+            rpar=[m.AtLeastN(n=1, matcher=m.RightParen())],
+        )
+    )
+    def remove_pointless_parens_around_call(self, _, updated_node):
+        return updated_node.with_changes(lpar=[], rpar=[])
