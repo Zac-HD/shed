@@ -4,8 +4,6 @@
 #
 #    pip-compile --output-file=deps/test.txt deps/test.in setup.py
 #
-appdirs==1.4.4
-    # via black
 atomicwrites==1.4.0
     # via pytest
 attrs==21.2.0
@@ -14,39 +12,38 @@ attrs==21.2.0
     #   pytest
 autoflake==1.4
     # via shed (setup.py)
-black==21.7b0
+black==21.9b0
     # via shed (setup.py)
-click==7.1.2
-    # via
-    #   black
-    #   pybetter
-    #   pyemojify
+click==8.0.2
+    # via black
 colorama==0.4.4
-    # via pytest
-coverage==5.5
+    # via
+    #   click
+    #   pytest
+coverage[toml]==6.0.1
     # via pytest-cov
 execnet==1.9.0
     # via pytest-xdist
-hypothesis==6.14.9
+hypothesis==6.23.2
     # via
     #   -r deps/test.in
     #   hypothesmith
 hypothesmith==0.1.9
     # via -r deps/test.in
-importlib-metadata==4.6.4
+importlib-metadata==4.8.1
     # via
+    #   click
     #   pluggy
     #   pytest
 iniconfig==1.1.1
     # via pytest
 isort==5.9.3
     # via shed (setup.py)
-lark-parser==0.11.3
+lark-parser==0.12.0
     # via hypothesmith
-libcst==0.3.20
+libcst==0.3.21
     # via
     #   hypothesmith
-    #   pybetter
     #   shed (setup.py)
 mypy-extensions==0.4.3
     # via
@@ -56,53 +53,49 @@ packaging==21.0
     # via pytest
 pathspec==0.9.0
     # via black
-pluggy==0.13.1
+platformdirs==2.4.0
+    # via black
+pluggy==1.0.0
     # via pytest
 py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pybetter==0.3.7
-    # via shed (setup.py)
-pyemojify==0.2.0
-    # via pybetter
-pyflakes==2.3.1
+pyflakes==2.4.0
     # via autoflake
-pygments==2.10.0
-    # via pybetter
 pyparsing==2.4.7
     # via packaging
-pytest==6.2.4
+pytest==6.2.5
     # via
     #   -r deps/test.in
     #   pytest-cov
     #   pytest-forked
     #   pytest-xdist
-pytest-cov==2.12.1
+pytest-cov==3.0.0
     # via -r deps/test.in
 pytest-forked==1.3.0
     # via pytest-xdist
-pytest-xdist==2.3.0
+pytest-xdist==2.4.0
     # via -r deps/test.in
-pyupgrade==2.24.0
+pyupgrade==2.29.0
     # via shed (setup.py)
 pyyaml==5.4.1
     # via libcst
-regex==2021.8.3
+regex==2021.10.8
     # via black
 sortedcontainers==2.4.0
     # via hypothesis
 tokenize-rt==4.1.0
     # via pyupgrade
 toml==0.10.2
-    # via
-    #   pytest
-    #   pytest-cov
+    # via pytest
 tomli==1.2.1
-    # via black
+    # via
+    #   black
+    #   coverage
 typed-ast==1.4.3
     # via black
-typing-extensions==3.10.0.0
+typing-extensions==3.10.0.2
     # via
     #   black
     #   importlib-metadata
@@ -110,5 +103,5 @@ typing-extensions==3.10.0.0
     #   typing-inspect
 typing-inspect==0.7.1
     # via libcst
-zipp==3.5.0
+zipp==3.6.0
     # via importlib-metadata
