@@ -1,5 +1,6 @@
 """Tests for the `shed` library."""
 
+import ast
 import os
 import tempfile
 from pathlib import Path
@@ -149,7 +150,7 @@ if "SHED_SLOW_TESTS" in os.environ:
 
     for base in sorted(site.PREFIXES):
         python_files.extend(Path(base).glob("**/*.py"))
-    python_files = sorted(set(python_files), key=str)
+    python_files = sorted(python_files, key=str)
 
 
 @pytest.mark.parametrize("py_file", python_files, ids=str)

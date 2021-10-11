@@ -95,7 +95,7 @@ def shed(
         parsed = lib2to3_parse(source_code.lstrip(), set(_version_map))
         # black.InvalidInput, blib2to3.pgen2.tokenize.TokenError, SyntaxError...
         # for forwards-compatibility I'm just going general here.
-    except Exception:
+    except Exception as err:
         msg = f"Could not parse {_location}"
         for pattern, blocktype in _SUGGESTIONS:
             if re.search(pattern, source_code, flags=re.MULTILINE):
@@ -106,10 +106,9 @@ def shed(
             pass
         else:
             msg += "\n    The syntax is valid Python, so please report this as a bug."
-        warnings.warn(
-            ShedSyntaxWarning(msg),
-            stacklevel=_location.count(" block in ") + 2,
-        )
+        w = ShedSyntaxWarning(msg)
+        w.__cause__ = err
+        warnings.warn(w, stacklevel=_location.count(" block in ") + 2)
         # Even if the code itself has invalid syntax, we might be able to
         # regex-match and therefore reformat code embedded in docstrings.
         return format_docs(source_code)

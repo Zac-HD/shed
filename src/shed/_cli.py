@@ -7,6 +7,7 @@ pass the names of specific files to format instead.
 import argparse
 import functools
 import multiprocessing
+import os
 import subprocess
 import sys
 import warnings
@@ -57,6 +58,8 @@ def _rewrite_on_disk(
         with warnings.catch_warnings(record=True) as record:
             result = writer(on_disk, _location=f"file {fname!r}", **kwargs)
     except Exception as err:  # pragma: no cover  # bugs are unknown xor fixed ;-)
+        if "SHED_RAISE" in os.environ:
+            raise
         return (
             f"Internal error formatting {fname!r}: {type(err).__name__}: {err}\n"
             "    Please report this to https://github.com/Zac-HD/shed/issues"
