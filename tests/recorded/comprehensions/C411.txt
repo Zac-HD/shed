@@ -8,4 +8,4 @@ list([f(x) for x in foo])
 # C411: Unnecessary list call - remove the outer call to list().
 # It’s unnecessary to use a list around a list comprehension, since it is equivalent without it. For example:
 
-list(f(x) for x in foo)
+[f(x) for x in foo]

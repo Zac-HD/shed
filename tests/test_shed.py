@@ -20,6 +20,7 @@ import unittest
 
 unittest.assertIs(a > b, True)
 """
+NOT_YET_FIXED = ("C400", "C401", "C402", "C405", "C406", "C408", "C409", "C410", "C413")
 
 
 def check(
@@ -63,7 +64,7 @@ def check(
     errors = [
         err
         for err in ComprehensionChecker(tree).run()
-        if False
+        if not err[2].startswith(NOT_YET_FIXED)
     ]
     assert not errors
     return result

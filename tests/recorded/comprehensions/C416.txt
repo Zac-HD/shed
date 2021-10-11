@@ -4,10 +4,16 @@
 [x for x in iterable]
 {x for x in iterable}
 
+y = 2
+[y for x in iterable]
+
 ================================================================================
 
 # C416: Unnecessary <list/set> comprehension - using <list/set>().
 # It’s unnecessary to use a list comprehension if the elements are unchanged. The iterable should be wrapped in list() or set() instead. For example:
 
-[x for x in iterable]
-{x for x in iterable}
+list(iterable)
+set(iterable)
+
+y = 2
+[y for x in iterable]
