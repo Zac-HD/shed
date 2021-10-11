@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.5.2 - 2021-10-11
+- Fix latent bugs around min-version handling with Black and LibCST
+- Fix a rare crash with `--refactor` where com2ann could fail to parse input
+
 #### 0.5.1 - 2021-10-05
 - Continue in a single process if `os.fork()` fails with `BlockingIOError`
 

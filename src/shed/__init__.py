@@ -41,7 +41,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -92,7 +92,10 @@ def shed(
 
     # Use black to autodetect our target versions
     try:
-        parsed = lib2to3_parse(source_code.lstrip(), set(_version_map))
+        parsed = lib2to3_parse(
+            source_code.lstrip(),
+            target_versions={k for k, v in _version_map.items() if v >= min_version},
+        )
         # black.InvalidInput, blib2to3.pgen2.tokenize.TokenError, SyntaxError...
         # for forwards-compatibility I'm just going general here.
     except Exception as err:

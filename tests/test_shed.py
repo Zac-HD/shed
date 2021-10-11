@@ -1,6 +1,5 @@
 """Tests for the `shed` library."""
 
-import ast
 import os
 import tempfile
 from pathlib import Path
