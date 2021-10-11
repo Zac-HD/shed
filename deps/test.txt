@@ -24,6 +24,10 @@ coverage[toml]==6.0.1
     # via pytest-cov
 execnet==1.9.0
     # via pytest-xdist
+flake8==3.9.2
+    # via flake8-comprehensions
+flake8-comprehensions==3.6.1
+    # via -r deps/test.in
 hypothesis==6.23.2
     # via
     #   -r deps/test.in
@@ -33,6 +37,8 @@ hypothesmith==0.1.9
 importlib-metadata==4.8.1
     # via
     #   click
+    #   flake8
+    #   flake8-comprehensions
     #   pluggy
     #   pytest
 iniconfig==1.1.1
@@ -45,6 +51,8 @@ libcst==0.3.21
     # via
     #   hypothesmith
     #   shed (setup.py)
+mccabe==0.6.1
+    # via flake8
 mypy-extensions==0.4.3
     # via
     #   black
@@ -61,8 +69,12 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pyflakes==2.4.0
-    # via autoflake
+pycodestyle==2.7.0
+    # via flake8
+pyflakes==2.3.1
+    # via
+    #   autoflake
+    #   flake8
 pyparsing==2.4.7
     # via packaging
 pytest==6.2.5

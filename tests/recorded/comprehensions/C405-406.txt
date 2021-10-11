@@ -1,0 +1,21 @@
+# C405-406: Unnecessary <list/tuple> literal - as a set literal.
+# It’s unnecessary to use a list or tuple literal within a call to set or dict. For example:
+
+set([1, 2])
+set((1, 2))
+set([])
+dict([(1, 2)])
+dict(((1, 2),))
+dict([])
+
+================================================================================
+
+# C405-406: Unnecessary <list/tuple> literal - as a set literal.
+# It’s unnecessary to use a list or tuple literal within a call to set or dict. For example:
+
+{1, 2}
+{1, 2}
+set()
+dict([(1, 2)])
+dict(((1, 2),))
+dict([])
