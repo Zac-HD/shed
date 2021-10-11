@@ -1,0 +1,21 @@
+# C413: Unnecessary <list/reversed> call around sorted().
+# It’s unnecessary to use list() around sorted()
+
+list(sorted([2, 3, 1]))
+reversed(sorted([2, 3, 1]))
+reversed(sorted([2, 3, 1], reverse=True))
+
+list(sorted([2, 3, 1], reverse=False))
+reversed(sorted([2, 3, 1], reverse=False))
+
+================================================================================
+
+# C413: Unnecessary <list/reversed> call around sorted().
+# It’s unnecessary to use list() around sorted()
+
+list(sorted([2, 3, 1]))
+reversed(sorted([2, 3, 1]))
+reversed(sorted([2, 3, 1], reverse=True))
+
+list(sorted([2, 3, 1], reverse=False))
+reversed(sorted([2, 3, 1], reverse=False))

@@ -1,0 +1,21 @@
+# C409-410: Unnecessary <list/tuple> passed to <list/tuple>() - (remove the outer call to <list/tuple>``()/as a ``<list/tuple> literal).
+# It’s unnecessary to use a list or tuple literal within a call to list or tuple, since there is literal syntax for these types. For example:
+
+tuple([1, 2])
+tuple((1, 2))
+tuple([])
+list([1, 2])
+list((1, 2))
+list([])
+
+================================================================================
+
+# C409-410: Unnecessary <list/tuple> passed to <list/tuple>() - (remove the outer call to <list/tuple>``()/as a ``<list/tuple> literal).
+# It’s unnecessary to use a list or tuple literal within a call to list or tuple, since there is literal syntax for these types. For example:
+
+tuple([1, 2])
+tuple((1, 2))
+tuple([])
+list([1, 2])
+list((1, 2))
+list([])

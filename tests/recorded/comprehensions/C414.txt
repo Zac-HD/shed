@@ -1,0 +1,45 @@
+# C414: Unnecessary <list/reversed/set/sorted/tuple> call within <list/set/sorted/tuple>().
+# It’s unnecessary to double-cast or double-process iterables by wrapping the listed functions within list/set/sorted/tuple. For example:
+
+list(list(iterable))
+list(tuple(iterable))
+tuple(list(iterable))
+tuple(tuple(iterable))
+set(set(iterable))
+set(list(iterable))
+set(tuple(iterable))
+set(sorted(iterable))
+set(reversed(iterable))
+sorted(list(iterable))
+sorted(tuple(iterable))
+sorted(sorted(iterable))
+sorted(reversed(iterable))
+
+sorted(sorted(iterable, reverse=True))
+sorted(sorted(iterable, reverse=True))
+sorted(sorted(iterable, reverse=True), reverse=False)
+sorted(sorted(iterable, reverse=False), reverse=True)
+
+================================================================================
+
+# C414: Unnecessary <list/reversed/set/sorted/tuple> call within <list/set/sorted/tuple>().
+# It’s unnecessary to double-cast or double-process iterables by wrapping the listed functions within list/set/sorted/tuple. For example:
+
+list(list(iterable))
+list(tuple(iterable))
+tuple(list(iterable))
+tuple(tuple(iterable))
+set(set(iterable))
+set(list(iterable))
+set(tuple(iterable))
+set(sorted(iterable))
+set(reversed(iterable))
+sorted(list(iterable))
+sorted(tuple(iterable))
+sorted(sorted(iterable))
+sorted(reversed(iterable))
+
+sorted(sorted(iterable, reverse=True))
+sorted(sorted(iterable, reverse=True))
+sorted(sorted(iterable, reverse=True), reverse=False)
+sorted(sorted(iterable, reverse=False), reverse=True)

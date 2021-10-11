@@ -1,4 +1,5 @@
 # Top-level dependencies for `tox -e test`
+flake8-comprehensions
 hypothesis
 hypothesmith
 pytest

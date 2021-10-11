@@ -9,6 +9,7 @@ import blib2to3
 import hypothesmith
 import libcst
 import pytest
+from flake8_comprehensions import ComprehensionChecker
 from hypothesis import HealthCheck, example, given, reject, settings, strategies as st
 
 from shed import ShedSyntaxWarning, _default_min_version, _version_map, shed
@@ -54,6 +55,17 @@ def check(
         min_version=min_version,
     )
     assert result == shed(source_code=result, first_party_imports=provides)
+
+    try:
+        tree = ast.parse(result)
+    except SyntaxError:
+        return result
+    errors = [
+        err
+        for err in ComprehensionChecker(tree).run()
+        if False
+    ]
+    assert not errors
     return result
 
 
