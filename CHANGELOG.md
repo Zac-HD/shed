@@ -1,5 +1,12 @@
 # Changelog
 
+#### 0.5.3 - 2021-10-12
+- Fix an internal error on files with lambdas containing positional-only arguments
+  which were [not detected as requiring Python 3.8](https://github.com/psf/black/pull/2532)
+- Fix an internal error on files with
+  ['fluent interface' call chains](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#call-chains)
+  (introduced in 0.5.2)
+
 #### 0.5.2 - 2021-10-11
 - Fix latent bugs around min-version handling with Black and LibCST
 - Fix a rare crash with `--refactor` where com2ann could fail to parse input
