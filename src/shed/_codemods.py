@@ -98,4 +98,11 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
     )
     def remove_pointless_parens_around_call(self, _, updated_node):
-        return updated_node.with_changes(lpar=[], rpar=[])
+        # This is *probably* valid, but we might have e.g. a multi-line parenthesised
+        # chain of attribute accesses ("fluent interface"), where we need the parens.
+        noparens = updated_node.with_changes(lpar=[], rpar=[])
+        try:
+            compile(self.module.code_for_node(noparens), "<string>", "eval")
+            return noparens
+        except SyntaxError:
+            return updated_node

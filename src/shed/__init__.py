@@ -138,8 +138,6 @@ def shed(
             source_code, _ = annotated
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
         source_code, _ = _teyit_refactor(source_code)
-    # Apply all our libcst-based codemods
-    source_code = _run_codemods(source_code, refactor=refactor, min_version=min_version)
     # And pyupgrade - see pyupgrade._main._fix_file - is our last stable fixer
     # Calculate separate minver because pyupgrade can take a little while to update
     pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
@@ -153,22 +151,23 @@ def shed(
     # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore loop until
     # neither of them have made a change in the last loop body, trusting that
     # `black` itself is idempotent because that's tested upstream.
-    prev = ""
     black_mode = black.Mode(target_versions=target_versions)  # type: ignore
-    while prev != source_code:
-        prev = source_code = black.format_str(source_code, mode=black_mode)
-        source_code = autoflake.fix_code(
-            source_code,
-            expand_star_imports=True,
-            remove_all_unused_imports=_remove_unused_imports,
-        )
-        source_code = isort.code(
-            source_code,
-            known_first_party=first_party_imports,
-            known_local_folder={"tests"},
-            profile="black",
-            combine_as_imports=True,
-        )
+    source_code = blackened = black.format_str(source_code, mode=black_mode)
+    source_code = _run_codemods(source_code, refactor=refactor, min_version=min_version)
+    source_code = autoflake.fix_code(
+        source_code,
+        expand_star_imports=True,
+        remove_all_unused_imports=_remove_unused_imports,
+    )
+    source_code = isort.code(
+        source_code,
+        known_first_party=first_party_imports,
+        known_local_folder={"tests"},
+        profile="black",
+        combine_as_imports=True,
+    )
+    if source_code != blackened:
+        source_code = black.format_str(source_code, mode=black_mode)
 
     # Then shed.docshed (below) formats any code blocks in documentation
     source_code = format_docs(source_code)
