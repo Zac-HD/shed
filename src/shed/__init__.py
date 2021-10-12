@@ -138,27 +138,33 @@ def shed(
             source_code, _ = annotated
         # Use teyit to replace old unittest.assertX methods on Python 3.9+
         source_code, _ = _teyit_refactor(source_code)
-    # And pyupgrade - see pyupgrade._main._fix_file - is our last stable fixer
-    # Calculate separate minver because pyupgrade can take a little while to update
+
+    # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
+    # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore run it
+    # before other fixers, and then (if they made changes) again afterwards.
+    black_mode = black.Mode(target_versions=target_versions)  # type: ignore
+    source_code = blackened = black.format_str(source_code, mode=black_mode)
+
     pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
     source_code = pyupgrade._main._fix_plugins(
         source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
     )
+    if source_code != blackened:
+        # Second step to converge: https://github.com/asottile/pyupgrade/issues/273
+        source_code = pyupgrade._main._fix_plugins(
+            source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
+        )
     source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
     source_code = pyupgrade._main._fix_py36_plus(source_code, min_version=pyupgrade_min)
 
-    # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
-    # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore loop until
-    # neither of them have made a change in the last loop body, trusting that
-    # `black` itself is idempotent because that's tested upstream.
-    black_mode = black.Mode(target_versions=target_versions)  # type: ignore
-    source_code = blackened = black.format_str(source_code, mode=black_mode)
     source_code = _run_codemods(source_code, refactor=refactor, min_version=min_version)
+
     source_code = autoflake.fix_code(
         source_code,
         expand_star_imports=True,
         remove_all_unused_imports=_remove_unused_imports,
     )
+
     source_code = isort.code(
         source_code,
         known_first_party=first_party_imports,
@@ -166,6 +172,7 @@ def shed(
         profile="black",
         combine_as_imports=True,
     )
+
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)
 
