@@ -7,15 +7,33 @@ reversed(sorted([2, 3, 1], reverse=True))
 
 list(sorted([2, 3, 1], reverse=False))
 reversed(sorted([2, 3, 1], reverse=False))
+reversed(sorted([2, 3, 1], reverse="abc"))
+reversed(sorted([2, 3, 1], reverse=1 + 2))
+reversed(sorted([2, 3, 1], reverse=1 or 2))
+
+sorted(list(set('aabc')))
+
+frozenset(set('abc'))
+set(frozenset('abc'))
+sorted(frozenset('abc'))
 
 ================================================================================
 
 # C413: Unnecessary <list/reversed> call around sorted().
 # It’s unnecessary to use list() around sorted()
 
-list(sorted([2, 3, 1]))
-reversed(sorted([2, 3, 1]))
-reversed(sorted([2, 3, 1], reverse=True))
+sorted([2, 3, 1])
+sorted([2, 3, 1], reverse=True)
+sorted([2, 3, 1])
 
-list(sorted([2, 3, 1], reverse=False))
-reversed(sorted([2, 3, 1], reverse=False))
+sorted([2, 3, 1], reverse=False)
+sorted([2, 3, 1], reverse=True)
+sorted([2, 3, 1])
+sorted([2, 3, 1], reverse=not 1 + 2)
+sorted([2, 3, 1], reverse=not 1 or 2)
+
+sorted(set("aabc"))
+
+frozenset("abc")
+set("abc")
+sorted(frozenset("abc"))

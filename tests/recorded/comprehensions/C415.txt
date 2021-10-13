@@ -14,10 +14,10 @@ set(iterable[None:None:])
 # C415: Unnecessary subscript reversal of iterable within <reversed/set/sorted>().
 # It’s unnecessary to reverse the order of an iterable when passing it into one of the listed functions will change the order again. For example:
 
-set(iterable[::-1])
-sorted(iterable[::-1])
-reversed(iterable[::-1])
+set(iterable)
+sorted(iterable)
+reversed(iterable)
 
-set(iterable[None:])
-set(iterable[:None:1])
-set(iterable[None:None:])
+set(iterable)
+set(iterable)
+set(iterable)

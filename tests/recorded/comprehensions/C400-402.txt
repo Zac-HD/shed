@@ -10,6 +10,6 @@ dict((x, f(x)) for x in foo)
 # C400-402: Unnecessary generator - as a <list/set/dict> comprehension.
 # It’s unnecessary to use list, set, or dict around a generator expression, since there are equivalent comprehensions for these types. For example:
 
-list(f(x) for x in foo)
+[f(x) for x in foo]
 {f(x) for x in foo}
 {x: f(x) for x in foo}

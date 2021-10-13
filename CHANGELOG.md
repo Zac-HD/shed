@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.6.0 - future
+- Codemods to fix most warnings from [`flake8-comprehensions`](https://pypi.org/project/flake8-comprehensions/)
+
 #### 0.5.3 - 2021-10-12
 - Fix an internal error on files with lambdas containing positional-only arguments
   which were [not detected as requiring Python 3.8](https://github.com/psf/black/pull/2532)
