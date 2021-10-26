@@ -14,27 +14,27 @@ autoflake==1.4
     # via shed (setup.py)
 black==21.9b0
     # via shed (setup.py)
-click==8.0.2
+click==8.0.3
     # via black
 colorama==0.4.4
     # via
     #   click
     #   pytest
-coverage[toml]==6.0.1
+coverage[toml]==6.0.2
     # via pytest-cov
 execnet==1.9.0
     # via pytest-xdist
-flake8==3.9.2
+flake8==4.0.1
     # via flake8-comprehensions
-flake8-comprehensions==3.6.1
+flake8-comprehensions==3.7.0
     # via -r deps/test.in
-hypothesis==6.23.2
+hypothesis==6.24.0
     # via
     #   -r deps/test.in
     #   hypothesmith
 hypothesmith==0.1.9
     # via -r deps/test.in
-importlib-metadata==4.8.1
+importlib-metadata==4.2.0
     # via
     #   click
     #   flake8
@@ -69,13 +69,13 @@ py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pycodestyle==2.7.0
+pycodestyle==2.8.0
     # via flake8
-pyflakes==2.3.1
+pyflakes==2.4.0
     # via
     #   autoflake
     #   flake8
-pyparsing==2.4.7
+pyparsing==3.0.1
     # via packaging
 pytest==6.2.5
     # via
@@ -91,17 +91,17 @@ pytest-xdist==2.4.0
     # via -r deps/test.in
 pyupgrade==2.29.0
     # via shed (setup.py)
-pyyaml==5.4.1
+pyyaml==6.0
     # via libcst
-regex==2021.10.8
+regex==2021.10.23
     # via black
 sortedcontainers==2.4.0
     # via hypothesis
-tokenize-rt==4.1.0
+tokenize-rt==4.2.1
     # via pyupgrade
 toml==0.10.2
     # via pytest
-tomli==1.2.1
+tomli==1.2.2
     # via
     #   black
     #   coverage

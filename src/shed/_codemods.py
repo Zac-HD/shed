@@ -39,10 +39,9 @@ def _run_codemods(code: str, refactor: bool, min_version: Tuple[int, int]) -> st
         # TODO: remove this whole try-except block after the next Black release.
         # Feature detection bug in Black, missing pos-only args in lambdas.
         # If this might have caused a problem, we try again:
-        if min_version < (3, 8):
-            mod = cst.parse_module(code, cst.PartialParserConfig(python_version="3.8"))
-        else:  # pragma: no cover
-            raise
+        if min_version >= (3, 8):
+            raise  # pragma: no cover
+        mod = cst.parse_module(code, cst.PartialParserConfig(python_version="3.8"))
 
     for fixer in [ShedFixers] + refactor * hypothesis_fixers:
         mod = fixer(context).transform_module(mod)

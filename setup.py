@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import setuptools
 
 with open("src/shed/__init__.py") as o:
@@ -36,7 +38,7 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    long_description=open("README.md").read(),
+    long_description=Path("README.md").read_text(),
     long_description_content_type="text/markdown",
     entry_points={"console_scripts": ["shed=shed._cli:cli"]},
 )

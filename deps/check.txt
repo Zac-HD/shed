@@ -4,43 +4,68 @@
 #
 #    pip-compile --output-file=deps/check.txt deps/check.in setup.py
 #
+astor==0.8.1
+    # via flake8-simplify
 attrs==21.2.0
     # via flake8-bugbear
 autoflake==1.4
     # via shed (setup.py)
 black==21.9b0
     # via shed (setup.py)
-click==8.0.2
+click==8.0.3
     # via black
 colorama==0.4.4
     # via click
-flake8==3.9.2
+flake8==4.0.1
     # via
     #   -r deps/check.in
+    #   flake8-2020
     #   flake8-bugbear
     #   flake8-builtins
     #   flake8-comprehensions
+    #   flake8-datetimez
     #   flake8-docstrings
+    #   flake8-helper
+    #   flake8-mutable
+    #   flake8-noqa
     #   flake8-polyfill
     #   flake8-print
+    #   flake8-simplify
+    #   flake8-strftime
     #   pep8-naming
+flake8-2020==1.6.0
+    # via -r deps/check.in
 flake8-bugbear==21.9.2
     # via -r deps/check.in
 flake8-builtins==1.5.3
     # via -r deps/check.in
-flake8-comprehensions==3.6.1
+flake8-comprehensions==3.7.0
+    # via -r deps/check.in
+flake8-datetimez==20.10.0
     # via -r deps/check.in
 flake8-docstrings==1.6.0
+    # via -r deps/check.in
+flake8-helper==0.1.1
+    # via flake8-strftime
+flake8-mutable==1.2.0
+    # via -r deps/check.in
+flake8-noqa==1.2.0
     # via -r deps/check.in
 flake8-polyfill==1.0.2
     # via pep8-naming
 flake8-print==4.0.0
     # via -r deps/check.in
-importlib-metadata==4.8.1
+flake8-simplify==0.14.2
+    # via -r deps/check.in
+flake8-strftime==0.3.2
+    # via -r deps/check.in
+importlib-metadata==4.2.0
     # via
     #   click
     #   flake8
+    #   flake8-2020
     #   flake8-comprehensions
+    #   flake8-simplify
 isort==5.9.3
     # via shed (setup.py)
 libcst==0.3.21
@@ -60,31 +85,31 @@ pep8-naming==0.12.1
     # via -r deps/check.in
 platformdirs==2.4.0
     # via black
-pycodestyle==2.7.0
+pycodestyle==2.8.0
     # via
     #   flake8
     #   flake8-print
 pydocstyle==6.1.1
     # via flake8-docstrings
-pyflakes==2.3.1
+pyflakes==2.4.0
     # via
     #   autoflake
     #   flake8
 pyupgrade==2.29.0
     # via shed (setup.py)
-pyyaml==5.4.1
+pyyaml==6.0
     # via libcst
-regex==2021.10.8
+regex==2021.10.23
     # via black
 six==1.16.0
     # via flake8-print
 snowballstemmer==2.1.0
     # via pydocstyle
-tokenize-rt==4.1.0
+tokenize-rt==4.2.1
     # via pyupgrade
 toml==0.10.2
     # via mypy
-tomli==1.2.1
+tomli==1.2.2
     # via black
 typed-ast==1.4.3
     # via
@@ -93,6 +118,7 @@ typed-ast==1.4.3
 typing-extensions==3.10.0.2
     # via
     #   black
+    #   flake8-noqa
     #   importlib-metadata
     #   libcst
     #   mypy
