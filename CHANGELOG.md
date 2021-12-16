@@ -1,7 +1,8 @@
 # Changelog
 
-#### 0.6.0 - future
-- Codemods to fix most warnings from [`flake8-comprehensions`](https://pypi.org/project/flake8-comprehensions/)
+#### 0.6.0 - 2021-12-16
+- Codemods to fix most warnings from [`flake8-comprehensions`](https://pypi.org/project/flake8-comprehensions/), in `--refactor` mode
+- Moves all `libCST` fixers to `--refactor` mode for speed
 
 #### 0.5.3 - 2021-10-12
 - Fix an internal error on files with lambdas containing positional-only arguments

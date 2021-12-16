@@ -24,7 +24,7 @@ else:
     hypothesis_fixers = [Hy1, Hy2]
 
 
-def _run_codemods(code: str, refactor: bool, min_version: Tuple[int, int]) -> str:
+def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
     """Run all Shed fixers on a code string."""
     context = cst.codemod.CodemodContext()
 
@@ -43,7 +43,7 @@ def _run_codemods(code: str, refactor: bool, min_version: Tuple[int, int]) -> st
             raise  # pragma: no cover
         mod = cst.parse_module(code, cst.PartialParserConfig(python_version="3.8"))
 
-    for fixer in [ShedFixers] + refactor * hypothesis_fixers:
+    for fixer in [ShedFixers] + hypothesis_fixers:
         mod = fixer(context).transform_module(mod)
     return mod.code
 

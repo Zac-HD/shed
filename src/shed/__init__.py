@@ -41,7 +41,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann
 
 
-__version__ = "0.5.3"
+__version__ = "0.6.0"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -157,7 +157,8 @@ def shed(
     source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
     source_code = pyupgrade._main._fix_py36_plus(source_code, min_version=pyupgrade_min)
 
-    source_code = _run_codemods(source_code, refactor=refactor, min_version=min_version)
+    if refactor:
+        source_code = _run_codemods(source_code, min_version=min_version)
 
     source_code = autoflake.fix_code(
         source_code,
