@@ -32,7 +32,7 @@ setuptools.setup(
         "pyupgrade >= 2.24.0",
         "teyit >= 0.3.2 ; python_version >= '3.9'",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU Affero General Public License v3",

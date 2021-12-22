@@ -38,16 +38,16 @@ except ImportError:  # pragma: no cover  # on Python 3.9
 # explicitly check the Python version, while waiting on an upstream fix.
 com2ann = _fallback
 if sys.version_info[:2] >= (3, 8):  # pragma: no cover
-    from com2ann import com2ann
+    from com2ann import com2ann  # type: ignore
 
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
     k: (int(k.name[2]), int(k.name[3:]))
     for k in TargetVersion
-    if k.value >= TargetVersion.PY36.value
+    if k.value >= TargetVersion.PY37.value
 }
 _default_min_version = min(_version_map.values())
 _SUGGESTIONS = (

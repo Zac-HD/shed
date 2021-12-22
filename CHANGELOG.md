@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.7.0 - 2021-12-23
+- Python 3.6 is end-of-life, so format code as 3.7+
+
 #### 0.6.0 - 2021-12-16
 - Codemods to fix most warnings from [`flake8-comprehensions`](https://pypi.org/project/flake8-comprehensions/), in `--refactor` mode
 - Moves all `libCST` fixers to `--refactor` mode for speed

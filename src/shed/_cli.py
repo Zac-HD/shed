@@ -28,7 +28,7 @@ def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
             check=True,
             timeout=10,
             stdout=subprocess.PIPE,
-            universal_newlines=True,
+            text=True,
             cwd=cwd,
         ).stdout.strip()
     except (subprocess.SubprocessError, FileNotFoundError):
@@ -114,7 +114,7 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
                 check=True,
                 timeout=10,
                 stdout=subprocess.PIPE,
-                universal_newlines=True,
+                text=True,
             ).stdout.splitlines()
         except (subprocess.SubprocessError, FileNotFoundError):
             print("Doesn't seem to be a git repo; pass filenames to format.")  # noqa
