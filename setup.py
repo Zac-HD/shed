@@ -30,7 +30,7 @@ setuptools.setup(
         "isort >= 5.9.3",
         "libcst >= 0.3.20",
         "pyupgrade >= 2.24.0",
-        "teyit >= 0.3.2 ; python_version >= '3.9'",
+        "teyit >= 0.4.1 ; python_version >= '3.9'",
     ],
     python_requires=">=3.7",
     classifiers=[
