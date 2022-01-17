@@ -5,6 +5,7 @@ These are mostly based on flake8, flake8-comprehensions, and some personal
 nitpicks about typing unions and literals.
 """
 
+import re
 from ast import literal_eval
 from typing import Tuple
 
@@ -13,15 +14,22 @@ import libcst.matchers as m
 from libcst._parser.types.config import _pick_compatible_python_version
 from libcst.codemod import VisitorBasedCodemodCommand
 
-try:
-    from hypothesis.extra.codemods import (
-        HypothesisFixComplexMinMagnitude as Hy1,
-        HypothesisFixPositionalKeywonlyArgs as Hy2,
-    )
-except ImportError:  # pragma: no cover
-    hypothesis_fixers = []
-else:
-    hypothesis_fixers = [Hy1, Hy2]
+
+def attempt_hypothesis_codemods(context, mod):  # pragma: no cover
+    try:
+        from hypothesis.extra.codemods import (
+            HypothesisFixComplexMinMagnitude,
+            HypothesisFixPositionalKeywonlyArgs,
+        )
+    except ImportError:
+        return mod
+    mod = HypothesisFixComplexMinMagnitude(context).transform_module(mod)
+    return HypothesisFixPositionalKeywonlyArgs(context).transform_module(mod)
+
+
+imports_hypothesis = re.compile(
+    r"^ *(?:import hypothesis|from hypothesis(?:\.[a-z]+)* import )"
+).search
 
 
 def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
@@ -35,8 +43,9 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
     config = cst.PartialParserConfig(python_version=f"{v.major}.{v.minor}")
     mod = cst.parse_module(code, config)
 
-    for fixer in [ShedFixers] + hypothesis_fixers:
-        mod = fixer(context).transform_module(mod)
+    if imports_hypothesis(code):  # pragma: no cover
+        mod = attempt_hypothesis_codemods(context, mod)
+    mod = ShedFixers(context).transform_module(mod)
     return mod.code
 
 
