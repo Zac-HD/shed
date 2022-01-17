@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.8.0 - 2022-01-16
+- Updated minimum dependency versions - bugfixes and improved support for Python 3.9+
+
 #### 0.7.0 - 2021-12-23
 - Python 3.6 is end-of-life, so format code as 3.7+
 

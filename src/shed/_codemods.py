@@ -33,15 +33,7 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
     # version is newer than that.
     v = _pick_compatible_python_version(".".join(map(str, min_version)))
     config = cst.PartialParserConfig(python_version=f"{v.major}.{v.minor}")
-    try:
-        mod = cst.parse_module(code, config)
-    except cst.ParserSyntaxError:
-        # TODO: remove this whole try-except block after the next Black release.
-        # Feature detection bug in Black, missing pos-only args in lambdas.
-        # If this might have caused a problem, we try again:
-        if min_version >= (3, 8):
-            raise  # pragma: no cover
-        mod = cst.parse_module(code, cst.PartialParserConfig(python_version="3.8"))
+    mod = cst.parse_module(code, config)
 
     for fixer in [ShedFixers] + hypothesis_fixers:
         mod = fixer(context).transform_module(mod)
