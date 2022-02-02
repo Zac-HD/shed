@@ -27,7 +27,7 @@ def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
             ["git", "rev-parse", "--show-toplevel"],
             check=True,
             timeout=10,
-            stdout=subprocess.PIPE,
+            capture_output=True,
             text=True,
             cwd=cwd,
         ).stdout.strip()

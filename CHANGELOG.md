@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.9.0 - 2022-02-01
+- Require a stable version of Black, which now has a formatting stability policy
+- Suppress ``stderr`` messages from Git when used outside a repository
+
 #### 0.8.0 - 2022-01-16
 - Updated minimum dependency versions - bugfixes and improved support for Python 3.9+
 - Avoid importing Hypothesis if it's not going to be used (#26)
