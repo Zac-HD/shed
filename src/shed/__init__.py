@@ -41,7 +41,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann  # type: ignore
 
 
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 __all__ = ["shed", "docshed"]
 
 _version_map = {

@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import FrozenSet, Union
 
 import autoflake
+from isort.api import place_module
 
 from . import ShedSyntaxWarning, _version_map, docshed, shed
 
@@ -33,8 +34,12 @@ def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
         ).stdout.strip()
     except (subprocess.SubprocessError, FileNotFoundError):
         return frozenset()
-    provides = {init.name for init in Path(base).glob("**/src/*/__init__.py")}
-    return frozenset(p for p in {Path(base).name} | provides if p.isidentifier())
+    provides = {init.parent.name for init in Path(base).glob("**/src/*/__init__.py")}
+    return frozenset(
+        p
+        for p in {Path(base).name} | provides
+        if p.isidentifier() and place_module(p) != "STDLIB"
+    )
 
 
 @functools.lru_cache(maxsize=None)

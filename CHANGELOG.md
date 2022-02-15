@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.9.1 - 2022-02-15
+- Fixed `__init__.py`-based detection heuristic for first-party module names
+- Avoid guessing that stdlib modules are first-party due to e.g. a `code/` directory
+
 #### 0.9.0 - 2022-02-01
 - Require a stable version of Black, which now has a formatting stability policy
 - Suppress ``stderr`` messages from Git when used outside a repository
