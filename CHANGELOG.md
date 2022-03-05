@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.9.2 - 2022-03-05
+- Fixed a crash with `--refactor` on files containing `f"{...=}"` (#31)
+
 #### 0.9.1 - 2022-02-15
 - Fixed `__init__.py`-based detection heuristic for first-party module names
 - Avoid guessing that stdlib modules are first-party due to e.g. a `code/` directory

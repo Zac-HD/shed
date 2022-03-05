@@ -38,10 +38,21 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
 
     # We want LibCST to parse the code as if running on our target minimum version,
     # but fall back to the latest version it supports (currently 3.8) if our target
-    # version is newer than that.
-    v = _pick_compatible_python_version(".".join(map(str, min_version)))
-    config = cst.PartialParserConfig(python_version=f"{v.major}.{v.minor}")
-    mod = cst.parse_module(code, config)
+    # version is newer than that.  Or jump *forward* if Black got the version wrong!
+    try:
+        v = _pick_compatible_python_version(".".join(map(str, min_version)))
+        config = cst.PartialParserConfig(python_version=f"{v.major}.{v.minor}")
+        mod = cst.parse_module(code, config)
+    except cst.ParserSyntaxError as err:
+        # missed f-string version check https://github.com/Zac-HD/shed/issues/31
+        msg = "Incomplete input. Encountered '=', but expected '!', ':', or '}'."
+        if min_version >= (3, 8) or "=}" not in code or msg not in str(err):
+            raise  # pragma: no cover  # no *known* cases trigger this, but...
+        mod = cst.parse_module(code, cst.PartialParserConfig(python_version="3.8"))
+        # Right here, we know that the minimum version was too low.  We could in
+        # principle `return shed.shed(code, ...)` to fully account for that, but
+        # I don't want to pass around so many extra args just to cover an edge
+        # case which should be fixed soon regardless.
 
     if imports_hypothesis(code):  # pragma: no cover
         mod = attempt_hypothesis_codemods(context, mod)

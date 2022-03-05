@@ -41,7 +41,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann  # type: ignore
 
 
-__version__ = "0.9.1"
+__version__ = "0.9.2"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -82,14 +82,6 @@ def shed(
     if source_code == "":
         return ""
 
-    format_docs = functools.partial(
-        docshed,
-        refactor=refactor,
-        first_party_imports=first_party_imports,
-        min_version=min_version,
-        _location=_location,
-    )
-
     # Use black to autodetect our target versions
     try:
         parsed = lib2to3_parse(
@@ -114,7 +106,13 @@ def shed(
         warnings.warn(w, stacklevel=_location.count(" block in ") + 2)
         # Even if the code itself has invalid syntax, we might be able to
         # regex-match and therefore reformat code embedded in docstrings.
-        return format_docs(source_code)
+        return docshed(
+            source_code,
+            refactor=refactor,
+            first_party_imports=first_party_imports,
+            min_version=min_version,
+            _location=_location,
+        )
     target_versions = set(_version_map) & set(black.detect_target_versions(parsed))
     assert target_versions
     min_version = max(
@@ -178,7 +176,13 @@ def shed(
         source_code = black.format_str(source_code, mode=black_mode)
 
     # Then shed.docshed (below) formats any code blocks in documentation
-    source_code = format_docs(source_code)
+    source_code = docshed(
+        source_code,
+        refactor=refactor,
+        first_party_imports=first_party_imports,
+        min_version=min_version,
+        _location=_location,
+    )
     # Remove any extra trailing whitespace
     return source_code.rstrip() + "\n"
 

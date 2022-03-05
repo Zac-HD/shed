@@ -113,6 +113,7 @@ def test_should_format_autodetection(fname, should):
         ("a.md", "```python\nprint(\n'hello world')\n```", True),
         ("a.rst", ".. code-block:: python\n\n    'single quotes'\n", True),
         ("a.py", "print(\n'hello world')\n", True),
+        ("a.py", 'f"{x=}"\n', False),
         ("from shebang", "#! python3\nprint(\n'hello world')\n", True),
     ],
 )
@@ -123,7 +124,7 @@ def test_rewrite_on_disk(fname, contents, changed):
         f.write_text(contents)
         ret = _rewrite_on_disk(str(f), **kwargs)
         result = f.read_text()
-    assert ret == changed
+    assert ret == changed, repr(result)
     assert changed == (contents != result)
 
 
