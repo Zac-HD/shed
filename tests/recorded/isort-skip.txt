@@ -1,0 +1,13 @@
+# isort: skip_file
+import re  # noqa
+import json  # noqa
+
+1+2# should have spaces added
+
+================================================================================
+
+# isort: skip_file
+import re  # noqa
+import json  # noqa
+
+1 + 2  # should have spaces added

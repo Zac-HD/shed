@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.9.3 - 2022-03-14
+- Fixed an internal error on `# isort: skip_file` (#32)
+
 #### 0.9.2 - 2022-03-05
 - Fixed a crash with `--refactor` on files containing `f"{...=}"` (#31)
 

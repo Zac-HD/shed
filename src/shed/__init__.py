@@ -18,6 +18,7 @@ import isort
 import pyupgrade._main
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
+from isort.exceptions import FileSkipComment
 
 from ._codemods import _run_codemods  # type: ignore
 
@@ -41,7 +42,7 @@ if sys.version_info[:2] >= (3, 8):  # pragma: no cover
     from com2ann import com2ann  # type: ignore
 
 
-__version__ = "0.9.2"
+__version__ = "0.9.3"
 __all__ = ["shed", "docshed"]
 
 _version_map = {
@@ -164,13 +165,16 @@ def shed(
         remove_all_unused_imports=_remove_unused_imports,
     )
 
-    source_code = isort.code(
-        source_code,
-        known_first_party=first_party_imports,
-        known_local_folder={"tests"},
-        profile="black",
-        combine_as_imports=True,
-    )
+    try:
+        source_code = isort.code(
+            source_code,
+            known_first_party=first_party_imports,
+            known_local_folder={"tests"},
+            profile="black",
+            combine_as_imports=True,
+        )
+    except FileSkipComment:
+        pass
 
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)
