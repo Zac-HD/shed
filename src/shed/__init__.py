@@ -10,7 +10,7 @@ import sys
 import textwrap
 import warnings
 from operator import attrgetter
-from typing import FrozenSet, Match, Tuple
+from typing import Any, FrozenSet, Match, Tuple
 
 import autoflake
 import black
@@ -20,30 +20,13 @@ from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-from ._codemods import _run_codemods  # type: ignore
-
-
-def _fallback(source: str, **kw: object) -> Tuple[str, object]:
-    return source, None  # pragma: no cover
-
-
-try:
-    from teyit import refactor_until_deterministic as _teyit_refactor
-except ImportError:  # pragma: no cover  # on Python 3.9
-    assert sys.version_info < (3, 9)
-    _teyit_refactor = _fallback
-
-# We can't use a try-except here because com2ann does not declare python_requires,
-# and so it is entirely possible to install it on a Python version that it does
-# not support, and nothing goes wrong until you call the function.  We therefore
-# explicitly check the Python version, while waiting on an upstream fix.
-com2ann = _fallback
-if sys.version_info[:2] >= (3, 8):  # pragma: no cover
-    from com2ann import com2ann  # type: ignore
-
-
-__version__ = "0.9.3"
+__version__ = "0.9.4"
 __all__ = ["shed", "docshed"]
+
+# Conditionally imported in refactor mode to reduce startup latency in the common case
+com2ann: Any = None
+_teyit_refactor: Any = None
+_run_codemods: Any = None
 
 _version_map = {
     k: (int(k.name[2]), int(k.name[3:]))
@@ -60,6 +43,10 @@ _SUGGESTIONS = (
 
 class ShedSyntaxWarning(SyntaxWarning):
     """Warns that shed has been called on something with invalid syntax."""
+
+
+def _fallback(source: str, **kw: object) -> Tuple[str, object]:
+    return source, None  # pragma: no cover
 
 
 @functools.lru_cache()
@@ -122,6 +109,29 @@ def shed(
     )
 
     if refactor:
+        # Here we have a deferred imports section, which is pretty ugly.
+        # It does however have one crucial advantage: several hundred milliseconds
+        # of startup latency in the common case where --refactor was *not* passed.
+        # This is a big deal for interactive use-cases such as pre-commit hooks
+        # or format-on-save in editors (though I prefer Black for the latter).
+        global com2ann
+        global _teyit_refactor
+        global _run_codemods
+        if com2ann is None:
+            from ._codemods import _run_codemods  # type: ignore
+
+            try:
+                from teyit import refactor_until_deterministic as _teyit_refactor
+            except ImportError:  # pragma: no cover  # on Python 3.9
+                assert sys.version_info < (3, 9)
+                _teyit_refactor = _fallback
+            try:
+                from com2ann import com2ann
+            except ImportError:  # pragma: no cover  # on Python 3.8
+                assert sys.version_info < (3, 8)
+                com2ann = _fallback
+            # OK, everything's imported, back to the runtime logic!
+
         # Some tools assume that the file is multi-line, but empty files are valid input.
         source_code += "\n"
         # Use com2ann to comvert type comments to annotations on Python 3.8+

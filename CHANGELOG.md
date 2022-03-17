@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.9.4 - 2022-03-16
+- Performance optimizations, reducing startup latency via deferred imports
+
 #### 0.9.3 - 2022-03-14
 - Fixed an internal error on `# isort: skip_file` (#32)
 
