@@ -169,6 +169,7 @@ def shed(
     if refactor:
         source_code = _run_codemods(source_code, min_version=min_version)
 
+    before_import_fixes = source_code
     source_code = autoflake.fix_code(
         source_code,
         expand_star_imports=True,
@@ -185,6 +186,20 @@ def shed(
         )
     except FileSkipComment:
         pass
+
+    if source_code != before_import_fixes:
+        # isort, autoflake, and pyupgrade can each make changes that unlock the others.
+        # We therefore just re-run the whole stack if we've changed any imports,
+        # internally iterating to a fixpoint so that we're idempotent - but without
+        # paying that performance cost in the common case where we don't need to.
+        return shed(
+            source_code,
+            refactor=refactor,
+            first_party_imports=first_party_imports,
+            min_version=min_version,
+            _location=_location,
+            _remove_unused_imports=_remove_unused_imports,
+        )
 
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)
