@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.9.5 - 2022-04-12
+- Supports (and requires) new version of `pyupgrade`
+
 #### 0.9.4 - 2022-03-16
 - Performance optimizations, reducing startup latency via deferred imports
 
