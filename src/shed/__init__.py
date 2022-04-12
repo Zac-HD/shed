@@ -164,7 +164,8 @@ def shed(
             source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
         )
     source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
-    source_code = pyupgrade._main._fix_py36_plus(source_code, min_version=pyupgrade_min)
+    if hasattr(pyupgrade._main, "_fix_py36_plus"):
+        source_code = pyupgrade._main._fix_py36_plus(source_code, min_version=pyupgrade_min)
 
     if refactor:
         source_code = _run_codemods(source_code, min_version=min_version)
