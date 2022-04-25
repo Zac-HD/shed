@@ -49,7 +49,16 @@ in which case `shed` supports them natively.  For a quick-and-dirty workflow,
 you can [use `nbqa shed notebook.ipynb`](https://nbqa.readthedocs.io/en/latest/readme.html) -
 `nbqa` works for any linter or formatter.
 
-## Using with pre-commit
+## Using `shed` in your editor
+We recommend [using `black` in your editor](https://black.readthedocs.io/en/stable/integrations/editors.html)
+instead of `shed`, since it provides our core formatting logic and `shed`'s extra
+smarts can be counterproductive while you're actively editing code - for example,
+removing an "unused" import just after you add it!
+
+Then, when you're done editing, you can run `shed` from the command-line, `pre-commit`
+hooks, and your CI system.
+
+## Using `shed` with pre-commit
 If you use [pre-commit](https://pre-commit.com/), you can use it with Shed by
 adding the following to your `.pre-commit-config.yaml`:
 
