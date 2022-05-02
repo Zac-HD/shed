@@ -274,3 +274,17 @@ class ShedFixers(VisitorBasedCodemodCommand):
             func = cst.Name("list" if isinstance(updated_node, cst.ListComp) else "set")
             return cst.Call(func=func, args=[cst.Arg(updated_node.for_in.iter)])
         return updated_node
+
+    @m.leave(
+        m.Annotation(annotation=m.Subscript(value=m.Name(value="Union")))
+        | m.Annotation(annotation=m.Subscript(value=m.Name(value="Literal")))
+    )
+    def reorder_union_literal_contents_none_last(self, _, updated_node):
+        try:
+            ann_slice = list(updated_node.annotation.slice)
+        except AttributeError:
+            return updated_node
+        ann_slice.sort(key=lambda elt: elt.slice.value.value == "None")
+        return updated_node.with_changes(
+            annotation=updated_node.annotation.with_changes(slice=ann_slice)
+        )

@@ -1,0 +1,49 @@
+def f1(x: Union[int, None, str] = 3):
+    pass
+
+
+def g1(x: Union):
+    pass
+
+
+def f2(x: Literal[None, 1] = None):
+    pass
+
+
+def g2(x: Literal):
+    pass
+
+Union[int, None, str]
+Literal[None, 1]
+
+================================================================================
+
+def f1(
+    x: Union[
+        int,
+        str,
+        None,
+    ] = 3
+):
+    pass
+
+
+def g1(x: Union):
+    pass
+
+
+def f2(
+    x: Literal[
+        1,
+        None,
+    ] = None
+):
+    pass
+
+
+def g2(x: Literal):
+    pass
+
+
+Union[int, None, str]
+Literal[None, 1]
