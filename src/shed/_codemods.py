@@ -125,7 +125,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
     )
     def convert_optional_literal_to_literal_none(self, _, updated_node):
-        """Inspired by Pybetter."""
         expr = updated_node.slice[0].slice.value
         args = list(expr.slice)
         args[-1] = args[-1].with_changes(comma=cst.Comma())
