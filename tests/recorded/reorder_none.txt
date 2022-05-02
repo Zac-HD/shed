@@ -1,16 +1,7 @@
-def f1(x: Union[int, None, str] = 3):
+def f(x: Union[int, None, str] = 3):
     pass
 
-
-def g1(x: Union):
-    pass
-
-
-def f2(x: Literal[None, 1] = None):
-    pass
-
-
-def g2(x: Literal):
+def g(x: Literal[None, 1] = None):
     pass
 
 Union[int, None, str]
@@ -18,7 +9,7 @@ Literal[None, 1]
 
 ================================================================================
 
-def f1(
+def f(
     x: Union[
         int,
         str,
@@ -28,11 +19,7 @@ def f1(
     pass
 
 
-def g1(x: Union):
-    pass
-
-
-def f2(
+def g(
     x: Literal[
         1,
         None,
@@ -41,9 +28,12 @@ def f2(
     pass
 
 
-def g2(x: Literal):
-    pass
-
-
-Union[int, None, str]
-Literal[None, 1]
+Union[
+    int,
+    str,
+    None,
+]
+Literal[
+    1,
+    None,
+]
