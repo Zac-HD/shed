@@ -280,6 +280,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         | m.Subscript(value=m.Name(value="Literal"))
     )
     def reorder_union_literal_contents_none_last(self, _, updated_node):
-        ann_slice = list(updated_node.slice)
-        ann_slice.sort(key=lambda elt: elt.slice.value.value == "None")
-        return updated_node.with_changes(slice=ann_slice)
+        subscript_slice = list(updated_node.slice)
+        subscript_slice.sort(key=lambda elt: elt.slice.value.value == "None")
+        return updated_node.with_changes(slice=subscript_slice)
