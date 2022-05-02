@@ -1,0 +1,7 @@
+Optional[Literal[1, 2]]  # Literal[1, 2, None]
+var: Optional[Literal[1, 2]] = 1  # Literal[1, 2, None]
+
+================================================================================
+
+Literal[1, 2, None]  # Literal[1, 2, None]
+var: Literal[1, 2, None] = 1  # Literal[1, 2, None]

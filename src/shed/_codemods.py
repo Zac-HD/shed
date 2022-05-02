@@ -56,6 +56,7 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
 
     if imports_hypothesis(code):  # pragma: no cover
         mod = attempt_hypothesis_codemods(context, mod)
+    # print(mod)
     mod = ShedFixers(context).transform_module(mod)
     return mod.code
 
@@ -113,6 +114,30 @@ class ShedFixers(VisitorBasedCodemodCommand):
         return cst.Raise(
             cst.Call(cst.Name("AssertionError"), args=[cst.Arg(updated_node.msg)])
         )
+
+    @m.leave(
+        m.Subscript(
+            value=m.Name(value="Optional"),
+            slice=[
+                m.SubscriptElement(
+                    slice=m.Index(value=m.Subscript(value=m.Name(value="Literal")))
+                )
+            ],
+        )
+    )
+    def convert_optional_literal_to_literal_none(self, _, updated_node):
+        """Inspired by Pybetter."""
+        expr = updated_node.slice[0].slice.value
+        args = list(expr.slice)
+        args[-1] = args[-1].with_changes(comma=cst.Comma())
+        args.append(
+            cst.SubscriptElement(
+                slice=cst.Index(value=cst.Name(value="None")),
+                comma=cst.MaybeSentinel.DEFAULT,
+            )
+        )
+        expr = expr.with_changes(slice=tuple(args))
+        return expr
 
     @m.leave(m.ComparisonTarget(comparator=m.Name(value="None"), operator=m.Equal()))
     def convert_none_cmp(self, _, updated_node):
