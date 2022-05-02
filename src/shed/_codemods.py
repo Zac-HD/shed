@@ -56,7 +56,6 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
 
     if imports_hypothesis(code):  # pragma: no cover
         mod = attempt_hypothesis_codemods(context, mod)
-    # print(mod)
     mod = ShedFixers(context).transform_module(mod)
     return mod.code
 
