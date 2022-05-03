@@ -9,31 +9,13 @@ Literal[None, 1]
 
 ================================================================================
 
-def f(
-    x: Union[
-        int,
-        str,
-        None,
-    ] = 3
-):
+def f(x: Union[int, str, None] = 3):
     pass
 
 
-def g(
-    x: Literal[
-        1,
-        None,
-    ] = None
-):
+def g(x: Literal[1, None] = None):
     pass
 
 
-Union[
-    int,
-    str,
-    None,
-]
-Literal[
-    1,
-    None,
-]
+Union[int, str, None]
+Literal[1, None]
