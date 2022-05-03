@@ -297,3 +297,15 @@ class ShedFixers(VisitorBasedCodemodCommand):
             func = cst.Name("list" if isinstance(updated_node, cst.ListComp) else "set")
             return cst.Call(func=func, args=[cst.Arg(updated_node.for_in.iter)])
         return updated_node
+
+    @m.leave(
+        m.Subscript(value=m.Name(value="Union"))
+        | m.Subscript(value=m.Name(value="Literal"))
+    )
+    def reorder_union_literal_contents_none_last(self, _, updated_node):
+        subscript_slice = list(updated_node.slice)
+        subscript_slice.sort(key=lambda elt: elt.slice.value.value == "None")
+        subscript_slice[-1] = subscript_slice[-1].with_changes(
+            comma=cst.MaybeSentinel.DEFAULT
+        )
+        return updated_node.with_changes(slice=subscript_slice)

@@ -1,0 +1,21 @@
+def f(x: Union[int, None, str] = 3):
+    pass
+
+def g(x: Literal[None, 1] = None):
+    pass
+
+Union[int, None, str]
+Literal[None, 1]
+
+================================================================================
+
+def f(x: Union[int, str, None] = 3):
+    pass
+
+
+def g(x: Literal[1, None] = None):
+    pass
+
+
+Union[int, str, None]
+Literal[1, None]
