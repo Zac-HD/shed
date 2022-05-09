@@ -310,6 +310,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
         return updated_node.with_changes(slice=subscript_slice)
 
+    @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
     @m.leave(
         m.BinaryOperation(left=m.Name("None"), operator=m.BitOr(), right=m.DoNotCare())
     )

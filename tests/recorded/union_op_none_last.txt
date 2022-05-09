@@ -1,7 +1,9 @@
-None | int
+None | int  # this should not change
+var: int | bool  # this should not change
 var: None | int
 
 ================================================================================
 
-int | None
+None | int  # this should not change
+var: int | bool  # this should not change
 var: int | None
