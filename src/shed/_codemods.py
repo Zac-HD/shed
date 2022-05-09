@@ -314,4 +314,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         m.BinaryOperation(left=m.Name("None"), operator=m.BitOr(), right=m.DoNotCare())
     )
     def reorder_union_operator_contents_none_last(self, _, updated_node):
-        return updated_node.with_changes(left=updated_node.right, right=cst.Name("None"))
+        return updated_node.with_changes(
+            left=updated_node.right, right=cst.Name("None")
+        )
