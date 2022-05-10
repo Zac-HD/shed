@@ -309,3 +309,26 @@ class ShedFixers(VisitorBasedCodemodCommand):
             comma=cst.MaybeSentinel.DEFAULT
         )
         return updated_node.with_changes(slice=subscript_slice)
+
+    @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
+    @m.leave(
+        m.BinaryOperation(
+            left=m.Name("None") | m.BinaryOperation(),
+            operator=m.BitOr(),
+            right=m.DoNotCare(),
+        )
+    )
+    def reorder_union_operator_contents_none_last(self, _, updated_node):
+        def _has_none(node):
+            if m.matches(node, m.Name("None")):
+                return True
+            elif m.matches(node, m.BinaryOperation()):
+                return _has_none(node.left) or _has_none(node.right)
+            else:
+                return False
+
+        node_left = updated_node.left
+        if _has_none(node_left):
+            return updated_node.with_changes(left=updated_node.right, right=node_left)
+        else:
+            return updated_node
