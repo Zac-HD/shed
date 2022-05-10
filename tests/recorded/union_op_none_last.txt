@@ -1,9 +1,21 @@
 None | int  # this should not change
 var: int | bool  # this should not change
+var: int | bool | str  # this should not change
 var: None | int
+var: bool | None | int
+var: None | bool | int
+var: bool | None | int | str
+var: None | bool | int | str
+var: bool | int | None | str
 
 ================================================================================
 
 None | int  # this should not change
 var: int | bool  # this should not change
+var: int | bool | str  # this should not change
 var: int | None
+var: int | bool | None
+var: int | bool | None
+var: str | int | bool | None
+var: str | int | bool | None
+var: str | bool | int | None
