@@ -341,37 +341,33 @@ class ShedFixers(VisitorBasedCodemodCommand):
             right=m.Name("None"),
         )
     )
-    def flatten_literal(self, _, updated_node):
-        left_node = updated_node.left
-        args = list(left_node.slice)
-        args[-1] = args[-1].with_changes(
-            comma=cst.Comma(
-                whitespace_before=cst.SimpleWhitespace(
-                    value="",
-                ),
-                whitespace_after=cst.SimpleWhitespace(
-                    value=" ",
-                ),
-            )
-        )
+    def flatten_literal_op(self, _, updated_node):
+        literal = updated_node.left
+        args = list(literal.slice)
+        for item in args:
+            if m.matches(item, m.SubscriptElement(m.Index(m.Name("None")))):
+                return literal  # Already has "None"
+        args[-1] = args[-1].with_changes(comma=cst.Comma())
         args.append(
             cst.SubscriptElement(
                 slice=cst.Index(value=cst.Name(value="None")),
-                comma=cst.MaybeSentinel.DEFAULT,
             )
         )
-        left_node = left_node.with_changes(slice=tuple(args))
-        return left_node
+        return literal.with_changes(slice=tuple(args))
 
-    @m.leave(m.Subscript(value=m.Name(value="Union")))
-    def flatten_union(self, _, updated_node):
+    @m.leave(m.Subscript(value=m.Name(value="Union") | m.Name(value="Literal")))
+    def flatten_union_literal_subscript(self, _, updated_node):
         new_slice = []
         has_none = False
         for item in updated_node.slice:
             if m.matches(item.slice.value, m.Subscript(m.Name("Optional"))):
-                new_slice.append(
-                    item.with_changes(slice=item.slice.value.slice[0].slice)
-                )  # peel off "Optional"
+                new_slice += item.slice.value.slice  # peel off "Optional"
+                has_none = True
+            elif m.matches(
+                item.slice.value, m.Subscript(m.Name("Union") | m.Name("Literal"))
+            ):
+                new_slice += item.slice.value.slice  # peel off "Union" or "Literal"
+            elif m.matches(item.slice.value, m.Name("None")):
                 has_none = True
             else:
                 new_slice.append(item)
@@ -379,8 +375,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
             new_slice.append(
                 cst.SubscriptElement(
                     slice=cst.Index(value=cst.Name(value="None")),
-                    comma=cst.MaybeSentinel.DEFAULT,
                 )
             )
-            return updated_node.with_changes(slice=new_slice)
-        return updated_node  # nothing changes
+        return updated_node.with_changes(slice=new_slice)

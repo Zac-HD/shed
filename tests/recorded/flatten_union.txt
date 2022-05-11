@@ -1,5 +1,9 @@
 Union[int, Optional[str], bool]
+Union[None, int, Optional[str]]
+Union[Union[int, float], str]
 
 ================================================================================
 
 Union[int, str, bool, None]
+Union[int, str, None]
+Union[int, float, str]
