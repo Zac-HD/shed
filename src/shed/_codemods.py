@@ -332,3 +332,33 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return updated_node.with_changes(left=updated_node.right, right=node_left)
         else:
             return updated_node
+
+    @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
+    @m.leave(
+        m.BinaryOperation(
+            left=m.Subscript(value=m.Name(value="Literal")),
+            operator=m.BitOr(),
+            right=m.Name("None"),
+        )
+    )
+    def flatten_literal(self, _, updated_node):
+        left_node = updated_node.left
+        args = list(left_node.slice)
+        args[-1] = args[-1].with_changes(
+            comma=cst.Comma(
+                whitespace_before=cst.SimpleWhitespace(
+                    value="",
+                ),
+                whitespace_after=cst.SimpleWhitespace(
+                    value=" ",
+                ),
+            )
+        )
+        args.append(
+            cst.SubscriptElement(
+                slice=cst.Index(value=cst.Name(value="None")),
+                comma=cst.MaybeSentinel.DEFAULT,
+            )
+        )
+        left_node = left_node.with_changes(slice=tuple(args))
+        return left_node

@@ -1,0 +1,7 @@
+Literal[1, 2] | None  # this should not change
+var: Literal[1, 2] | None
+
+================================================================================
+
+Literal[1, 2] | None  # this should not change
+var: Literal[1, 2, None]
