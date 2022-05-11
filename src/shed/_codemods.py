@@ -362,3 +362,25 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
         left_node = left_node.with_changes(slice=tuple(args))
         return left_node
+
+    @m.leave(m.Subscript(value=m.Name(value="Union")))
+    def flatten_union(self, _, updated_node):
+        new_slice = []
+        has_none = False
+        for item in updated_node.slice:
+            if m.matches(item.slice.value, m.Subscript(m.Name("Optional"))):
+                new_slice.append(
+                    item.with_changes(slice=item.slice.value.slice[0].slice)
+                )  # peel off "Optional"
+                has_none = True
+            else:
+                new_slice.append(item)
+        if has_none:
+            new_slice.append(
+                cst.SubscriptElement(
+                    slice=cst.Index(value=cst.Name(value="None")),
+                    comma=cst.MaybeSentinel.DEFAULT,
+                )
+            )
+            return updated_node.with_changes(slice=new_slice)
+        return updated_node  # nothing changes
