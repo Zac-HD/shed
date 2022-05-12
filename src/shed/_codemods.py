@@ -347,7 +347,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         for item in args:
             if m.matches(item, m.SubscriptElement(m.Index(m.Name("None")))):
                 return literal  # Already has "None"
-        args[-1] = args[-1].with_changes(comma=cst.Comma())
         args.append(
             cst.SubscriptElement(
                 slice=cst.Index(value=cst.Name(value="None")),
