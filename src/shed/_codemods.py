@@ -128,11 +128,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         expr = updated_node.slice[0].slice.value
         args = list(expr.slice)
         args[-1] = args[-1].with_changes(comma=cst.Comma())
-        args.append(
-            cst.SubscriptElement(
-                slice=cst.Index(value=cst.Name(value="None"))
-            )
-        )
+        args.append(cst.SubscriptElement(slice=cst.Index(value=cst.Name(value="None"))))
         expr = expr.with_changes(slice=tuple(args))
         return expr
 
