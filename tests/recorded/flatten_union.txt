@@ -1,9 +1,13 @@
 Union[int, Optional[str], bool]
 Union[None, int, Optional[str]]
 Union[Union[int, float], str]
+Union[int, Literal[1, 2]]  # this should not change
+Union[int, Literal[1, 2], Optional[str]]
 
 ================================================================================
 
 Union[int, str, bool, None]
 Union[int, str, None]
-Union[int, float, str]
+Union[Union[int, float], str]
+Union[int, Literal[1, 2]]  # this should not change
+Union[int, Literal[1, 2], str, None]
