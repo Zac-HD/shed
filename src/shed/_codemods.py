@@ -129,7 +129,11 @@ class ShedFixers(VisitorBasedCodemodCommand):
         none = cst.SubscriptElement(slice=cst.Index(value=cst.Name(value="None")))
         return expr.with_changes(slice=list(expr.slice) + [none])
 
-    @m.leave(m.ComparisonTarget(comparator=m.Name(value="None"), operator=m.Equal()))
+    @m.leave(
+        m.ComparisonTarget(
+            comparator=oneof_names("None", "False", "True"), operator=m.Equal()
+        )
+    )
     def convert_none_cmp(self, _, updated_node):
         """Inspired by Pybetter."""
         return updated_node.with_changes(operator=cst.Is())
