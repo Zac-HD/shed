@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.9.6 - 2022-05-12
+- Several new custom refactoring passes (#37, #38, #39, #40)
+
 #### 0.9.5 - 2022-04-12
 - Supports (and requires) new version of `pyupgrade`
 
