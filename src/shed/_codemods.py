@@ -130,8 +130,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         args[-1] = args[-1].with_changes(comma=cst.Comma())
         args.append(
             cst.SubscriptElement(
-                slice=cst.Index(value=cst.Name(value="None")),
-                comma=cst.MaybeSentinel.DEFAULT,
+                slice=cst.Index(value=cst.Name(value="None"))
             )
         )
         expr = expr.with_changes(slice=tuple(args))
@@ -305,9 +304,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
     def reorder_union_literal_contents_none_last(self, _, updated_node):
         subscript_slice = list(updated_node.slice)
         subscript_slice.sort(key=lambda elt: elt.slice.value.value == "None")
-        subscript_slice[-1] = subscript_slice[-1].with_changes(
-            comma=cst.MaybeSentinel.DEFAULT
-        )
         return updated_node.with_changes(slice=subscript_slice)
 
     @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
