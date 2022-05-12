@@ -360,7 +360,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
                 has_none = True
             elif m.matches(
                 item.slice.value, m.Subscript(m.Name("Union") | m.Name("Literal"))
-            ) and updated_node.value == item.slice.value:
+            ) and m.matches(updated_node.value, item.slice.value.value):
                 new_slice += item.slice.value.slice  # peel off "Union" or "Literal"
             elif m.matches(item.slice.value, m.Name("None")):
                 has_none = True
