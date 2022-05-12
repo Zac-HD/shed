@@ -126,11 +126,8 @@ class ShedFixers(VisitorBasedCodemodCommand):
     )
     def convert_optional_literal_to_literal_none(self, _, updated_node):
         expr = updated_node.slice[0].slice.value
-        args = list(expr.slice)
-        args[-1] = args[-1].with_changes(comma=cst.Comma())
-        args.append(cst.SubscriptElement(slice=cst.Index(value=cst.Name(value="None"))))
-        expr = expr.with_changes(slice=tuple(args))
-        return expr
+        none = cst.SubscriptElement(slice=cst.Index(value=cst.Name(value="None")))
+        return expr.with_changes(slice=list(expr.slice) + [none])
 
     @m.leave(m.ComparisonTarget(comparator=m.Name(value="None"), operator=m.Equal()))
     def convert_none_cmp(self, _, updated_node):
@@ -363,9 +360,5 @@ class ShedFixers(VisitorBasedCodemodCommand):
             else:
                 new_slice.append(item)
         if has_none:
-            new_slice.append(
-                cst.SubscriptElement(
-                    slice=cst.Index(value=cst.Name(value="None")),
-                )
-            )
+            new_slice.append(cst.SubscriptElement(slice=cst.Index(cst.Name("None"))))
         return updated_node.with_changes(slice=new_slice)
