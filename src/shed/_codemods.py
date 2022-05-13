@@ -294,14 +294,15 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return cst.Call(func=func, args=[cst.Arg(updated_node.for_in.iter)])
         return updated_node
 
-    @m.leave(
-        m.Subscript(value=m.Name(value="Union"))
-        | m.Subscript(value=m.Name(value="Literal"))
-    )
+    @m.leave(m.Subscript(oneof_names("Union", "Literal")))
     def reorder_union_literal_contents_none_last(self, _, updated_node):
-        subscript_slice = list(updated_node.slice)
-        subscript_slice.sort(key=lambda elt: elt.slice.value.value == "None")
-        return updated_node.with_changes(slice=subscript_slice)
+        subscript = list(updated_node.slice)
+        try:
+            subscript.sort(key=lambda elt: elt.slice.value.value == "None")
+            subscript[-1] = subscript[-1].with_changes(comma=cst.MaybeSentinel.DEFAULT)
+            return updated_node.with_changes(slice=subscript)
+        except Exception:  # Single-element literals are not slices, etc.
+            return updated_node
 
     @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
     @m.leave(
@@ -326,29 +327,18 @@ class ShedFixers(VisitorBasedCodemodCommand):
         else:
             return updated_node
 
-    @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
-    @m.leave(
-        m.BinaryOperation(
-            left=m.Subscript(value=m.Name(value="Literal")),
-            operator=m.BitOr(),
-            right=m.Name("None"),
-        )
-    )
-    def flatten_literal_op(self, _, updated_node):
-        literal = updated_node.left
-        args = list(literal.slice)
-        for item in args:
-            if m.matches(item, m.SubscriptElement(m.Index(m.Name("None")))):
-                return literal  # Already has "None"
-        args.append(
-            cst.SubscriptElement(
-                slice=cst.Index(value=cst.Name(value="None")),
-            )
-        )
-        return literal.with_changes(slice=tuple(args))
+    @m.leave(m.Subscript(value=m.Name("Literal")))
+    def flatten_literal_subscript(self, _, updated_node):
+        new_slice = []
+        for item in updated_node.slice:
+            if m.matches(item.slice.value, m.Subscript(m.Name("Literal"))):
+                new_slice += item.slice.value.slice
+            else:
+                new_slice.append(item)
+        return updated_node.with_changes(slice=new_slice)
 
-    @m.leave(m.Subscript(value=m.Name(value="Union") | m.Name(value="Literal")))
-    def flatten_union_literal_subscript(self, _, updated_node):
+    @m.leave(m.Subscript(value=m.Name("Union")))
+    def flatten_union_subscript(self, _, updated_node):
         new_slice = []
         has_none = False
         for item in updated_node.slice:
@@ -356,7 +346,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
                 new_slice += item.slice.value.slice  # peel off "Optional"
                 has_none = True
             elif m.matches(
-                item.slice.value, m.Subscript(m.Name("Union") | m.Name("Literal"))
+                item.slice.value, m.Subscript(m.Name("Union"))
             ) and m.matches(updated_node.value, item.slice.value.value):
                 new_slice += item.slice.value.slice  # peel off "Union" or "Literal"
             elif m.matches(item.slice.value, m.Name("None")):

@@ -1,15 +1,9 @@
-Literal[1, 2] | None  # this should not change
 var: Literal[1, 2] | None
 var2: Literal[1, Literal[2, 3]]
-var3: Literal[None, 1, 2] | None
-Literal[1, 2, Union[bool, str]]  # this should not change
-Literal[1, 2, Union[bool, str], Optional[int]]
+var3: Literal[None, 1, 2]
 
 ================================================================================
 
-Literal[1, 2] | None  # this should not change
-var: Literal[1, 2, None]
+var: Literal[1, 2] | None
 var2: Literal[1, 2, 3]
 var3: Literal[1, 2, None]
-Literal[1, 2, Union[bool, str]]  # this should not change
-Literal[1, 2, Union[bool, str], int, None]
