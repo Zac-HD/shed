@@ -356,3 +356,10 @@ class ShedFixers(VisitorBasedCodemodCommand):
         if has_none:
             new_slice.append(cst.SubscriptElement(slice=cst.Index(cst.Name("None"))))
         return updated_node.with_changes(slice=new_slice)
+
+    @m.leave(m.Else(m.IndentedBlock([m.SimpleStatementLine([m.Pass()])])))
+    def discard_empty_else_blocks(self, _, _updated_node):
+        # An `else: pass` block can always simply be discarded, and libcst ensures
+        # that an Else node can only ever occur attached to an If, While, For, or Try
+        # node; in each case `None` is the valid way to represent "no else block".
+        return cst.RemoveFromParent()

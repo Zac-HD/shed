@@ -1,0 +1,49 @@
+if coinflip:
+    ...
+else:
+    pass
+
+if coinflip:
+    ...
+elif coinflip:
+    ...
+else:
+    pass
+
+for _ in range(10):
+    ...
+else:
+    pass
+
+while coinflip:
+    ...
+else:
+    pass
+
+try:
+    1 / 0
+except:
+    ...
+else:
+    pass
+
+================================================================================
+
+if coinflip:
+    ...
+
+if coinflip:
+    ...
+elif coinflip:
+    ...
+
+for _ in range(10):
+    ...
+
+while coinflip:
+    ...
+
+try:
+    1 / 0
+except:
+    ...
