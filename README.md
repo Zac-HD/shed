@@ -78,6 +78,9 @@ can avoid running `shed` on unchanged files.
 code.  If you want a more aggressive refactoring tool and don't mind checking
 for breaking changes, [check out `flynt`](https://github.com/ikamensh/flynt).
 
+For Django upgrades, see [`django-codemod`](https://github.com/browniebroke/django-codemod)
+or [`django-upgrade`](https://github.com/adamchainz/django-upgrade).
+
 ## Changelog
 
 Patch notes [can be found in `CHANGELOG.md`](https://github.com/Zac-HD/shed/blob/master/CHANGELOG.md).
