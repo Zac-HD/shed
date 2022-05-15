@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.9.7 - 2022-05-15
+- Dropped `teyit` because `pyupgrade` now handles deprecated unittest methods
+- Don't merge `None` into `Literal` types; it's easier to read `| None`
+
 #### 0.9.6 - 2022-05-12
 - Several new custom refactoring passes (#37, #38, #39, #40)
 

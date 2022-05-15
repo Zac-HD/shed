@@ -20,12 +20,11 @@ from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-__version__ = "0.9.6"
+__version__ = "0.9.7"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
 com2ann: Any = None
-_teyit_refactor: Any = None
 _run_codemods: Any = None
 
 _version_map = {
@@ -115,16 +114,10 @@ def shed(
         # This is a big deal for interactive use-cases such as pre-commit hooks
         # or format-on-save in editors (though I prefer Black for the latter).
         global com2ann
-        global _teyit_refactor
         global _run_codemods
         if com2ann is None:
             from ._codemods import _run_codemods  # type: ignore
 
-            try:
-                from teyit import refactor_until_deterministic as _teyit_refactor
-            except ImportError:  # pragma: no cover  # on Python 3.9
-                assert sys.version_info < (3, 9)
-                _teyit_refactor = _fallback
             try:
                 from com2ann import com2ann
             except ImportError:  # pragma: no cover  # on Python 3.8
@@ -145,8 +138,6 @@ def shed(
             # This can only be None if ast.parse() raises a SyntaxError,
             # which is possible but rare after the parsing checks above.
             source_code, _ = annotated
-        # Use teyit to replace old unittest.assertX methods on Python 3.9+
-        source_code, _ = _teyit_refactor(source_code)
 
     # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
     # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore run it

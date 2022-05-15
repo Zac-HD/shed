@@ -21,22 +21,19 @@ or explicitly passed a list of files to format on the command-line.
 - Runs [`autoflake`](https://pypi.org/project/autoflake/),
   to remove unused imports and variables
 - Runs [`pyupgrade`](https://pypi.org/project/pyupgrade/),
-  with autodetected minimum version >= py36
+  with autodetected minimum version >= py37
 - Runs [`isort`](https://pypi.org/project/isort/),
   with autodetected first-party imports and `--ca --profile=black` args
 - Runs [`black`](https://pypi.org/project/black/),
-  with autodetected minimum version >= py36
-- Runs custom refactoring logic using [`libcst`](https://pypi.org/project/libcst/)
+  with autodetected minimum version >= py37
 - Formats code blocks in docstrings, markdown, and restructured text docs
   (like [`blacken-docs`](https://pypi.org/project/blacken-docs/)).
-- If `shed --refactor`, also runs [`pybetter`](https://pypi.org/project/pybetter/)
-  to fix some style issues, [`teyit`](https://pypi.org/project/teyit/) to update
-  deprecated `unittest` methods, and [`com2ann`](https://pypi.org/project/com2ann/)
-  to convert type comments to annotations.
+- If `shed --refactor`, also runs [`com2ann`](https://pypi.org/project/com2ann/)
+  and custom refactoring logic using [`libcst`](https://pypi.org/project/libcst/).
 
 The version detection logic is provided by `black`.  Because `shed` supports the same
 [versions of Python as upstream](https://devguide.python.org/#status-of-python-branches),
-it assumes that the minimum version is Python 3.6.
+it assumes that the minimum version is Python 3.7.
 
 If you run `shed` in a Git repository, the name of the root directory is assumed to be a
 first-party import.  [`src` layout](https://hynek.me/articles/testing-packaging/)
@@ -66,7 +63,7 @@ adding the following to your `.pre-commit-config.yaml`:
 minimum_pre_commit_version: '2.9.0'
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 0.9.6
+  rev: 0.9.7
   hooks:
     - id: shed
       # args: [--refactor, --py39-plus]
