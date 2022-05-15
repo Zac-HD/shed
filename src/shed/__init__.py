@@ -146,14 +146,11 @@ def shed(
     source_code = blackened = black.format_str(source_code, mode=black_mode)
 
     pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
-    source_code = pyupgrade._main._fix_plugins(
-        source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
-    )
+    pu_settings = pyupgrade._main.Settings(min_version=pyupgrade_min)
+    source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
     if source_code != blackened:
         # Second step to converge: https://github.com/asottile/pyupgrade/issues/273
-        source_code = pyupgrade._main._fix_plugins(
-            source_code, settings=pyupgrade._main.Settings(min_version=pyupgrade_min)
-        )
+        source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
     source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
 
     if refactor:
