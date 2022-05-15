@@ -159,12 +159,6 @@ def shed(
     if refactor:
         source_code = _run_codemods(source_code, min_version=min_version)
 
-    source_code = autoflake.fix_code(
-        source_code,
-        expand_star_imports=True,
-        remove_all_unused_imports=_remove_unused_imports,
-    )
-
     try:
         source_code = isort.code(
             source_code,
@@ -175,6 +169,12 @@ def shed(
         )
     except FileSkipComment:
         pass
+
+    source_code = autoflake.fix_code(
+        source_code,
+        expand_star_imports=True,
+        remove_all_unused_imports=_remove_unused_imports,
+    )
 
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)

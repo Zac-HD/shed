@@ -83,6 +83,12 @@ example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 
 )
 @example(source_code=TEYIT_TWO_PASS, **example_kwargs)
 @example(source_code="class A:\n\x0c pass\n", **example_kwargs)
+@example(
+    source_code="from.import(A)#",
+    refactor=False,
+    provides=frozenset(),
+    min_version=(3, 7),
+)
 @settings(suppress_health_check=HealthCheck.all(), deadline=None)
 def test_shed_is_idempotent(source_code, refactor, provides, min_version):
     check(source_code, refactor=refactor, min_version=min_version, provides=provides)
