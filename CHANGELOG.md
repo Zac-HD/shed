@@ -5,6 +5,7 @@
 - Don't merge `None` into `Literal` types; it's easier to read `| None`
 - Avoid crashing on some rare and questionable code patterns
 - With `--refactor`, remove `else: pass` blocks
+- With `--refactor`, "unwrap" lambdas - e.g. `lambda x: sorted(x)` -> `sorted`
 
 #### 0.9.6 - 2022-05-12
 - Several new custom refactoring passes (#37, #38, #39, #40)

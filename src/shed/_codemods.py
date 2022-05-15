@@ -363,3 +363,25 @@ class ShedFixers(VisitorBasedCodemodCommand):
         # that an Else node can only ever occur attached to an If, While, For, or Try
         # node; in each case `None` is the valid way to represent "no else block".
         return cst.RemoveFromParent()
+
+    @m.leave(
+        m.Lambda(
+            params=m.MatchIfTrue(
+                lambda node: (
+                    node.star_kwarg is None
+                    and not node.kwonly_params
+                    and not node.posonly_params
+                    and isinstance(node.star_arg, cst.MaybeSentinel)
+                    and all(param.default is None for param in node.params)
+                )
+            )
+        )
+    )
+    def remove_lambda_indirection(self, _, updated_node):
+        same_args = [
+            m.Arg(m.Name(param.name.value), star="", keyword=None)
+            for param in updated_node.params.params
+        ]
+        if m.matches(updated_node.body, m.Call(args=same_args)):
+            return cst.ensure_type(updated_node.body, cst.Call).func
+        return updated_node

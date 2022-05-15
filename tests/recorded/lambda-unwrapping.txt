@@ -1,0 +1,35 @@
+# No changes for these cases
+lambda x: foo(y)
+lambda x: foo(x, y)
+lambda x, y: foo(x)
+lambda *, x: foo(x)
+lambda x = y: foo(x)
+lambda x, y: foo(y, x)
+lambda self: self.func()
+lambda x, y: foo(y=x, x=y)
+lambda x, y, *z: foo(x, y, z)
+lambda x, y, **z: foo(x, y, z)
+
+# But these ones should be "unwrapped"
+lambda: self.func()
+lambda x: foo(x)
+lambda x, y, z: (t + u).math_call(x, y, z)
+
+================================================================================
+
+# No changes for these cases
+lambda x: foo(y)
+lambda x: foo(x, y)
+lambda x, y: foo(x)
+lambda *, x: foo(x)
+lambda x=y: foo(x)
+lambda x, y: foo(y, x)
+lambda self: self.func()
+lambda x, y: foo(y=x, x=y)
+lambda x, y, *z: foo(x, y, z)
+lambda x, y, **z: foo(x, y, z)
+
+# But these ones should be "unwrapped"
+self.func
+foo
+(t + u).math_call
