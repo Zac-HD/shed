@@ -21,17 +21,22 @@ from . import ShedSyntaxWarning, _version_map, docshed, shed
 
 
 @functools.lru_cache()
+def _get_git_repo_root(cwd: str = None) -> str:
+    return subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        check=True,
+        timeout=10,
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+    ).stdout.strip()
+
+
+@functools.lru_cache()
 def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
     """Guess the name of the current package for first-party imports."""
     try:
-        base = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            check=True,
-            timeout=10,
-            capture_output=True,
-            text=True,
-            cwd=cwd,
-        ).stdout.strip()
+        base = _get_git_repo_root(cwd)
     except (subprocess.SubprocessError, FileNotFoundError):
         return frozenset()
     provides = {init.parent.name for init in Path(base).glob("**/src/*/__init__.py")}
@@ -114,17 +119,21 @@ def cli() -> None:  # pragma: no cover  # mutates things in-place, will test lat
     else:
         # Get all tracked files from `git ls-files`
         try:
+            root = os.path.relpath(_get_git_repo_root())
             all_filenames = subprocess.run(
                 ["git", "ls-files"],
                 check=True,
                 timeout=10,
                 stdout=subprocess.PIPE,
                 text=True,
+                cwd=root,
             ).stdout.splitlines()
         except (subprocess.SubprocessError, FileNotFoundError):
             print("Doesn't seem to be a git repo; pass filenames to format.")  # noqa
             sys.exit(1)
-        all_filenames = [f for f in all_filenames if _should_format(f)]
+        all_filenames = [
+            os.path.join(root, f) for f in all_filenames if _should_format(f)
+        ]
 
     rewrite = functools.partial(
         _rewrite_on_disk,
