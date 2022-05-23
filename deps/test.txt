@@ -12,19 +12,19 @@ autoflake==1.4
     # via shed (setup.py)
 black==22.3.0
     # via shed (setup.py)
-click==8.1.2
+click==8.1.3
     # via black
 com2ann==0.3.0 ; python_version >= "3.8"
     # via shed (setup.py)
-coverage[toml]==6.3.2
+coverage[toml]==6.4
     # via pytest-cov
 execnet==1.9.0
     # via pytest-xdist
 flake8==4.0.1
     # via flake8-comprehensions
-flake8-comprehensions==3.8.0
+flake8-comprehensions==3.10.0
     # via -r deps/test.in
-hypothesis==6.43.0
+hypothesis==6.46.7
     # via
     #   -r deps/test.in
     #   hypothesmith
@@ -36,7 +36,7 @@ isort==5.10.1
     # via shed (setup.py)
 lark-parser==0.12.0
     # via hypothesmith
-libcst==0.4.1
+libcst==0.4.3
     # via
     #   hypothesmith
     #   shed (setup.py)
@@ -50,7 +50,7 @@ packaging==21.3
     # via pytest
 pathspec==0.9.0
     # via black
-platformdirs==2.5.1
+platformdirs==2.5.2
     # via black
 pluggy==1.0.0
     # via pytest
@@ -64,9 +64,9 @@ pyflakes==2.4.0
     # via
     #   autoflake
     #   flake8
-pyparsing==3.0.8
+pyparsing==3.0.9
     # via packaging
-pytest==7.1.1
+pytest==7.1.2
     # via
     #   -r deps/test.in
     #   pytest-cov
@@ -78,7 +78,7 @@ pytest-forked==1.4.0
     # via pytest-xdist
 pytest-xdist==2.5.0
     # via -r deps/test.in
-pyupgrade==2.32.0
+pyupgrade==2.32.1
     # via shed (setup.py)
 pyyaml==6.0
     # via libcst
@@ -91,7 +91,7 @@ tomli==2.0.1
     #   black
     #   coverage
     #   pytest
-typing-extensions==4.1.1
+typing-extensions==4.2.0
     # via
     #   black
     #   libcst
