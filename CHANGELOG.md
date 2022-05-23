@@ -1,6 +1,7 @@
 # Changelog
 
 - When finding files in a git repo, search from root not current directory
+- Keep `else: pass` blocks if they contain any comments
 - Leave `Optional[Literal[...]]` alone too
 
 #### 0.9.7 - 2022-05-15

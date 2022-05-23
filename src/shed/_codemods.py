@@ -343,10 +343,12 @@ class ShedFixers(VisitorBasedCodemodCommand):
         return updated_node.with_changes(slice=new_slice)
 
     @m.leave(m.Else(m.IndentedBlock([m.SimpleStatementLine([m.Pass()])])))
-    def discard_empty_else_blocks(self, _, _updated_node):
+    def discard_empty_else_blocks(self, _, updated_node):
         # An `else: pass` block can always simply be discarded, and libcst ensures
         # that an Else node can only ever occur attached to an If, While, For, or Try
         # node; in each case `None` is the valid way to represent "no else block".
+        if m.findall(updated_node, m.Comment()):
+            return updated_node  # If there are any comments, keep the node
         return cst.RemoveFromParent()
 
     @m.leave(

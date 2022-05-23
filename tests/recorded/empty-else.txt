@@ -27,6 +27,22 @@ except:
 else:
     pass
 
+if coinflip:
+    ...
+else:  # keep this block with a comment on the else
+    pass
+
+if coinflip:
+    ...
+else:
+    # keep this block with a comment on a blank line
+    pass
+
+if coinflip:
+    ...
+else:
+    pass  # keep this block with a comment inline
+
 ================================================================================
 
 if coinflip:
@@ -47,3 +63,19 @@ try:
     1 / 0
 except:
     ...
+
+if coinflip:
+    ...
+else:  # keep this block with a comment on the else
+    pass
+
+if coinflip:
+    ...
+else:
+    # keep this block with a comment on a blank line
+    pass
+
+if coinflip:
+    ...
+else:
+    pass  # keep this block with a comment inline
