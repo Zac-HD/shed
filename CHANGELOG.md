@@ -1,8 +1,10 @@
 # Changelog
 
+#### 0.10.0 - 2022-05-22
 - When finding files in a git repo, search from root not current directory
 - Keep `else: pass` blocks if they contain any comments
 - Leave `Optional[Literal[...]]` alone too
+- Merge `isinstance(x, y) or isinstance(x, z)` to `isinstance(x, (y, z))`
 
 #### 0.9.7 - 2022-05-15
 - Dropped `teyit` because `pyupgrade` now handles deprecated unittest methods

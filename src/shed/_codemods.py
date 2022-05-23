@@ -372,3 +372,20 @@ class ShedFixers(VisitorBasedCodemodCommand):
         if m.matches(updated_node.body, m.Call(args=same_args)):
             return cst.ensure_type(updated_node.body, cst.Call).func
         return updated_node
+
+    @m.leave(
+        m.BooleanOperation(
+            left=m.Call(m.Name("isinstance"), [m.Arg(), m.Arg()]),
+            operator=m.Or(),
+            right=m.Call(m.Name("isinstance"), [m.Arg(), m.Arg()]),
+        )
+    )
+    def collapse_isinstance_checks(self, _, updated_node):
+        left_target, left_type = updated_node.left.args
+        right_target, right_type = updated_node.right.args
+        if left_target.deep_equals(right_target):
+            merged_type = cst.Arg(
+                cst.Tuple([cst.Element(left_type.value), cst.Element(right_type.value)])
+            )
+            return updated_node.left.with_changes(args=[left_target, merged_type])
+        return updated_node

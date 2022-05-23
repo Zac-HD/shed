@@ -1,0 +1,19 @@
+# Should not be merged
+isinstance(x, y) or something or isinstance(x, z)
+isinstance(x, y) or isinstance(y, z)
+
+# Should be merged
+isinstance(x, y) or isinstance(x, z)
+# isinstance(x, y) or isinstance(x, z) or isinstance(x, q)
+# isinstance(x, a) or isinstance(x, b) or isinstance(y, c) or isinstance(y, d)
+
+================================================================================
+
+# Should not be merged
+isinstance(x, y) or something or isinstance(x, z)
+isinstance(x, y) or isinstance(y, z)
+
+# Should be merged
+isinstance(x, (y, z))
+# isinstance(x, y) or isinstance(x, z) or isinstance(x, q)
+# isinstance(x, a) or isinstance(x, b) or isinstance(y, c) or isinstance(y, d)
