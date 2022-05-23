@@ -1,5 +1,7 @@
 # Changelog
 
+- Leave `Optional[Literal[...]]` alone too
+
 #### 0.9.7 - 2022-05-15
 - Dropped `teyit` because `pyupgrade` now handles deprecated unittest methods
 - Don't merge `None` into `Literal` types; it's easier to read `| None`

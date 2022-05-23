@@ -115,21 +115,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
 
     @m.leave(
-        m.Subscript(
-            value=m.Name(value="Optional"),
-            slice=[
-                m.SubscriptElement(
-                    slice=m.Index(value=m.Subscript(value=m.Name(value="Literal")))
-                )
-            ],
-        )
-    )
-    def convert_optional_literal_to_literal_none(self, _, updated_node):
-        expr = updated_node.slice[0].slice.value
-        none = cst.SubscriptElement(slice=cst.Index(value=cst.Name(value="None")))
-        return expr.with_changes(slice=list(expr.slice) + [none])
-
-    @m.leave(
         m.ComparisonTarget(
             comparator=oneof_names("None", "False", "True"), operator=m.Equal()
         )
