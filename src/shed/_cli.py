@@ -6,10 +6,12 @@ pass the names of specific files to format instead.
 
 import argparse
 import functools
+import io
 import multiprocessing
 import os
 import subprocess
 import sys
+import tokenize
 import warnings
 from pathlib import Path
 from typing import FrozenSet, Union
@@ -57,8 +59,11 @@ def _rewrite_on_disk(
 ) -> Union[bool, str]:
     """Return either bool(rewrote the file), or an error message string."""
     try:
-        with open(fname) as handle:
-            on_disk = handle.read()
+        with open(fname, mode="rb") as handle:
+            bytes_on_disk = handle.read()
+        encoding, _ = tokenize.detect_encoding(io.BytesIO(bytes_on_disk).readline)
+        with io.TextIOWrapper(io.BytesIO(bytes_on_disk), encoding) as wrapper:
+            on_disk = wrapper.read()
     except (OSError, UnicodeError) as err:
         # Permissions or encoding issue, or file deleted since last commit.
         return f"skipping {fname!r} due to {err}"
@@ -82,7 +87,7 @@ def _rewrite_on_disk(
             if not issubclass(w.category, ShedSyntaxWarning):
                 warnings.warn(w.message, category=w.category, stacklevel=2)
     if result != on_disk:
-        with open(fname, mode="w") as fh:
+        with open(fname, mode="w", encoding=encoding) as fh:
             fh.write(result)
     return msg or result != on_disk
 

@@ -1,5 +1,7 @@
 # Changelog
 
+#### 0.10.1 - 2022-06-06
+- Handle non-locale-encoded files, such as UTF-8 on Windows (#42)
 - Preserve comments on the last element of `Literal` types with `--refactor`
 
 #### 0.10.0 - 2022-05-22
