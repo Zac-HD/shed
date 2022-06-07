@@ -1,5 +1,7 @@
 # Changelog
 
+- Preserve comments on the last element of `Literal` types with `--refactor`
+
 #### 0.10.0 - 2022-05-22
 - When finding files in a git repo, search from root not current directory
 - Keep `else: pass` blocks if they contain any comments

@@ -73,6 +73,13 @@ def multi(*args, **kwargs):
     return m.OneOf(*(a(**kwargs) for a in args))
 
 
+def remove_trailing_comma(node):
+    # Remove the comma from this node, *unless* it's already a comma node with comments
+    if node.comma is cst.MaybeSentinel.DEFAULT or m.findall(node, m.Comment()):
+        return node
+    return node.with_changes(comma=cst.MaybeSentinel.DEFAULT)
+
+
 MATCH_NONE = m.MatchIfTrue(lambda x: x is None)
 ALL_ELEMS_SLICE = m.Slice(
     lower=MATCH_NONE | m.Name("None"),
@@ -212,9 +219,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
                         args[i] = arg.with_changes(value=cst.Name("True"))
                     else:
                         del args[i]
-                        args[i - 1] = args[i - 1].with_changes(
-                            comma=cst.MaybeSentinel.DEFAULT
-                        )
+                        args[i - 1] = remove_trailing_comma(args[i - 1])
                 break
         else:
             args.append(cst.Arg(keyword=cst.Name("reverse"), value=cst.Name("True")))
@@ -284,7 +289,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         subscript = list(updated_node.slice)
         try:
             subscript.sort(key=lambda elt: elt.slice.value.value == "None")
-            subscript[-1] = subscript[-1].with_changes(comma=cst.MaybeSentinel.DEFAULT)
+            subscript[-1] = remove_trailing_comma(subscript[-1])
             return updated_node.with_changes(slice=subscript)
         except Exception:  # Single-element literals are not slices, etc.
             return updated_node

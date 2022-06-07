@@ -1,0 +1,11 @@
+Literal[
+    1, # lorem ipsum
+    2, # this comment should not be removed
+]
+
+================================================================================
+
+Literal[
+    1,  # lorem ipsum
+    2,  # this comment should not be removed
+]
