@@ -89,6 +89,15 @@ example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 
     provides=frozenset(),
     min_version=(3, 7),
 )
+# Minimum-version examples via https://github.com/jwilk/python-syntax-errors/
+@example(source_code="lambda: (x := 0)\n", **example_kwargs)
+@example(source_code="@0\ndef f(): pass\n", **example_kwargs)
+@example(source_code="match 0:\n  case 0: ...\n", **example_kwargs)
+@example(source_code="try: pass\nexcept* 0: pass\n", **example_kwargs)
+@example(
+    source_code="async def f(x): [[x async for x in ...] for y in ()]\n",
+    **example_kwargs,
+)
 @settings(suppress_health_check=HealthCheck.all(), deadline=None)
 def test_shed_is_idempotent(source_code, refactor, provides, min_version):
     check(source_code, refactor=refactor, min_version=min_version, provides=provides)
