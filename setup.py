@@ -25,11 +25,11 @@ setuptools.setup(
     description="`shed` canonicalises Python code.",
     install_requires=[
         "autoflake >= 1.4",
-        "black >= 22.3.0",
+        "black >= 22.8.0",
         "com2ann >= 0.3.0 ; python_version >= '3.8'",
         "isort >= 5.10.1",
-        "libcst >= 0.4.0",
-        "pyupgrade >= 2.32.0",
+        "libcst >= 0.4.6",
+        "pyupgrade >= 2.37.0",
     ],
     python_requires=">=3.7",
     classifiers=[

@@ -1,5 +1,10 @@
 # Changelog
 
+#### 0.10.2 - 2022-09-05
+- Require latest version of Black to detect that `f"{x=}"` requires Python 3.8+
+  (and remove previous workaround)
+- Fixed detection of Hypothesis codemods in `--refactor` mode
+
 #### 0.10.1 - 2022-06-06
 - Handle non-locale-encoded files, such as UTF-8 on Windows (#42)
 - Preserve comments on the last element of `Literal` types with `--refactor`
