@@ -31,7 +31,7 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
-          - "3.11.0-rc.1 - 3.11"  # version range syntax to allow pre-release
+          # - "3.11.0-rc.1 - 3.11"  # version range syntax to allow pre-release  ## Skip pending https://github.com/lark-parser/lark/pull/1140
           ## LibCST fails to install under PyPy due to PyO3 compilation error?
           # - "pypy-3.7"
           # - "pypy-3.8"
