@@ -28,11 +28,13 @@ jobs:
       matrix:
         python-version:
           - "3.7"
+          - "3.8"
           - "3.9"
-          - "3.9"
-          # - "3.10"  # autoflake uses deprecated distutils package
-          ## typed-ast doesn't work on pypy :-(
+          - "3.10"
+          - "3.11.0-rc1"  # have to specify an exact pre-release?  Annoying.
+          ## LibCST fails to install under PyPy due to PyO3 compilation error?
           # - "pypy-3.7"
+          # - "pypy-3.8"
           # - "pypy-3.9"
       fail-fast: false
     steps:
