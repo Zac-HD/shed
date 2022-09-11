@@ -5,6 +5,7 @@ pass the names of specific files to format instead.
 """
 
 import functools
+import os
 import re
 import sys
 import textwrap
@@ -17,10 +18,10 @@ import black
 import isort
 import pyupgrade._main
 from black.mode import TargetVersion
-from black.parsing import lib2to3_parse
+from black.parsing import InvalidInput, lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-__version__ = "0.10.2"
+__version__ = "0.10.3"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
@@ -70,15 +71,21 @@ def shed(
         return ""
 
     # Use black to autodetect our target versions
+    target_versions = {k for k, v in _version_map.items() if v >= min_version}
     try:
-        parsed = lib2to3_parse(
-            source_code.lstrip(),
-            target_versions={k for k, v in _version_map.items() if v >= min_version},
-        )
+        # Black errors out if we have pattern matching (3.10+), and the target versions
+        # include older versions.  Very well; we'll add a temporary workaround.
+        try:
+            parsed = lib2to3_parse(source_code.lstrip(), target_versions)
+        except InvalidInput as err:
+            if not re.match(r"Cannot parse: \d+:\d+: match ", str(err)):
+                raise
+            target_versions = {k for k, v in _version_map.items() if v >= (3, 10)}
+            parsed = lib2to3_parse(source_code.lstrip(), target_versions)
         # black.InvalidInput, blib2to3.pgen2.tokenize.TokenError, SyntaxError...
         # for forwards-compatibility I'm just going general here.
     except Exception as err:
-        msg = f"Could not parse {_location}"
+        msg = f"Could not parse {_location}\n    {type(err).__qualname__}: {err}"
         for pattern, blocktype in _SUGGESTIONS:
             if re.search(pattern, source_code, flags=re.MULTILINE):
                 msg += f"\n    Perhaps you should use a {blocktype!r} block instead?"
@@ -87,9 +94,14 @@ def shed(
         except SyntaxError:
             pass
         else:
-            msg += "\n    The syntax is valid Python, so please report this as a bug."
+            msg += (
+                f"\n    The syntax is valid for Python {sys.version_info.major}"
+                f".{sys.version_info.minor}, so please report this as a bug."
+            )
         w = ShedSyntaxWarning(msg)
         w.__cause__ = err
+        if "SHED_RAISE" in os.environ:  # pragma: no cover
+            raise w
         warnings.warn(w, stacklevel=_location.count(" block in ") + 2)
         # Even if the code itself has invalid syntax, we might be able to
         # regex-match and therefore reformat code embedded in docstrings.
@@ -100,7 +112,7 @@ def shed(
             min_version=min_version,
             _location=_location,
         )
-    target_versions = set(_version_map) & set(black.detect_target_versions(parsed))
+    target_versions &= set(black.detect_target_versions(parsed))
     assert target_versions
     min_version = max(
         min_version,
@@ -149,7 +161,8 @@ def shed(
     pu_settings = pyupgrade._main.Settings(min_version=pyupgrade_min)
     source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
     if source_code != blackened:
-        # Second step to converge: https://github.com/asottile/pyupgrade/issues/273
+        # Second step to converge: without this we have f-string problems.
+        # Upstream issue: https://github.com/asottile/pyupgrade/issues/703
         source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
     source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
 

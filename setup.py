@@ -28,7 +28,7 @@ setuptools.setup(
         "black >= 22.8.0",
         "com2ann >= 0.3.0 ; python_version >= '3.8'",
         "isort >= 5.10.1",
-        "libcst >= 0.4.6",
+        "libcst >= 0.4.7",
         "pyupgrade >= 2.37.0",
     ],
     python_requires=">=3.7",

@@ -1,5 +1,10 @@
 # Changelog
 
+#### 0.10.3 - 2022-09-10
+- Fix a crash when used with Python 3.10 pattern matching
+- Fix a bug where the minimum-version argument was sometimes ignored
+- Clarified some error messages for easier debugging
+
 #### 0.10.2 - 2022-09-05
 - Require latest version of Black to detect that `f"{x=}"` requires Python 3.8+
   (and remove previous workaround)

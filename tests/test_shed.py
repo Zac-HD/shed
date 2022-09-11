@@ -49,6 +49,8 @@ def check(
         libcst.ParserSyntaxError,
         ShedSyntaxWarning,
     ):
+        if except_ is ...:
+            raise
         except_()
     assert result == shed(
         source_code=result,
@@ -170,6 +172,13 @@ def test_empty_stays_empty(refactor):
 def test_error_on_invalid_syntax(source_code, refactor):
     with pytest.raises(Exception):
         assert shed(source_code=source_code, refactor=refactor)
+
+
+def test_cleans_up_after_setting_env_var(monkeypatch):
+    monkeypatch.setenv("LIBCST_PARSER_TYPE", "non-native")
+    assert os.environ.get("LIBCST_PARSER_TYPE") == "non-native"
+    shed(source_code="match x:\n  case _:\n    pass\n", refactor=True)
+    assert os.environ.get("LIBCST_PARSER_TYPE") == "non-native"
 
 
 python_files = []

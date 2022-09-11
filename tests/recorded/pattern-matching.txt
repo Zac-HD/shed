@@ -32,12 +32,12 @@ match command.split():
     case ["quit"]: ... # Code omitted for brevity
     case ["go", direction]: ...
     case ["drop", *objects]: ...
-    ... # Other cases
+    # Other cases
     case _:
         print(f"Sorry, I couldn't understand {command!r}")
 
 match command.split():
-    ... # Other cases
+    # Other cases
     case ["north"] | ["go", "north"]:
         current_room = current_room.neighbor("north")
     case ["get", obj] | ["pick", "up", obj] | ["pick", obj, "up"]:
@@ -65,7 +65,7 @@ match event.get():
         game.quit()
     case KeyPress(key_name="up arrow"):
         game.go_north()
-    ...
+    # ...
     case KeyPress():
         pass # Ignore other keystrokes
     case other_event:
@@ -125,13 +125,13 @@ for action in actions:
 
 match command.split():
     case [action, obj]:
-        ... # interpret action, obj
+        ...  # interpret action, obj
 
 match command.split():
     case [action]:
-        ... # interpret single-verb action
+        ...  # interpret single-verb action
     case [action, obj]:
-        ... # interpret action, obj
+        ...  # interpret action, obj
 
 match command.split():
     case ["quit"]:
@@ -152,19 +152,22 @@ match command.split():
     # The rest of your commands go here
 
 match command.split():
-    case ["quit"]: ... # Code omitted for brevity
-    case ["go", direction]: ...
-    case ["drop", *objects]: ...
-    ... # Other cases
+    case ["quit"]:
+        ...  # Code omitted for brevity
+    case ["go", direction]:
+        ...
+    case ["drop", *objects]:
+        ...
+    # Other cases
     case _:
         print(f"Sorry, I couldn't understand {command!r}")
 
 match command.split():
-    ... # Other cases
+    # Other cases
     case ["north"] | ["go", "north"]:
         current_room = current_room.neighbor("north")
     case ["get", obj] | ["pick", "up", obj] | ["pick", obj, "up"]:
-        ... # Code for picking up the given object
+        ...  # Code for picking up the given object
 
 match command.split():
     case ["go", ("north" | "south" | "east" | "west")]:
@@ -188,29 +191,34 @@ match event.get():
         game.quit()
     case KeyPress(key_name="up arrow"):
         game.go_north()
-    ...
+    # ...
     case KeyPress():
-        pass # Ignore other keystrokes
+        pass  # Ignore other keystrokes
     case other_event:
         raise ValueError(f"Unrecognized event: {other_event}")
 
 from dataclasses import dataclass
+
 
 @dataclass
 class Click:
     position: tuple
     button: Button
 
+
 match event.get():
     case Click((x, y)):
         handle_click_at(x, y)
 
+
 class Click:
     __match_args__ = ("position", "button")
+
     def __init__(self, pos, btn):
         self.position = pos
         self.button = btn
         ...
+
 
 match event.get():
     case Click((x, y), button=Button.LEFT):  # This is a left click

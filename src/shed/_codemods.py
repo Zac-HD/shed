@@ -5,13 +5,13 @@ These are mostly based on flake8, flake8-comprehensions, and some personal
 nitpicks about typing unions and literals.
 """
 
+import os
 import re
 from ast import literal_eval
 from typing import Tuple
 
 import libcst as cst
 import libcst.matchers as m
-from libcst._parser.types.config import _pick_compatible_python_version
 from libcst.codemod import VisitorBasedCodemodCommand
 
 
@@ -36,12 +36,16 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
     """Run all Shed fixers on a code string."""
     context = cst.codemod.CodemodContext()
 
-    # We want LibCST to parse the code as if running on our target minimum version,
-    # but fall back to the latest version it supports (currently 3.8) if our target
-    # version is newer than that.  Or jump *forward* if Black got the version wrong!
-    v = _pick_compatible_python_version(".".join(map(str, min_version)))
-    config = cst.PartialParserConfig(python_version=f"{v.major}.{v.minor}")
-    mod = cst.parse_module(code, config)
+    # Only the native parser supports Python 3.9 and later, but for now it's
+    # only active if you set an environment variable.  Very well then:
+    var = os.environ.get("LIBCST_PARSER_TYPE")
+    try:
+        os.environ["LIBCST_PARSER_TYPE"] = "native"
+        mod = cst.parse_module(code)
+    finally:
+        os.environ.pop("LIBCST_PARSER_TYPE")
+        if var is not None:
+            os.environ["LIBCST_PARSER_TYPE"] = var
 
     if imports_hypothesis(code):  # pragma: no cover
         mod = attempt_hypothesis_codemods(context, mod)
