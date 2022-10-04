@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.10.4 - 2022-10-04
+- Updated for compatibility with new `pyupgrade==3.0.0`
+
 #### 0.10.3 - 2022-09-10
 - Fix a crash when used with Python 3.10 pattern matching
 - Fix a bug where the minimum-version argument was sometimes ignored

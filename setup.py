@@ -29,7 +29,7 @@ setuptools.setup(
         "com2ann >= 0.3.0 ; python_version >= '3.8'",
         "isort >= 5.10.1",
         "libcst >= 0.4.7",
-        "pyupgrade >= 2.37.0",
+        "pyupgrade >= 3.0.0",
     ],
     python_requires=">=3.7",
     classifiers=[

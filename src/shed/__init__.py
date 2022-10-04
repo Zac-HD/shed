@@ -21,7 +21,7 @@ from black.mode import TargetVersion
 from black.parsing import InvalidInput, lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-__version__ = "0.10.3"
+__version__ = "0.10.4"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
@@ -157,14 +157,14 @@ def shed(
     black_mode = black.Mode(target_versions=target_versions)  # type: ignore
     source_code = blackened = black.format_str(source_code, mode=black_mode)
 
-    pyupgrade_min = min(min_version, max(pyupgrade._main.IMPORT_REMOVALS))
+    pyupgrade_min = min(min_version, max(pyupgrade._plugins.imports.REPLACE_EXACT))
     pu_settings = pyupgrade._main.Settings(min_version=pyupgrade_min)
     source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
     if source_code != blackened:
         # Second step to converge: without this we have f-string problems.
         # Upstream issue: https://github.com/asottile/pyupgrade/issues/703
         source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
-    source_code = pyupgrade._main._fix_tokens(source_code, min_version=pyupgrade_min)
+    source_code = pyupgrade._main._fix_tokens(source_code)
 
     if refactor:
         source_code = _run_codemods(source_code, min_version=min_version)
