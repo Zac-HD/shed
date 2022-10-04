@@ -8,7 +8,7 @@ astor==0.8.1
     # via flake8-simplify
 attrs==22.1.0
     # via flake8-bugbear
-autoflake==1.5.3
+autoflake==1.6.1
     # via shed (setup.py)
 black==22.8.0
     # via shed (setup.py)
@@ -32,7 +32,7 @@ flake8==5.0.4
     #   pep8-naming
 flake8-2020==1.7.0
     # via -r deps/check.in
-flake8-bugbear==22.8.23
+flake8-bugbear==22.9.23
     # via -r deps/check.in
 flake8-builtins==1.5.3
     # via -r deps/check.in
@@ -56,7 +56,7 @@ libcst==0.4.7
     # via shed (setup.py)
 mccabe==0.7.0
     # via flake8
-mypy==0.971
+mypy==0.982
     # via -r deps/check.in
 mypy-extensions==0.4.3
     # via
@@ -79,18 +79,17 @@ pyflakes==2.5.0
     # via
     #   autoflake
     #   flake8
-pyupgrade==2.37.3
+pyupgrade==3.0.0
     # via shed (setup.py)
 pyyaml==6.0
     # via libcst
 snowballstemmer==2.2.0
     # via pydocstyle
-tokenize-rt==4.2.1
+tokenize-rt==5.0.0
     # via pyupgrade
-toml==0.10.2
-    # via autoflake
 tomli==2.0.1
     # via
+    #   autoflake
     #   black
     #   mypy
 typing-extensions==4.3.0

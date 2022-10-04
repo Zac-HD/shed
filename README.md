@@ -27,7 +27,7 @@ or explicitly passed a list of files to format on the command-line.
 - Runs [`black`](https://pypi.org/project/black/),
   with autodetected minimum version >= py37
 - Formats code blocks in docstrings, markdown, and restructured text docs
-  (like [`blacken-docs`](https://pypi.org/project/blacken-docs/)).
+  (based on [`blacken-docs`](https://pypi.org/project/blacken-docs/)).
 - If `shed --refactor`, also runs [`com2ann`](https://pypi.org/project/com2ann/)
   and custom refactoring logic using [`libcst`](https://pypi.org/project/libcst/).
 

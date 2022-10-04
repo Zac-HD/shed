@@ -8,7 +8,7 @@ attrs==22.1.0
     # via
     #   hypothesis
     #   pytest
-autoflake==1.5.3
+autoflake==1.6.1
     # via shed (setup.py)
 black==22.8.0
     # via shed (setup.py)
@@ -16,7 +16,7 @@ click==8.1.3
     # via black
 com2ann==0.3.0 ; python_version >= "3.8"
     # via shed (setup.py)
-coverage[toml]==6.4.4
+coverage[toml]==6.5.0
     # via pytest-cov
 exceptiongroup==1.0.0rc9
     # via hypothesis
@@ -26,7 +26,7 @@ flake8==5.0.4
     # via flake8-comprehensions
 flake8-comprehensions==3.10.0
     # via -r deps/test.in
-hypothesis==6.54.5
+hypothesis==6.56.0
     # via
     #   -r deps/test.in
     #   hypothesmith
@@ -74,24 +74,23 @@ pytest==7.1.3
     #   pytest-cov
     #   pytest-forked
     #   pytest-xdist
-pytest-cov==3.0.0
+pytest-cov==4.0.0
     # via -r deps/test.in
 pytest-forked==1.4.0
     # via pytest-xdist
 pytest-xdist==2.5.0
     # via -r deps/test.in
-pyupgrade==2.37.3
+pyupgrade==3.0.0
     # via shed (setup.py)
 pyyaml==6.0
     # via libcst
 sortedcontainers==2.4.0
     # via hypothesis
-tokenize-rt==4.2.1
+tokenize-rt==5.0.0
     # via pyupgrade
-toml==0.10.2
-    # via autoflake
 tomli==2.0.1
     # via
+    #   autoflake
     #   black
     #   coverage
     #   pytest
