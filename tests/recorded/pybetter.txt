@@ -2,6 +2,7 @@ not (x in y)
 z == None
 a == True
 a == False
+df[df.flag == True]  # doesn't break Pandas code
 
 with a:
     with b:
@@ -18,6 +19,7 @@ x not in y
 z is None
 a is True
 a is False
+df[df.flag == True]  # doesn't break Pandas code
 
 with a:
     with b:

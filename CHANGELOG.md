@@ -2,6 +2,7 @@
 
 - Preserve trailing commas in literals in `--refactor` mode
 - `--refactor` mode now flattens `Optional[Union[...]]` to `Union[..., None]`
+- Don't convert `==` to `is` in subscripts, to save e.g. `df[df.flag == True]`
 
 #### 0.10.4 - 2022-10-04
 - Updated for compatibility with new `pyupgrade==3.0.0`

@@ -119,6 +119,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             comparator=oneof_names("None", "False", "True"), operator=m.Equal()
         )
     )
+    @m.call_if_not_inside(m.Index())  # Pandas idiom, e.g. df[df.flag == True]
     def convert_none_cmp(self, _, updated_node):
         """Inspired by Pybetter."""
         return updated_node.with_changes(operator=cst.Is())
