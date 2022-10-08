@@ -21,7 +21,7 @@ from black.mode import TargetVersion
 from black.parsing import InvalidInput, lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-__version__ = "0.10.4"
+__version__ = "0.10.5"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
