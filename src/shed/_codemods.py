@@ -281,8 +281,10 @@ class ShedFixers(VisitorBasedCodemodCommand):
     def reorder_union_literal_contents_none_last(self, _, updated_node):
         subscript = list(updated_node.slice)
         try:
+            has_comma = isinstance(subscript[-1].comma, cst.Comma)
             subscript.sort(key=lambda elt: elt.slice.value.value == "None")
-            subscript[-1] = remove_trailing_comma(subscript[-1])
+            if not has_comma:
+                subscript[-1] = remove_trailing_comma(subscript[-1])
             return updated_node.with_changes(slice=subscript)
         except Exception:  # Single-element literals are not slices, etc.
             return updated_node
