@@ -5,6 +5,10 @@ list(f(x) for x in foo)
 set(f(x) for x in foo)
 dict((x, f(x)) for x in foo)
 
+list(
+    f(x) for x in foo  # should preserve this trailing comment
+)
+
 ================================================================================
 
 # C400-402: Unnecessary generator - as a <list/set/dict> comprehension.
@@ -13,3 +17,7 @@ dict((x, f(x)) for x in foo)
 [f(x) for x in foo]
 {f(x) for x in foo}
 {x: f(x) for x in foo}
+
+[
+    f(x) for x in foo  # should preserve this trailing comment
+]
