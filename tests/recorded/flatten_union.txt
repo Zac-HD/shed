@@ -3,6 +3,7 @@ Union[None, int, Optional[str]]
 Union[Union[int, float], str]
 Union[int, Literal[1, 2]]  # this should not change
 Union[int, Literal[1, 2], Optional[str]]
+Optional[Union[int, str]]
 
 Union[tuple(t for t in [int, str])]  # Statically invalid but exists in the wild
 
@@ -13,5 +14,6 @@ Union[int, str, None]
 Union[int, float, str]
 Union[int, Literal[1, 2]]  # this should not change
 Union[int, Literal[1, 2], str, None]
+Union[int, str, None]
 
 Union[tuple(t for t in [int, str])]  # Statically invalid but exists in the wild

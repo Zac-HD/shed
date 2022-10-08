@@ -289,6 +289,17 @@ class ShedFixers(VisitorBasedCodemodCommand):
         except Exception:  # Single-element literals are not slices, etc.
             return updated_node
 
+    @m.leave(
+        m.Subscript(
+            m.Name("Optional"),
+            [m.SubscriptElement(m.Index(m.Subscript(value=m.Name("Union"))))],
+        )
+    )
+    def reorder_merge_optional_union(self, _, updated_node):
+        union = updated_node.slice[0].slice.value
+        none = [cst.SubscriptElement(cst.Index(cst.Name("None")))]
+        return union.with_changes(slice=list(union.slice) + none)
+
     @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
     @m.leave(
         m.BinaryOperation(

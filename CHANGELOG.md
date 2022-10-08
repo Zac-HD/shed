@@ -1,6 +1,7 @@
 # Changelog
 
 - Preserve trailing commas in literals in `--refactor` mode
+- `--refactor` mode now flattens `Optional[Union[...]]` to `Union[..., None]`
 
 #### 0.10.4 - 2022-10-04
 - Updated for compatibility with new `pyupgrade==3.0.0`
