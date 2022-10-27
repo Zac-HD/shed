@@ -1,0 +1,62 @@
+assert a and b # one
+
+assert a and b and c # two
+
+assert (a and b) # three
+
+assert a(1, 2) and b(3, 7) # four
+
+def f():
+    assert a and b
+
+assert (a and b) and (c and d)
+
+assert a or b and c
+assert a and b or c
+
+assert a and (b or c)
+
+assert (a or b) and c
+
+assert a or b
+
+assert a
+
+================================================================================
+
+assert a
+assert b  # one
+
+assert a
+assert b
+assert c  # two
+
+assert a
+assert b  # three
+
+assert a(1, 2)
+assert b(3, 7)  # four
+
+
+def f():
+    assert a
+    assert b
+
+
+assert a
+assert b
+assert c
+assert d
+
+assert a or b and c
+assert a and b or c
+
+assert a
+assert b or c
+
+assert a or b
+assert c
+
+assert a or b
+
+assert a

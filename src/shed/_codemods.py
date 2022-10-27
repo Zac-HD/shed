@@ -401,3 +401,18 @@ class ShedFixers(VisitorBasedCodemodCommand):
             )
             return updated_node.left.with_changes(args=[left_target, merged_type])
         return updated_node
+
+    # helper function to handle recursive structures created by e.g. `assert a and b and c`
+    def _flatten_bool(self, expr):
+        if m.matches(expr, m.BooleanOperation(operator=m.And())):
+            return self._flatten_bool(expr.left) + self._flatten_bool(expr.right)
+        return [expr]
+
+    # split `assert a and b` into `assert a` and `assert b`
+    @m.leave(m.Assert(test=m.BooleanOperation(operator=m.And())))
+    def split_assert_and(self, _, updated_node):
+        flat_nodes = self._flatten_bool(updated_node.test)
+        nodes = [updated_node.with_changes(test=flat_nodes[0])]
+        for node in flat_nodes[1:]:
+            nodes.append(cst.Assert(node))
+        return cst.FlattenSentinel(nodes)
