@@ -8,7 +8,7 @@ nitpicks about typing unions and literals.
 import os
 import re
 from ast import literal_eval
-from typing import Tuple
+from typing import List, Tuple
 
 import libcst as cst
 import libcst.matchers as m
@@ -402,17 +402,153 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return updated_node.left.with_changes(args=[left_target, merged_type])
         return updated_node
 
-    # helper function to handle recursive structures created by e.g. `assert a and b and c`
-    def _flatten_bool(self, expr):
-        if m.matches(expr, m.BooleanOperation(operator=m.And())):
-            return self._flatten_bool(expr.left) + self._flatten_bool(expr.right)
-        return [expr]
+    # main function to split assertions
+    # i.e. turn `assert a and b` into `assert a` and `assert b`
+    # it's a separate function, since it recursively calls itself on recursive structures,
+    # e.g. `a and (b and c)` and `a and b and c`
+    # it handles comments on multi-line assertions, assigning comments to the correct
+    # statements as far as possible
+    # The parent SimpleLineStatement can have comments on leading lines, these are sent
+    # in `leading_lines` and put before the first assert.
+    # It can also have a comment in
+    # it's TrailingWhitespace, which is sent in `comments` and added to the correct
+    # statement, or left until the end to be added at the end.
+    # Further comments are saved in
+    # [lpar/operator/rpar].[whitespace_after/whitespace_before].[first_line/empty_lines]
+    # and set as leading_lines and trailing_whitespace for the different assert statements.
+    # comments on lines after the last tested statement are added to a pass statement,
+    # this will require manual intervention - but in libCST comments are either on the
+    # lines before, or the same line as, a statement. In theory one could do a module-level
+    # analysis, but this should be a very rare case and regardless the user will probably
+    # need to manually intervene.
+    def _flatten_bool(
+        self,
+        expr,
+        leading_lines: List[cst.EmptyLine],
+        comments: List[cst.Comment],
+    ) -> List[cst.SimpleStatementLine]:
+        def handle_leftright(node, comments, nodes, leading_lines):
+            # if node is a BoolOp, recurse - sending them our leading lines
+            if m.matches(node, m.BooleanOperation(operator=m.And())):
+                nodes.extend(self._flatten_bool(node, leading_lines, comments))
+            else:
+                nodes.append(
+                    cst.SimpleStatementLine(
+                        [cst.Assert(node)],
+                        leading_lines,
+                        cst.TrailingWhitespace(
+                            whitespace=cst.SimpleWhitespace("  " if comments else ""),
+                            comment=comments.pop(0) if comments else None,
+                        ),
+                    )
+                )
+
+        assert m.matches(expr, m.BooleanOperation(operator=m.And()))
+
+        nodes = []
+        if not leading_lines:
+            leading_lines = []
+
+        # add comments in expr.lpar as leading_lines
+        for lpar in expr.lpar:
+            if m.matches(lpar.whitespace_after, m.ParenthesizedWhitespace()):
+                leading_lines.append(
+                    cst.EmptyLine(comment=lpar.whitespace_after.first_line.comment)
+                )
+                for empty_line in lpar.whitespace_after.empty_lines:
+                    leading_lines.append(cst.EmptyLine(comment=empty_line.comment))
+
+        # the comment belonging to the left value (or left.right in nested cases) is
+        # put in operator.whitespace_before.first_line for some reason, so we add it
+        # to comments before handling left.
+        if isinstance(expr.operator.whitespace_before, cst.ParenthesizedWhitespace):
+            comments.insert(0, expr.operator.whitespace_before.first_line.comment)
+
+        # handle left value, updating comments & nodes
+        handle_leftright(expr.left, comments, nodes, leading_lines)
+
+        # the other comments on the operator are added as leading lines to the right
+        # value
+        leading_lines = []
+        if isinstance(expr.operator.whitespace_before, cst.ParenthesizedWhitespace):
+            leading_lines.extend(expr.operator.whitespace_before.empty_lines)
+        if isinstance(expr.operator.whitespace_after, cst.ParenthesizedWhitespace):
+            leading_lines.append(expr.operator.whitespace_after.first_line)
+            leading_lines.extend(expr.operator.whitespace_after.empty_lines)
+
+        # add first comment in rpar.whitespace_before.first_line to comments
+        # as this would be the comment on the same line as right
+        if expr.rpar and m.matches(
+            expr.rpar[0].whitespace_before, m.ParenthesizedWhitespace()
+        ):
+            comments.insert(0, expr.rpar[0].whitespace_before.first_line.comment)
+
+        # handle right value, updating comments & nodes
+        handle_leftright(expr.right, comments, nodes, leading_lines)
+
+        # shuffle around references a bit to insert all rpar comments before old comments
+        # and preserve the reference to comments
+        old_comments = comments.copy()
+        comments.clear()
+        for i, rpar in enumerate(expr.rpar):
+            if m.matches(rpar.whitespace_before, m.ParenthesizedWhitespace()):
+                # other reformatters remove extra parentheses, so unless they change
+                # this won't be executed (afaik)
+                if i != 0:  # pragma: no cover
+                    comments.append(rpar.whitespace_before.first_line.comment)
+                for line in rpar.whitespace_before.empty_lines:
+                    comments.append(line.comment)
+        comments.extend(old_comments)
+        # remaining comments are handled by the caller afterwards
+
+        return nodes
 
     # split `assert a and b` into `assert a` and `assert b`
-    @m.leave(m.Assert(test=m.BooleanOperation(operator=m.And())))
+    @m.leave(
+        m.SimpleStatementLine(
+            body=[m.Assert(msg=None, test=m.BooleanOperation(operator=m.And()))]
+        )
+    )
     def split_assert_and(self, _, updated_node):
-        flat_nodes = self._flatten_bool(updated_node.test)
-        nodes = [updated_node.with_changes(test=flat_nodes[0])]
-        for node in flat_nodes[1:]:
-            nodes.append(cst.Assert(node))
+        # the simple statements trailing whitespace may be on the same line
+        # as the first assert, or if there's sufficient comments within the assert
+        # it may be left for later and inserted at the end.
+        if m.matches(
+            updated_node,
+            m.SimpleStatementLine(
+                trailing_whitespace=m.TrailingWhitespace(comment=m.Comment())
+            ),
+        ):
+            comments = [updated_node.trailing_whitespace.comment]
+        else:
+            comments = []
+
+        nodes = self._flatten_bool(
+            updated_node.body[0].test, list(updated_node.leading_lines), comments
+        )
+
+        # if there is a single comment left and the last node doesn't have trailing
+        # whitespace, add it as trailing whitespace to the last
+        # statement
+        if len(comments) == 1 and nodes[-1].trailing_whitespace.comment is None:
+            nodes[-1] = nodes[-1].with_changes(
+                trailing_whitespace=cst.TrailingWhitespace(
+                    whitespace=cst.SimpleWhitespace("  "), comment=comments.pop()
+                )
+            )
+        # if there are multiple comments left, e.g. comments on lines after the last rpar,
+        # insert them as leading lines to a pass statement and let the user handle them
+        elif comments:
+            nodes.append(
+                cst.SimpleStatementLine(
+                    [cst.Pass()],
+                    [cst.EmptyLine(comment=c) for c in comments],
+                    cst.TrailingWhitespace(
+                        whitespace=cst.SimpleWhitespace("  "),
+                        comment=cst.Comment(
+                            "# inserted by shed refactor, please remove"
+                        ),
+                    ),
+                )
+            )
         return cst.FlattenSentinel(nodes)
