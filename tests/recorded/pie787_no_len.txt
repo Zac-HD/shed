@@ -1,3 +1,5 @@
+bool(len(foo))
+
 if len(foo):
     ...
 
@@ -35,10 +37,16 @@ if len({1: 2}):
 if len([1, 2]):
     ...
 
+if len({1, 2}):
+    ...
+
 if len({1: 2 for _ in range(10)}):
     ...
 
 if len([i*a for i in range(10)]):
+    ...
+
+if len({i*a for i in range(10)}):
     ...
 
 print(5+(1 if len(foo) else 0))
@@ -71,6 +79,8 @@ if len(foo(5+len(foo))):
     ...
 
 ================================================================================
+
+bool(foo)
 
 if foo:
     ...
@@ -109,10 +119,16 @@ if {1: 2}:
 if [1, 2]:
     ...
 
+if {1, 2}:
+    ...
+
 if {1: 2 for _ in range(10)}:
     ...
 
 if [i * a for i in range(10)]:
+    ...
+
+if {i * a for i in range(10)}:
     ...
 
 print(5 + (1 if foo else 0))

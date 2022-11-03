@@ -84,10 +84,22 @@ ALL_ELEMS_SLICE = m.Slice(
 )
 
 
-# helper function for ShedFixers.remove_unnecessary_len
-def _len_call():
-    value = multi(m.Name, m.Attribute, m.Call, m.Dict, m.DictComp, m.List, m.ListComp)
-    return m.Call(func=m.Name("len"), args=[m.Arg(value)])
+# helper function for ShedFixers.remove_unnecessary_call
+def _bool_or_len_call():
+    value = multi(
+        m.Name,
+        m.Attribute,
+        m.Call,
+        m.Dict,
+        m.DictComp,
+        m.List,
+        m.ListComp,
+        m.Set,
+        m.SetComp,
+    )
+    return m.OneOf(
+        m.Call(func=m.Name("len"), args=[m.Arg(value)]), m.Call(func=m.Name("bool"))
+    )
 
 
 class ShedFixers(VisitorBasedCodemodCommand):
@@ -554,25 +566,45 @@ class ShedFixers(VisitorBasedCodemodCommand):
             )
         return cst.FlattenSentinel(nodes)
 
-    # can't use call_if_inside since it matches on any parents
+    # Remove unnecessary len() and bool() calls in tests
+    # we can't use call_if_inside since it matches on any parents, which breaks on
+    # complicated nested cases - so we have to split into different leave's
     @m.leave(
         multi(
             m.If,
             m.IfExp,
             m.While,
-            test=_len_call(),
+            test=_bool_or_len_call(),
         )
     )
-    @m.leave(m.BooleanOperation(left=_len_call()))
-    @m.leave(m.BooleanOperation(right=_len_call()))
-    @m.leave(m.UnaryOperation(operator=m.Not(), expression=_len_call()))
-    def remove_unnecessary_len(self, _, updated_node):
-        for attr in "test", "left", "right", "expression":
-            if hasattr(updated_node, attr) and m.matches(
-                getattr(updated_node, attr), _len_call()
-            ):
-                return updated_node.with_changes(
-                    **{attr: getattr(updated_node, attr).args[0]}
-                )
-        # this should never be reached
-        raise AssertionError("This code should never be reached")  # pragma: no cover
+    def remove_unnecessary_call_test(self, _, updated_node):
+        return self._collapse_attribute(updated_node, "test")
+
+    # remove len/bool on left-hand side of any BooleanOperation
+    # `len(foo) or ...` -> `
+    @m.leave(m.BooleanOperation(left=_bool_or_len_call()))
+    def remove_unnecessary_call_left(self, _, updated_node):
+        return self._collapse_attribute(updated_node, "left")
+
+    # remove len/bool on right-hand side of any BooleanOperation
+    # `... and len(bar)` -> `... and bar`
+    @m.leave(m.BooleanOperation(right=_bool_or_len_call()))
+    def remove_unnecessary_call_right(self, _, updated_node):
+        return self._collapse_attribute(updated_node, "right")
+
+    # remove not:ed len/bool
+    # `not len(foo)` -> `not foo`
+    @m.leave(m.UnaryOperation(operator=m.Not(), expression=_bool_or_len_call()))
+    def remove_unnecessary_call_expression(self, _, updated_node):
+        return self._collapse_attribute(updated_node, "expression")
+
+    # used by the above functions
+    @classmethod
+    def _collapse_attribute(cls, node, attr):
+        return node.with_changes(**{attr: getattr(node, attr).args[0]})
+
+    # remove len/bool inside bool()
+    # `bool(len(foo))` or `bool(bool(foo))` -> `bool(foo)`
+    @m.leave(m.Call(func=m.Name("bool"), args=[m.Arg(value=_bool_or_len_call())]))
+    def remove_unnecessary_call2(self, _, updated_node):
+        return updated_node.with_changes(args=updated_node.args[0].value.args)
