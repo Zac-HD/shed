@@ -86,16 +86,8 @@ ALL_ELEMS_SLICE = m.Slice(
 
 # helper function for ShedFixers.remove_unnecessary_len
 def _len_call():
-    return m.Call(
-        func=m.Name(value="len"),
-        args=[
-            m.Arg(
-                value=multi(
-                    m.Name, m.Attribute, m.Call, m.Dict, m.DictComp, m.List, m.ListComp
-                )
-            )
-        ],
-    )
+    value = multi(m.Name, m.Attribute, m.Call, m.Dict, m.DictComp, m.List, m.ListComp)
+    return m.Call(func=m.Name("len"), args=[m.Arg(value)])
 
 
 class ShedFixers(VisitorBasedCodemodCommand):
@@ -555,14 +547,9 @@ class ShedFixers(VisitorBasedCodemodCommand):
         elif comments:
             nodes.append(
                 cst.SimpleStatementLine(
-                    [cst.Pass()],
+                    [cst.Pass()],  # pointless-pass is removed by autoflake later
                     [cst.EmptyLine(comment=c) for c in comments],
-                    cst.TrailingWhitespace(
-                        whitespace=cst.SimpleWhitespace("  "),
-                        comment=cst.Comment(
-                            "# inserted by shed refactor, please remove"
-                        ),
-                    ),
+                    cst.TrailingWhitespace(whitespace=cst.SimpleWhitespace(" ")),
                 )
             )
         return cst.FlattenSentinel(nodes)

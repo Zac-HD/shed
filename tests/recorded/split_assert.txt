@@ -241,7 +241,6 @@ assert b  # 7 b_comment
 # 12.2 after b
 # 13.1 end_paren_comment
 # 13.2 end_paren_comment
-pass  # inserted by shed refactor, please remove
 # 14.1 after assert
 # 14.2 after assert
 
@@ -259,7 +258,6 @@ assert b  # 7 b_comment
 assert c  # 11 c_comment
 # 12 after c
 # 13 end_paren_comment
-pass  # inserted by shed refactor, please remove
 # 14 after assert
 
 # 0.1 before assert
@@ -289,7 +287,6 @@ assert c  # 11 c_comment
 # 13.11
 # 13.12
 # 13.2 end_paren_comment
-pass  # inserted by shed refactor, please remove
 # 14.1 after assert
 # 14.2 after assert
 
@@ -338,7 +335,6 @@ assert c  # 11 c_comment
 # 12.33
 # 12.41
 # 13.2 end_paren_comment
-pass  # inserted by shed refactor, please remove
 # 14.1 after assert
 # 14.2 after assert
 
@@ -431,5 +427,4 @@ b # 7
  # 9
 )  # 10
 # 11
-pass  # inserted by shed refactor, please remove
 # fmt: on

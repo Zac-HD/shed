@@ -1,5 +1,10 @@
 # Changelog
 
+#### 0.10.6 - 2022-11-03
+- `--refactor` now splits `assert a and b [and c and ...]` into a separate
+  assertion for each clause, so that it's always clear which (if any) failed.
+- `--refactor` removes redundant calls to `len()` in boolean contexts.
+
 #### 0.10.5 - 2022-10-08
 - Preserve trailing commas in literals in `--refactor` mode
 - `--refactor` mode now flattens `Optional[Union[...]]` to `Union[..., None]`
