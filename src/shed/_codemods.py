@@ -84,6 +84,20 @@ ALL_ELEMS_SLICE = m.Slice(
 )
 
 
+# helper function for ShedFixers.remove_unnecessary_len
+def _len_call():
+    return m.Call(
+        func=m.Name(value="len"),
+        args=[
+            m.Arg(
+                value=multi(
+                    m.Name, m.Attribute, m.Call, m.Dict, m.DictComp, m.List, m.ListComp
+                )
+            )
+        ],
+    )
+
+
 class ShedFixers(VisitorBasedCodemodCommand):
     """Fix a variety of small problems.
 
@@ -416,3 +430,26 @@ class ShedFixers(VisitorBasedCodemodCommand):
         for node in flat_nodes[1:]:
             nodes.append(cst.Assert(node))
         return cst.FlattenSentinel(nodes)
+
+    # can't use call_if_inside since it matches on any parents
+    @m.leave(
+        multi(
+            m.If,
+            m.IfExp,
+            m.While,
+            test=_len_call(),
+        )
+    )
+    @m.leave(m.BooleanOperation(left=_len_call()))
+    @m.leave(m.BooleanOperation(right=_len_call()))
+    @m.leave(m.UnaryOperation(operator=m.Not(), expression=_len_call()))
+    def remove_unnecessary_len(self, _, updated_node):
+        for attr in "test", "left", "right", "expression":
+            if hasattr(updated_node, attr) and m.matches(
+                getattr(updated_node, attr), _len_call()
+            ):
+                return updated_node.with_changes(
+                    **{attr: getattr(updated_node, attr).args[0]}
+                )
+        # this should never be reached
+        raise AssertionError("This code should never be reached")  # pragma: no cover

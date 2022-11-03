@@ -1,0 +1,145 @@
+if len(foo):
+    ...
+
+if True and len(foo):
+    ...
+
+if len(foo) and True:
+    ...
+
+if len(foo) and len(foo):
+    ...
+
+while len(foo):
+    ...
+
+print(0 if len(foo) else 1)
+
+[0 for i in range(10) if not len(foo)]
+
+if len(bar.foo):
+    ...
+
+if len(bar.zee.foo):
+    ...
+
+if len(foo()):
+    ...
+
+if len(bar.foo()):
+    ...
+
+if len({1: 2}):
+    ...
+
+if len([1, 2]):
+    ...
+
+if len({1: 2 for _ in range(10)}):
+    ...
+
+if len([i*a for i in range(10)]):
+    ...
+
+print(5+(1 if len(foo) else 0))
+
+# these should not be modified
+
+k = len
+k = len()
+k = len(foo)
+
+len(foo)
+if len(foo, bar):
+    ...
+if len(bar=5):
+    ...
+
+if 3+len(foo):
+    ...
+
+if (3+len(foo) == 5):
+    ...
+
+if len(foo) == 2:
+    ...
+
+if zoobies(5+len(foo)):
+    ...
+
+if len(foo(5+len(foo))):
+    ...
+
+================================================================================
+
+if foo:
+    ...
+
+if True and foo:
+    ...
+
+if foo and True:
+    ...
+
+if foo and foo:
+    ...
+
+while foo:
+    ...
+
+print(0 if foo else 1)
+
+[0 for i in range(10) if not foo]
+
+if bar.foo:
+    ...
+
+if bar.zee.foo:
+    ...
+
+if foo():
+    ...
+
+if bar.foo():
+    ...
+
+if {1: 2}:
+    ...
+
+if [1, 2]:
+    ...
+
+if {1: 2 for _ in range(10)}:
+    ...
+
+if [i * a for i in range(10)]:
+    ...
+
+print(5 + (1 if foo else 0))
+
+# these should not be modified
+
+k = len
+k = len()
+k = len(foo)
+
+len(foo)
+if len(foo, bar):
+    ...
+if len(bar=5):
+    ...
+
+if 3 + len(foo):
+    ...
+
+if 3 + len(foo) == 5:
+    ...
+
+if len(foo) == 2:
+    ...
+
+if zoobies(5 + len(foo)):
+    ...
+
+if foo(5 + len(foo)):
+    ...
