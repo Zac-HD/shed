@@ -1,3 +1,132 @@
+# this will fail since black reformats it
+assert (
+a # a
+and b # b
+)
+
+# disable Black formatting to not have to have crazy long variable names / comments to avoid it collapsing stuff
+#fmt: off
+
+# currently ignored, it only matches SimpleStatementLine with a single assert node
+# but only a problem if black is disabled
+assert a and b; assert b and c # foo
+assert a and b; print("foo") # foobie
+print("bar"); assert a and b # foobar
+
+# 0.1 before assert
+# 0.2 before assert
+assert (# 1.1 start_paren_comment
+( # 1.2 start_paren_comment
+        # 2.1 before a
+        # 2.2 before a
+        a # 3 a_comment
+        # 4.1 between a&and
+        # 4.2 between a&and
+        and # 5 and_comment
+        # 6.1 between and&b
+        # 6.2 between and&b
+        b # 7 b_comment
+        # 12.1 after b
+        # 12.2 after b
+        ) # 13.1 end_paren_comment
+        ) # 13.2 end_paren_comment
+# 14.1 after assert
+# 14.2 after assert
+
+# 0 before assert
+assert ( # 1 start_paren_comment
+        # 2 before a
+        a # 3 a_comment
+        # 4 between a&and
+        and # 5 and_comment
+        # 6 between and&b
+        b # 7 b_comment
+        # 8 between b&and
+        and # 9 and_comment_2
+        # 10 between and&c
+        c # 11 c_comment
+        # 12 after c
+        ) # 13 end_paren_comment
+# 14 after assert
+
+# 0.1 before assert
+# 0.2 before assert
+assert (# 1.1 start_paren_comment
+# 1.11
+# 1.12
+( # 1.2 start_paren_comment
+        # 2.1 before a
+        # 2.2 before a
+        a # 3 a_comment
+        # 4.1 between a&and
+        # 4.2 between a&and
+        and # 5 and_comment
+        # 6.1 between and&b
+        # 6.2 between and&b
+        b # 7 b_comment
+        # 8.1 between b&and
+        # 8.2 between b&and
+        and # 9 and_comment_2
+        # 10.1 between and&c
+        # 10.2 between and&c
+        c # 11 c_comment
+        # 12.1 after c
+        # 12.2 after c
+        ) # 13.1 end_paren_comment
+# 13.11
+# 13.12
+        ) # 13.2 end_paren_comment
+# 14.1 after assert
+# 14.2 after assert
+
+# 0.1 before assert
+# 0.2 before assert
+assert (# 1.1 start_paren_comment
+# 1.11
+# 1.12
+( # 1.2 start_paren_comment
+        # 2.1 before a
+        # 2.2 before a
+        a # 3 a_comment
+        # 4.1 between a&and
+        # 4.2 between a&and
+        and # 5 and_comment
+        # 6.1 between and&b
+        # 6.2 between and&b
+        ( # 6.21
+        # 6.22
+        # 6.23
+        ( # 6.31
+        # 6.32
+        # 6.33
+        ( # 6.41
+        # 6.42
+        # 6.43
+        b # 7 b_comment
+        # 8.1 between b&and
+        # 8.2 between b&and
+        and # 9 and_comment_2
+        # 10.1 between and&c
+        # 10.2 between and&c
+        c # 11 c_comment
+        # 12.1 after c
+        # 12.2 after c
+        ) # 12.21
+        # 12.22
+        # 12.23
+        ) # 12.31
+        # 12.32
+        # 12.33
+        ) # 12.41
+        # 12.42
+        # 12.43
+        ) # 13.1 end_paren_comment
+# 13.11
+# 13.12
+        ) # 13.2 end_paren_comment
+# 14.1 after assert
+# 14.2 after assert
+
 assert a and b # one
 
 assert a and b and c # two
@@ -22,26 +151,213 @@ assert a or b
 
 assert a
 
+assert (
+    a # comment on a2
+    and b # comment on b2
+)
+
+assert (
+    a # comment on a1
+    and b # comment on b1
+    and c # comment on c1
+)
+
+assert (
+    a # a_comment
+    and (b # and_b_comment
+    and c) # and_c_comment
+    )
+
+# these will be incorrectly formatted as the comment is deemed to belong to the
+# and, and we have to assume Black-style formatting with leading `and` on new line
+assert (
+    a and # comment on a3
+    b and # comment on b3
+    c # comment on c3
+)
+
+assert (
+    a and # a_and_comment
+    (b and # b_and_comment
+    c) # c_comment
+    )
+
+assert (a # two # pounds on the same line
+and b)
+
+assert a and b, "avoid splitting if there's a message"
+
+# this one shouldn't need an extra `pass` statement
+assert (
+a # a
+and # and
+b
+) # one trailing comment, added to b
+
+
+# extra parens get removed by other refactorers
+assert ( # 1
+a # 2
+and # 3
+( # 4
+( # 5
+( # 6
+b # 7
+) # 8
+) # 9
+) # 10
+) # 11
+# fmt: on
+
 ================================================================================
 
-assert a
-assert b  # one
-
-assert a
+# this will fail since black reformats it
+assert a  # a  # b
 assert b
-assert c  # two
 
-assert a
-assert b  # three
+# disable Black formatting to not have to have crazy long variable names / comments to avoid it collapsing stuff
+# fmt: off
 
-assert a(1, 2)
-assert b(3, 7)  # four
+# currently ignored, it only matches SimpleStatementLine with a single assert node
+# but only a problem if black is disabled
+assert a and b; assert b and c # foo
+assert a and b; print("foo") # foobie
+print("bar"); assert a and b # foobar
 
+# 0.1 before assert
+# 0.2 before assert
+# 1.1 start_paren_comment
+# 1.2 start_paren_comment
+# 2.1 before a
+# 2.2 before a
+assert a  # 3 a_comment
+        # 4.1 between a&and
+        # 4.2 between a&and
+ # 5 and_comment
+        # 6.1 between and&b
+        # 6.2 between and&b
+assert b  # 7 b_comment
+# 12.1 after b
+# 12.2 after b
+# 13.1 end_paren_comment
+# 13.2 end_paren_comment
+pass  # inserted by shed refactor, please remove
+# 14.1 after assert
+# 14.2 after assert
+
+# 0 before assert
+# 1 start_paren_comment
+# 2 before a
+assert a  # 3 a_comment
+        # 4 between a&and
+ # 5 and_comment
+        # 6 between and&b
+assert b  # 7 b_comment
+        # 8 between b&and
+ # 9 and_comment_2
+        # 10 between and&c
+assert c  # 11 c_comment
+# 12 after c
+# 13 end_paren_comment
+pass  # inserted by shed refactor, please remove
+# 14 after assert
+
+# 0.1 before assert
+# 0.2 before assert
+# 1.1 start_paren_comment
+# 1.11
+# 1.12
+# 1.2 start_paren_comment
+# 2.1 before a
+# 2.2 before a
+assert a  # 3 a_comment
+        # 4.1 between a&and
+        # 4.2 between a&and
+ # 5 and_comment
+        # 6.1 between and&b
+        # 6.2 between and&b
+assert b  # 7 b_comment
+        # 8.1 between b&and
+        # 8.2 between b&and
+ # 9 and_comment_2
+        # 10.1 between and&c
+        # 10.2 between and&c
+assert c  # 11 c_comment
+# 12.1 after c
+# 12.2 after c
+# 13.1 end_paren_comment
+# 13.11
+# 13.12
+# 13.2 end_paren_comment
+pass  # inserted by shed refactor, please remove
+# 14.1 after assert
+# 14.2 after assert
+
+# 0.1 before assert
+# 0.2 before assert
+# 1.1 start_paren_comment
+# 1.11
+# 1.12
+# 1.2 start_paren_comment
+# 2.1 before a
+# 2.2 before a
+assert a  # 3 a_comment
+        # 4.1 between a&and
+        # 4.2 between a&and
+ # 5 and_comment
+        # 6.1 between and&b
+        # 6.2 between and&b
+# 6.21
+# 6.22
+# 6.23
+# 6.31
+# 6.32
+# 6.33
+# 6.41
+# 6.42
+# 6.43
+assert b  # 7 b_comment
+        # 8.1 between b&and
+        # 8.2 between b&and
+ # 9 and_comment_2
+        # 10.1 between and&c
+        # 10.2 between and&c
+assert c  # 11 c_comment
+# 12.42
+# 12.43
+# 13.1 end_paren_comment
+# 13.11
+# 13.12
+# 12.1 after c
+# 12.2 after c
+# 12.21
+# 12.22
+# 12.23
+# 12.31
+# 12.32
+# 12.33
+# 12.41
+# 13.2 end_paren_comment
+pass  # inserted by shed refactor, please remove
+# 14.1 after assert
+# 14.2 after assert
+
+assert a  # one
+assert b
+
+assert a  # two
+assert b
+assert c
+
+assert a  # three
+assert b
+
+assert a(1, 2)  # four
+assert b(3, 7)
 
 def f():
     assert a
     assert b
-
 
 assert a
 assert b
@@ -52,11 +368,68 @@ assert a or b and c
 assert a and b or c
 
 assert a
-assert b or c
+assert (b or c)
 
-assert a or b
+assert (a or b)
 assert c
 
 assert a or b
 
 assert a
+
+
+assert a  # comment on a2
+assert b  # comment on b2
+
+
+assert a  # comment on a1
+assert b  # comment on b1
+assert c  # comment on c1
+
+
+assert a  # a_comment
+assert b  # and_b_comment
+assert c  # and_c_comment
+
+# these will be incorrectly formatted as the comment is deemed to belong to the
+# and, and we have to assume Black-style formatting with leading `and` on new line
+
+assert a
+ # comment on a3
+assert b
+ # comment on b3
+assert c  # comment on c3
+
+
+assert a
+ # a_and_comment
+assert b  # c_comment
+ # b_and_comment
+assert c
+
+assert a  # two # pounds on the same line
+assert b
+
+assert a and b, "avoid splitting if there's a message"
+
+# this one shouldn't need an extra `pass` statement
+
+assert a  # a
+ # and
+assert b  # one trailing comment, added to b
+
+
+# extra parens get removed by other refactorers
+# 1
+assert a  # 2
+ # 3
+assert ( # 4
+ # 5
+ # 6
+b # 7
+ # 8
+ # 9
+)  # 10
+# 11
+pass  # inserted by shed refactor, please remove
+# fmt: on
