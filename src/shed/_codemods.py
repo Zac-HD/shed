@@ -84,10 +84,24 @@ ALL_ELEMS_SLICE = m.Slice(
 )
 
 
-# helper function for ShedFixers.remove_unnecessary_len
-def _len_call():
-    value = multi(m.Name, m.Attribute, m.Call, m.Dict, m.DictComp, m.List, m.ListComp)
-    return m.Call(func=m.Name("len"), args=[m.Arg(value)])
+# helper function for ShedFixers.remove_unnecessary_call
+def _collapsible_expression():
+    value = multi(
+        m.Name,
+        m.Attribute,
+        m.Call,
+        m.Dict,
+        m.DictComp,
+        m.List,
+        m.ListComp,
+        m.Set,
+        m.SetComp,
+    )
+    return m.OneOf(
+        m.Call(func=m.Name("len"), args=[m.Arg(value)]),
+        m.Call(func=m.Name("bool")),
+        m.BooleanOperation(),
+    )
 
 
 class ShedFixers(VisitorBasedCodemodCommand):
@@ -554,25 +568,62 @@ class ShedFixers(VisitorBasedCodemodCommand):
             )
         return cst.FlattenSentinel(nodes)
 
-    # can't use call_if_inside since it matches on any parents
+    # Remove unnecessary len() and bool() calls in tests
+    # we can't use call_if_inside since it matches on any parents, which breaks on
+    # complicated nested cases - so we have to split into different leave's
+    # len/bool inside boolops (and/or) can only be removed if the boolop is inside a test
+    # otherwise `print(False or bool(5))` changes functionality (prints `True` vs `5`)
     @m.leave(
         multi(
             m.If,
             m.IfExp,
             m.While,
-            test=_len_call(),
+            test=_collapsible_expression(),
         )
     )
-    @m.leave(m.BooleanOperation(left=_len_call()))
-    @m.leave(m.BooleanOperation(right=_len_call()))
-    @m.leave(m.UnaryOperation(operator=m.Not(), expression=_len_call()))
-    def remove_unnecessary_len(self, _, updated_node):
-        for attr in "test", "left", "right", "expression":
-            if hasattr(updated_node, attr) and m.matches(
-                getattr(updated_node, attr), _len_call()
-            ):
-                return updated_node.with_changes(
-                    **{attr: getattr(updated_node, attr).args[0]}
+    def remove_unnecessary_call_test(self, _, updated_node):
+        return self._collapse_attribute(updated_node, "test")
+
+    # remove not:ed len/bool
+    # `not len(foo)` -> `not foo`
+    @m.leave(m.UnaryOperation(operator=m.Not(), expression=_collapsible_expression()))
+    def remove_unnecessary_call_expression(self, _, updated_node):
+        return self._collapse_attribute(updated_node, "expression")
+
+    # used by the above functions
+    @classmethod
+    def _collapse_attribute(cls, node, attr):
+        child_node = getattr(node, attr)
+        # if the attribute is a boolop, recurse through it and replace len/bool that are
+        # direct child nodes to (a chain of) boolops
+        if isinstance(child_node, cst.BooleanOperation):
+            return node.with_changes(**{attr: cls._remove_recursive_helper(child_node)})
+        # otherwise just remove the len/bool
+        return node.with_changes(**{attr: child_node.args[0]})
+
+    # remove len/bool inside bool()
+    # `bool(len(foo))` or `bool(bool(foo))` -> `bool(foo)`
+    @m.leave(m.Call(func=m.Name("bool"), args=[m.Arg(value=_collapsible_expression())]))
+    def remove_unnecessary_call2(self, _, updated_node):
+        collapse_node = updated_node.args[0].value
+        if isinstance(collapse_node, cst.BooleanOperation):
+            return updated_node.with_deep_changes(
+                updated_node.args[0], value=self._remove_recursive_helper(collapse_node)
+            )
+
+        return updated_node.with_changes(args=updated_node.args[0].value.args)
+
+    # remove len/bool inside (any number of) boolops inside the above
+    @classmethod
+    def _remove_recursive_helper(cls, bool_node):
+        for side in "left", "right":
+            side_node = getattr(bool_node, side)
+            if isinstance(side_node, cst.BooleanOperation):
+                bool_node = bool_node.with_changes(
+                    **{side: cls._remove_recursive_helper(side_node)},
                 )
-        # this should never be reached
-        raise AssertionError("This code should never be reached")  # pragma: no cover
+            elif m.matches(side_node, _collapsible_expression()):
+                bool_node = bool_node.with_changes(
+                    **{side: side_node.args[0]},
+                )
+        return bool_node

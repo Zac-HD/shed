@@ -1,0 +1,155 @@
+if bool(foo):
+    ...
+
+bool(true and bool(foo))
+if True and bool(foo):
+    ...
+while bool(foo) or False:
+    ...
+
+while bool(foo):
+    ...
+
+print(0 if bool(foo) else 1)
+
+[0 for i in range(10) if not bool(foo)]
+
+if bool(bar.foo):
+    ...
+
+if bool(bar.zee.foo):
+    ...
+
+if bool(foo()):
+    ...
+
+if bool(bar.foo()):
+    ...
+
+if bool(5):
+    ...
+
+if bool({1: 2}):
+    ...
+
+if bool([1, 2]):
+    ...
+
+if bool({1: 2 for _ in range(10)}):
+    ...
+
+if bool([i*a for i in range(10)]):
+    ...
+
+print(5+(1 if bool(foo) else 0))
+
+# should be bool(foo)
+bool(bool(foo))
+
+# these should not be modified
+print(True and bool(foo))
+print(bool(foo) and True)
+print(bool(foo) and bool(foo))
+
+len(bool(foo))
+
+k = bool
+k = bool()
+k = bool(foo)
+
+bool(foo)
+print(bool(foo))
+
+if 3+bool(foo):
+    ...
+
+if (3+bool(foo) == 5):
+    ...
+
+if bool(foo) == 2:
+    ...
+
+if zoobies(5+bool(foo)):
+    ...
+
+if bool(foo(5+bool(foo))):
+    ...
+
+================================================================================
+
+if foo:
+    ...
+
+bool(true and foo)
+if True and foo:
+    ...
+while foo or False:
+    ...
+
+while foo:
+    ...
+
+print(0 if foo else 1)
+
+[0 for i in range(10) if not foo]
+
+if bar.foo:
+    ...
+
+if bar.zee.foo:
+    ...
+
+if foo():
+    ...
+
+if bar.foo():
+    ...
+
+if 5:
+    ...
+
+if {1: 2}:
+    ...
+
+if [1, 2]:
+    ...
+
+if {1: 2 for _ in range(10)}:
+    ...
+
+if [i * a for i in range(10)]:
+    ...
+
+print(5 + (1 if foo else 0))
+
+# should be bool(foo)
+bool(foo)
+
+# these should not be modified
+print(True and bool(foo))
+print(bool(foo) and True)
+print(bool(foo) and bool(foo))
+
+len(bool(foo))
+
+k = bool
+k = bool()
+k = bool(foo)
+
+bool(foo)
+print(bool(foo))
+
+if 3 + bool(foo):
+    ...
+
+if 3 + bool(foo) == 5:
+    ...
+
+if bool(foo) == 2:
+    ...
+
+if zoobies(5 + bool(foo)):
+    ...
+
+if foo(5 + bool(foo)):
+    ...
