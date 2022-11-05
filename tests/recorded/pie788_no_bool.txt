@@ -1,9 +1,11 @@
 if bool(foo):
     ...
 
-print(True and bool(foo))
-print(bool(foo) and True)
-print(bool(foo) and bool(foo))
+bool(true and bool(foo))
+if True and bool(foo):
+    ...
+while bool(foo) or False:
+    ...
 
 while bool(foo):
     ...
@@ -45,6 +47,10 @@ print(5+(1 if bool(foo) else 0))
 bool(bool(foo))
 
 # these should not be modified
+print(True and bool(foo))
+print(bool(foo) and True)
+print(bool(foo) and bool(foo))
+
 len(bool(foo))
 
 k = bool
@@ -74,9 +80,11 @@ if bool(foo(5+bool(foo))):
 if foo:
     ...
 
-print(True and foo)
-print(foo and True)
-print(foo and foo)
+bool(true and foo)
+if True and foo:
+    ...
+while foo or False:
+    ...
 
 while foo:
     ...
@@ -118,6 +126,10 @@ print(5 + (1 if foo else 0))
 bool(foo)
 
 # these should not be modified
+print(True and bool(foo))
+print(bool(foo) and True)
+print(bool(foo) and bool(foo))
+
 len(bool(foo))
 
 k = bool
