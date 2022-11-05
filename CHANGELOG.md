@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.10.7 - 2022-11-05
+- Fixed `--refactor` to avoid incorrect changes to e.g. `x = y or len(z)`
+- `--refactor` also removes redundant calls to `bool()` in boolean contexts.
+
 #### 0.10.6 - 2022-11-03
 - `--refactor` now splits `assert a and b [and c and ...]` into a separate
   assertion for each clause, so that it's always clear which (if any) failed.
