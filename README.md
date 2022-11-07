@@ -81,6 +81,10 @@ for breaking changes, [check out `flynt`](https://github.com/ikamensh/flynt).
 For Django upgrades, see [`django-codemod`](https://github.com/browniebroke/django-codemod)
 or [`django-upgrade`](https://github.com/adamchainz/django-upgrade).
 
+[`Semgrep` supports some autofixes](https://r2c.dev/blog/2022/autofixing-code-with-semgrep/#the-results),
+with patterns for a wide variety of languages.  This includes a variety of both
+security and style checks, with manual inspection of results recommended.
+
 ## Changelog
 
 Patch notes [can be found in `CHANGELOG.md`](https://github.com/Zac-HD/shed/blob/master/CHANGELOG.md).
