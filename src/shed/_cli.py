@@ -14,7 +14,7 @@ import sys
 import tokenize
 import warnings
 from pathlib import Path
-from typing import FrozenSet, Union
+from typing import Callable, FrozenSet, Union
 
 import autoflake
 from isort.api import place_module
@@ -51,7 +51,7 @@ def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
 
 @functools.lru_cache(maxsize=None)
 def _should_format(fname: str) -> bool:
-    return fname.endswith((".md", ".rst")) or autoflake.is_python_file(fname)
+    return fname.endswith((".md", ".rst", ".pyi")) or autoflake.is_python_file(fname)
 
 
 def _rewrite_on_disk(
@@ -67,7 +67,13 @@ def _rewrite_on_disk(
     except (OSError, UnicodeError) as err:
         # Permissions or encoding issue, or file deleted since last commit.
         return f"skipping {fname!r} due to {err}"
-    writer = docshed if fname.endswith((".md", ".rst")) else shed
+    if fname.endswith((".md", ".rst")):
+        writer: Callable[..., str] = docshed
+    elif fname.endswith(".pyi"):
+        writer = functools.partial(shed, is_pyi=True)
+    else:
+        writer = shed
+
     msg = ""
     try:
         with warnings.catch_warnings(record=True) as record:

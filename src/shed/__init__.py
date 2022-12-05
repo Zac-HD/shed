@@ -54,6 +54,7 @@ def shed(
     source_code: str,
     *,
     refactor: bool = False,
+    is_pyi: bool = False,
     first_party_imports: FrozenSet[str] = frozenset(),
     min_version: Tuple[int, int] = _default_min_version,
     _location: str = "string passed to shed.shed()",
@@ -154,7 +155,7 @@ def shed(
     # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
     # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore run it
     # before other fixers, and then (if they made changes) again afterwards.
-    black_mode = black.Mode(target_versions=target_versions)  # type: ignore
+    black_mode = black.Mode(target_versions=target_versions, is_pyi=is_pyi)  # type: ignore
     source_code = blackened = black.format_str(source_code, mode=black_mode)
 
     pyupgrade_min = min(min_version, max(pyupgrade._plugins.imports.REPLACE_EXACT))
@@ -166,7 +167,7 @@ def shed(
         source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
     source_code = pyupgrade._main._fix_tokens(source_code)
 
-    if refactor:
+    if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
     try:
