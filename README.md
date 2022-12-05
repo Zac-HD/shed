@@ -67,7 +67,7 @@ repos:
   hooks:
     - id: shed
       # args: [--refactor, --py39-plus]
-      types_or: [python, markdown, rst]
+      types_or: [python, pyi, markdown, rst]
 ```
 
 This is often considerably faster for large projects, because `pre-commit`

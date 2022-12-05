@@ -115,7 +115,13 @@ def test_guesses_empty_for_non_repo_dirs():
 
 @pytest.mark.parametrize(
     "fname,should",
-    [("a.md", True), ("a.rst", True), ("a.py", True), ("does not exist", False)],
+    [
+        ("a.md", True),
+        ("a.rst", True),
+        ("a.py", True),
+        ("does not exist", False),
+        ("a.pyi", True),
+    ],
 )
 def test_should_format_autodetection(fname, should):
     assert _should_format(fname) == should
@@ -127,6 +133,7 @@ def test_should_format_autodetection(fname, should):
         ("a.md", "Lorem ipsum...", False),
         ("a.rst", "Lorem ipsum...", False),
         ("a.py", "# A comment\n", False),
+        ("a.pyi", "## Another comment\n", False),
         ("a.md", "```python\nprint(\n'hello world')\n```", True),
         ("a.rst", ".. code-block:: python\n\n    'single quotes'\n", True),
         ("a.py", "print(\n'hello world')\n", True),
