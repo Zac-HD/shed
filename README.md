@@ -1,5 +1,5 @@
 # shed
-`shed` canonicalises Python code.  Shed your legacy, stop bikeshedding, and move on.  Black++
+`shed` canonizes Python code.  Shed your legacy, stop bikeshedding, and move on.  Black++
 
 ## What does it do?
 `shed` is the *maximally opinionated* autoformatting tool.  It's *all about*
