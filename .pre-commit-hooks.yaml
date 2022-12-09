@@ -3,4 +3,4 @@
   entry: shed
   language: python
   types: [file]
-  files: .*\.(py|md|rst)
+  files: .*\.(py|pyi|md|rst)
