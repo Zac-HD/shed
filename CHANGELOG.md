@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.10.8 - 2022-12-10
+- Reformat `.pyi` files too
+
 #### 0.10.7 - 2022-11-05
 - Fixed `--refactor` to avoid incorrect changes to e.g. `x = y or len(z)`
 - `--refactor` also removes redundant calls to `bool()` in boolean contexts.
