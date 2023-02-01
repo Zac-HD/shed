@@ -18,10 +18,10 @@ import black
 import isort
 import pyupgrade._main
 from black.mode import TargetVersion
-from black.parsing import InvalidInput, lib2to3_parse
+from black.parsing import lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-__version__ = "0.10.8"
+__version__ = "0.10.9"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
@@ -74,15 +74,7 @@ def shed(
     # Use black to autodetect our target versions
     target_versions = {k for k, v in _version_map.items() if v >= min_version}
     try:
-        # Black errors out if we have pattern matching (3.10+), and the target versions
-        # include older versions.  Very well; we'll add a temporary workaround.
-        try:
-            parsed = lib2to3_parse(source_code.lstrip(), target_versions)
-        except InvalidInput as err:
-            if not re.match(r"Cannot parse: \d+:\d+: match ", str(err)):
-                raise
-            target_versions = {k for k, v in _version_map.items() if v >= (3, 10)}
-            parsed = lib2to3_parse(source_code.lstrip(), target_versions)
+        parsed = lib2to3_parse(source_code.lstrip(), target_versions)
         # black.InvalidInput, blib2to3.pgen2.tokenize.TokenError, SyntaxError...
         # for forwards-compatibility I'm just going general here.
     except Exception as err:

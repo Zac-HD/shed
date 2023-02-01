@@ -1,5 +1,8 @@
 # Changelog
 
+#### 0.10.9 - 2023-02-01
+- Require Black >= 23.1.0 for latest code style
+
 #### 0.10.8 - 2022-12-10
 - Reformat `.pyi` files too
 
