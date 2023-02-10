@@ -7,7 +7,7 @@ import pytest
 
 import shed
 
-from .test_shed import check
+from test_shed import check, test_on_site_code
 
 
 @pytest.mark.parametrize(
@@ -36,6 +36,7 @@ def test_saved_examples(filename, min_version):
         result = check(
             source_code=input_, refactor=True, min_version=min_version, except_=...
         )
+        test_on_site_code(filename)
     if result.strip() != expected:
         filename.write_text(joiner.join([input_, result]))
         raise AssertionError(filename.name + " changed formatting")

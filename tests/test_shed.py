@@ -205,6 +205,8 @@ def test_on_site_code(py_file):
     # the standard library, and all installed packages.
     try:
         source_code = py_file.read_text()
+        # the source code is the part of the file thats before the ====...
+        source_code = source_code.split("=" * 80)[0]
     except UnicodeDecodeError:
         pytest.xfail(reason="encoding problem")
     try:
