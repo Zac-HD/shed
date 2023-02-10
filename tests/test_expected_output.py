@@ -7,7 +7,7 @@ import pytest
 
 import shed
 
-from test_shed import check, test_on_site_code
+from .test_shed import check, test_on_site_code
 
 
 @pytest.mark.parametrize(
