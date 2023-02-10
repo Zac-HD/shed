@@ -1,5 +1,9 @@
 # Changelog
 
+#### 0.11.0 - 2023-02-11
+- remove print statement in tests/__init__.py
+- fail test on invalid syntax
+
 #### 0.10.9 - 2023-02-01
 - Require Black >= 23.1.0 for latest code style
 
