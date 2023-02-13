@@ -31,6 +31,7 @@ def test_saved_examples(filename, min_version):
     """
     joiner = "\n\n" + "=" * 80 + "\n\n"
     input_, expected, *_ = map(str.strip, (filename.read_text() + joiner).split(joiner))
+    compile(input_, filename, "exec")  # check for SyntaxError
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", shed.ShedSyntaxWarning)
         result = check(
