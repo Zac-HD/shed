@@ -167,6 +167,9 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
     )
     def remove_pointless_parens_around_call(self, _, updated_node):
+        # Don't remove whitespace if it includes comments
+        if m.findall(updated_node, m.Comment()):
+            return updated_node
         # This is *probably* valid, but we might have e.g. a multi-line parenthesised
         # chain of attribute accesses ("fluent interface"), where we need the parens.
         noparens = updated_node.with_changes(lpar=[], rpar=[])

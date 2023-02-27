@@ -1,0 +1,7 @@
+# These parens are pointless and thus removed
+(["foo"].append("bar"))
+
+================================================================================
+
+# These parens are pointless and thus removed
+["foo"].append("bar")

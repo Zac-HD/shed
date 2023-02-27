@@ -1,0 +1,11 @@
+(
+    # "Pointless" parens with comments are preserved
+    ["foo"].append("bar")
+)
+
+================================================================================
+
+(
+    # "Pointless" parens with comments are preserved
+    ["foo"].append("bar")
+)
