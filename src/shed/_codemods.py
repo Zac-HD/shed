@@ -186,10 +186,8 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return cst.Dict([])
         elif updated_node.func.value == "list":
             return cst.List([])
-        elif updated_node.func.value == "tuple":
-            return cst.Tuple([])
         else:
-            raise AssertionError("unreachable")
+            return cst.Tuple([])
 
     @m.leave(
         m.Call(
