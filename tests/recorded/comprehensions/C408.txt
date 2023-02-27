@@ -11,7 +11,7 @@ tuple()
 # C408: Unnecessary <dict/list/tuple> call - as a literal.
 # It’s slower to call e.g. dict() than using the empty literal, because the name dict must be looked up in the global scope in case it has been rebound. Same for the other two basic types here. For example:
 
-dict()
+{}
 dict(a=1, b=2)
-list()
-tuple()
+[]
+()
