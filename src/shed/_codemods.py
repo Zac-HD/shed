@@ -176,26 +176,23 @@ class ShedFixers(VisitorBasedCodemodCommand):
         except SyntaxError:
             return updated_node
 
-    @m.leave(
-        m.Call(func=m.Name("dict"), args=[])
-        | m.Call(func=m.Name("list"), args=[])
-        | m.Call(func=m.Name("tuple"), args=[])
-    )
+    @m.leave(m.Call(func=oneof_names("dict", "list", "tuple"), args=[]))
     def replace_builtin_with_literal(self, _, updated_node):
         if updated_node.func.value == "dict":
             return cst.Dict([])
         elif updated_node.func.value == "list":
             return cst.List([])
         else:
+            assert updated_node.func.value == "tuple"
             return cst.Tuple([])
 
     @m.leave(
         m.Call(
-            func=m.Name("list"),
+            func=oneof_names("dict", "list", "tuple"),
             args=[m.Arg(m.Dict([]) | m.List([]) | m.SimpleString() | m.Tuple([]))],
         )
     )
-    def replace_builtin_empty_list(self, _, updated_node):
+    def replace_builtin_empty_collection(self, _, updated_node):
         val = updated_node.args[0].value
         val_is_empty_seq = (
             isinstance(val, (cst.Dict, cst.List, cst.Tuple)) and not val.elements
@@ -203,10 +200,15 @@ class ShedFixers(VisitorBasedCodemodCommand):
         val_is_empty_str = (
             isinstance(val, cst.SimpleString) and val.evaluated_value == ""
         )
-        if val_is_empty_seq or val_is_empty_str:
+        if not (val_is_empty_seq or val_is_empty_str):
+            return updated_node
+        elif updated_node.func.value == "dict":
+            return cst.Dict([])
+        elif updated_node.func.value == "list":
             return cst.List([])
         else:
-            return updated_node
+            assert updated_node.func.value == "tuple"
+            return cst.Tuple([])
 
     # The following methods fix https://pypi.org/project/flake8-comprehensions/
 
