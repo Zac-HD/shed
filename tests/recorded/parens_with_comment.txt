@@ -1,0 +1,19 @@
+# These parens are pointless and thus removed
+(["foo"].append("bar"))
+(
+    ["foo"].append("bar")
+)
+(
+    # "Pointless" parens with comments are preserved
+    ["foo"].append("bar")
+)
+
+================================================================================
+
+# These parens are pointless and thus removed
+["foo"].append("bar")
+["foo"].append("bar")
+(
+    # "Pointless" parens with comments are preserved
+    ["foo"].append("bar")
+)

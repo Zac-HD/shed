@@ -1,5 +1,9 @@
 # Changelog
 
+####
+- Switch to calendar versioning to match underlying tools
+- Fixed a cases where `shed --refactor` could delete comments in parens
+
 #### 0.10.9 - 2023-02-01
 - Require Black >= 23.1.0 for latest code style
 
