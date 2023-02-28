@@ -15,7 +15,7 @@ list([])
 
 tuple([1, 2])
 tuple((1, 2))
-tuple([])
+()
 list([1, 2])
 list((1, 2))
-list([])
+[]

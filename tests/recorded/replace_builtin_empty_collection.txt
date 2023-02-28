@@ -1,0 +1,47 @@
+list({})
+list([])
+list("")
+list(())
+
+dict({})
+dict([])
+dict("")
+dict(())
+
+tuple({})
+tuple([])
+tuple("")
+tuple(())
+
+# Make sure non-empty collections aren't affected
+list({"a": "b"})
+list([1, 2, 3])
+list("test")
+list((1, 2, 3))
+tuple("abc")
+tuple({"foo": 0, "bar": 1})
+
+================================================================================
+
+[]
+[]
+[]
+[]
+
+{}
+{}
+{}
+{}
+
+()
+()
+()
+()
+
+# Make sure non-empty collections aren't affected
+list({"a": "b"})
+list([1, 2, 3])
+list("test")
+list((1, 2, 3))
+tuple("abc")
+tuple({"foo": 0, "bar": 1})
