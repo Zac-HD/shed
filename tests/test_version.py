@@ -48,19 +48,6 @@ def test_changelog_is_ordered():
     assert dates == tuple(sorted(dates, reverse=True))
 
 
-def test_version_increments_are_correct():
-    # We either increment the patch version by one, increment the minor version
-    # and reset the patch, or increment major and reset both minor and patch.
-    versions, _ = zip(*get_releases())
-    for prev, current in zip(versions[1:], versions):
-        assert prev < current  # remember that `versions` is newest-first
-        assert current in (
-            prev._replace(patch=prev.patch + 1),
-            prev._replace(minor=prev.minor + 1, patch=0),
-            prev._replace(major=prev.major + 1, minor=0, patch=0),
-        ), f"{current} does not follow {prev}"
-
-
 if __name__ == "__main__":
     # If we've added a new version to the changelog, update __version__ to match
     last_version, _ = get_releases()[0]

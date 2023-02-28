@@ -1,8 +1,10 @@
 # Changelog
+*`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
-####
+#### 2023.2.1 - 2023-02-27
 - Switch to calendar versioning to match underlying tools
-- Fixed a cases where `shed --refactor` could delete comments in parens
+- Fixed a cases where `--refactor` could delete comments in parens
+- `--refactor` replaces some calls to `list()`, `tuple()` and `dict()` builtins with literals
 
 #### 0.10.9 - 2023-02-01
 - Require Black >= 23.1.0 for latest code style
