@@ -21,7 +21,17 @@ import unittest
 
 unittest.assertIs(a > b, True)
 """
-NOT_YET_FIXED = ("C402", "C406", "C408", "C409", "C410")
+NOT_YET_FIXED = (
+    "C402",
+    "C406",
+    "C408",
+    "C409",
+    "C410",
+    # This error will fire in cases where it would be inappropriate
+    # to fix automatically (because e.g. sorted has a call to key),
+    # so we can't always reliably fix it.
+    "C414",
+)
 
 
 def check(
