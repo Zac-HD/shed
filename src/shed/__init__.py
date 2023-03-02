@@ -162,7 +162,7 @@ def shed(
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
-    def run_isort():
+    def run_isort() -> str:
         try:
             return isort.code(
                 source_code,
