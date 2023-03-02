@@ -290,6 +290,21 @@ class ShedFixers(VisitorBasedCodemodCommand):
 
         Unnecessary <list/reversed/sorted/tuple> call within <list/set/sorted/tuple>()..
         """
+        # If either of two nested sorted calls have a key, it's incorrect to try
+        # to merge them. Theoretically the keys could be combined into a tuple,
+        # but this is hard to make work in generality, and it's better to just
+        # leave this alone and let a human deal with it if they care.
+        if (
+            updated_node.func.value == "sorted"
+            and updated_node.args[0].value.func.value == "sorted"
+            and any(
+                arg.keyword and arg.keyword.value == "key"
+                for args in (updated_node.args, updated_node.args[0].value.args)
+                for arg in args
+            )
+        ):
+            return updated_node
+
         return updated_node.with_changes(
             args=[cst.Arg(updated_node.args[0].value.args[0].value)]
             + list(updated_node.args[1:]),
