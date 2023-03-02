@@ -162,22 +162,34 @@ def shed(
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
-    try:
-        source_code = isort.code(
-            source_code,
-            known_first_party=first_party_imports,
-            known_local_folder={"tests"},
-            profile="black",
-            combine_as_imports=True,
-        )
-    except FileSkipComment:
-        pass
+    def run_isort() -> str:
+        try:
+            return isort.code(
+                source_code,
+                known_first_party=first_party_imports,
+                known_local_folder={"tests"},
+                profile="black",
+                combine_as_imports=True,
+            )
+        except FileSkipComment:
+            return source_code
+
+    # Autoflake cannot always correctly resolve imports it can remove until
+    # they have been properly formatted, so we have to run isort first so that
+    # it gets well formatted imports.
+    pre_autoflake = source_code = run_isort()
 
     source_code = autoflake.fix_code(
         source_code,
         expand_star_imports=True,
         remove_all_unused_imports=_remove_unused_imports,
     )
+
+    # Until https://github.com/PyCQA/autoflake/issues/229 is fixed, autoflake
+    # may reorder imports in a way that is incompatible with isort's ordering,
+    # so we may need to re-sort its output.
+    if source_code != pre_autoflake:
+        source_code = run_isort()
 
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)

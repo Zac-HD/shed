@@ -1,0 +1,32 @@
+from os import (
+    wait,
+    wait3,
+    wait4,
+    waitid,
+    waitid_result,
+    waitpid,
+    waitstatus_to_exitcode,
+    walk,
+    write,
+    writev,
+)
+
+print(
+    waitpid,
+    waitstatus_to_exitcode,
+    walk,
+    write,
+    writev,
+)
+
+================================================================================
+
+from os import waitpid, waitstatus_to_exitcode, walk, write, writev
+
+print(
+    waitpid,
+    waitstatus_to_exitcode,
+    walk,
+    write,
+    writev,
+)
