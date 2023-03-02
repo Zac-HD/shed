@@ -1,0 +1,9 @@
+from typing import TYPE_CHECKING, Any, NamedTuple, TypeVar
+
+x = (TYPE_CHECKING, NamedTuple, TypeVar)
+
+================================================================================
+
+from typing import TYPE_CHECKING, NamedTuple, TypeVar
+
+x = (TYPE_CHECKING, NamedTuple, TypeVar)
