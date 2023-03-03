@@ -14,7 +14,7 @@ import sys
 import tokenize
 import warnings
 from pathlib import Path
-from typing import Callable, FrozenSet, Union
+from typing import Callable, FrozenSet, Optional, Union
 
 import autoflake
 from isort.api import place_module
@@ -23,7 +23,7 @@ from . import ShedSyntaxWarning, _version_map, docshed, shed
 
 
 @functools.lru_cache()
-def _get_git_repo_root(cwd: str = None) -> str:
+def _get_git_repo_root(cwd: Optional[str] = None) -> str:
     return subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         check=True,
@@ -35,7 +35,7 @@ def _get_git_repo_root(cwd: str = None) -> str:
 
 
 @functools.lru_cache()
-def _guess_first_party_modules(cwd: str = None) -> FrozenSet[str]:
+def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
     """Guess the name of the current package for first-party imports."""
     try:
         base = _get_git_repo_root(cwd)

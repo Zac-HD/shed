@@ -178,16 +178,16 @@ def test_empty_stays_empty(refactor):
 
 
 @pytest.mark.parametrize(
-    "source_code",
+    "source_code,exception",
     [
-        "this isn't valid Python",
+        ("this isn't valid Python", ShedSyntaxWarning),
         # We request a bug report for valid unhandled syntax, i.e. (upstream) bugs
-        "class A:\\\r# type: ignore\n pass\n",
+        ("class A:\\\r# type: ignore\n pass\n", ShedSyntaxWarning),
     ],
 )
 @pytest.mark.parametrize("refactor", [True, False])
-def test_error_on_invalid_syntax(source_code, refactor):
-    with pytest.raises(Exception):
+def test_error_on_invalid_syntax(source_code, exception, refactor):
+    with pytest.raises(exception):
         assert shed(source_code=source_code, refactor=refactor)
 
 
