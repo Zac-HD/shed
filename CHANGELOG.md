@@ -1,9 +1,13 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+#### 2023.3.1 - 2023-03-05
+- Fixed cases where `shed` took two passes to handle unordered and removable imports
+- Fixed cases where `--refactor` was making unintended semantic changes
+
 #### 2023.2.1 - 2023-02-27
 - Switch to calendar versioning to match underlying tools
-- Fixed a cases where `--refactor` could delete comments in parens
+- Fixed cases where `--refactor` could delete comments in parens
 - `--refactor` replaces some calls to `list()`, `tuple()` and `dict()` builtins with literals
 
 #### 0.10.9 - 2023-02-01
