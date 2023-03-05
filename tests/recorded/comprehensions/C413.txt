@@ -23,14 +23,14 @@ sorted(frozenset('abc'))
 # It’s unnecessary to use list() around sorted()
 
 sorted([2, 3, 1])
-sorted([2, 3, 1], reverse=True)
-sorted([2, 3, 1])
+reversed(sorted([2, 3, 1]))
+reversed(sorted([2, 3, 1], reverse=True))
 
 sorted([2, 3, 1], reverse=False)
-sorted([2, 3, 1], reverse=True)
-sorted([2, 3, 1])
-sorted([2, 3, 1], reverse=not 1 + 2 + c)
-sorted([2, 3, 1], reverse=not 1 or 2)
+reversed(sorted([2, 3, 1], reverse=False))
+reversed(sorted([2, 3, 1], reverse="abc"))
+reversed(sorted([2, 3, 1], reverse=1 + 2 + c))
+reversed(sorted([2, 3, 1], reverse=1 or 2))
 
 sorted(set("aabc"))
 

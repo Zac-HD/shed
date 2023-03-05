@@ -27,6 +27,10 @@ NOT_YET_FIXED = (
     "C408",
     "C409",
     "C410",
+)
+SHOULD_NOT_FIX = (
+    # Removing calls to reversed() changes results of stable sorting.
+    "C413",
     # This error will fire in cases where it would be inappropriate
     # to fix automatically (because e.g. sorted has a call to key),
     # so we can't always reliably fix it.
@@ -77,7 +81,7 @@ def check(
     errors = [
         err
         for err in ComprehensionChecker(tree).run()
-        if not err[2].startswith(NOT_YET_FIXED)
+        if not err[2].startswith(NOT_YET_FIXED + SHOULD_NOT_FIX)
     ]
     assert not errors
     return result

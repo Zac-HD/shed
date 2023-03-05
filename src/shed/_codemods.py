@@ -232,50 +232,21 @@ class ShedFixers(VisitorBasedCodemodCommand):
     def replace_unnecessary_list_around_sorted(self, _, updated_node):
         """Fix flake8-comprehensions C411 and C413.
 
-        Unnecessary <list/reversed> call around sorted().
+        Unnecessary list() call around sorted().
 
         Also covers C411 Unnecessary list call around list comprehension
         for lists and sets.
         """
         return updated_node.args[0].value
 
+    _sets = oneof_names("set", "frozenset")
+    _seqs = oneof_names("list", "sorted", "tuple")
+
     @m.leave(
         m.Call(
-            func=m.Name("reversed"),
-            args=[m.Arg(m.Call(func=m.Name("sorted")), star="")],
+            func=_sets,
+            args=[m.Arg(m.Call(func=_sets | _seqs | m.Name("reversed")), star="")],
         )
-    )
-    def replace_unnecessary_reversed_around_sorted(self, _, updated_node):
-        """Fix flake8-comprehensions C413.
-
-        Unnecessary reversed call around sorted().
-        """
-        call = updated_node.args[0].value
-        args = list(call.args)
-        for i, arg in enumerate(args):
-            if m.matches(arg.keyword, m.Name("reverse")):
-                try:
-                    val = bool(literal_eval(self.module.code_for_node(arg.value)))
-                except Exception:
-                    args[i] = arg.with_changes(
-                        value=cst.UnaryOperation(cst.Not(), arg.value)
-                    )
-                else:
-                    if not val:
-                        args[i] = arg.with_changes(value=cst.Name("True"))
-                    else:
-                        del args[i]
-                        args[i - 1] = remove_trailing_comma(args[i - 1])
-                break
-        else:
-            args.append(cst.Arg(keyword=cst.Name("reverse"), value=cst.Name("True")))
-        return call.with_changes(args=args)
-
-    _sets = oneof_names("set", "frozenset")
-    _seqs = oneof_names("list", "reversed", "sorted", "tuple")
-
-    @m.leave(
-        m.Call(func=_sets, args=[m.Arg(m.Call(func=_sets | _seqs), star="")])
         | m.Call(
             func=oneof_names("list", "tuple"),
             args=[m.Arg(m.Call(func=oneof_names("list", "tuple")), star="")],
@@ -288,7 +259,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
     def replace_unnecessary_nested_calls(self, _, updated_node):
         """Fix flake8-comprehensions C414.
 
-        Unnecessary <list/reversed/sorted/tuple> call within <list/set/sorted/tuple>()..
+        Unnecessary <list/sorted/tuple> call within <list/set/sorted/tuple>()..
         """
         # If either of two nested sorted calls have a key, it's incorrect to try
         # to merge them. Theoretically the keys could be combined into a tuple,

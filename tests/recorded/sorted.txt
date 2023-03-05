@@ -21,5 +21,5 @@ sorted(sorted(xs, key=lambda x: 0))
 sorted(sorted(xs), key=lambda x: 0)
 sorted(sorted(xs, key=lambda x: 1), key=lambda x: 0)
 
-sorted(xs, reverse=True)
-sorted(xs, key=lambda x: 0, reverse=True)
+reversed(sorted(xs))
+reversed(sorted(xs, key=lambda x: 0))
