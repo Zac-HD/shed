@@ -191,6 +191,10 @@ class ShedFixers(VisitorBasedCodemodCommand):
         )
     )
     def replace_builtin_empty_collection(self, _, updated_node):
+        # If there is a keyword argument either this is a dict (and thus
+        # not empty) or the user has made an error we shouldn't mask.
+        if updated_node.args[0].keyword:
+            return updated_node
         val = updated_node.args[0].value
         val_is_empty_seq = (
             isinstance(val, (cst.Dict, cst.List, cst.Tuple)) and not val.elements

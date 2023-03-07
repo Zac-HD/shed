@@ -1,9 +1,15 @@
 dict()
 list()
 tuple()
+dict(ENV_VAR="")
+dict(ENV_VAR="foo")
+dict(ENV_VAR=0)
 
 ================================================================================
 
 {}
 []
 ()
+dict(ENV_VAR="")
+dict(ENV_VAR="foo")
+dict(ENV_VAR=0)
