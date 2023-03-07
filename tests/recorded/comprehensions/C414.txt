@@ -25,7 +25,7 @@ sorted(sorted(iterable, reverse=False), reverse=True)
 # C414: Unnecessary <list/reversed/set/sorted/tuple> call within <list/set/sorted/tuple>().
 # It’s unnecessary to double-cast or double-process iterables by wrapping the listed functions within list/set/sorted/tuple. For example:
 
-iterable
+list(iterable)
 list(iterable)
 tuple(iterable)
 tuple(iterable)
