@@ -15,6 +15,13 @@ assert ("", "message")
 # not an exception, replaced with NotImplementedError
 raise NotImplemented
 
+# regression test for https://github.com/Zac-HD/shed/issues/84
+assert (
+    "some very long                       string"
+    and "another long                     string"
+    == "third long                        string"
+)
+
 ================================================================================
 
 # unchanged because test is not a literal
@@ -28,3 +35,10 @@ raise AssertionError("message")
 
 # not an exception, replaced with NotImplementedError
 raise NotImplementedError
+
+# regression test for https://github.com/Zac-HD/shed/issues/84
+assert (
+    "some very long                       string"
+    and "another long                     string"
+    == "third long                        string"
+)

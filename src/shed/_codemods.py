@@ -609,6 +609,11 @@ class ShedFixers(VisitorBasedCodemodCommand):
                     cst.TrailingWhitespace(whitespace=cst.SimpleWhitespace(" ")),
                 )
             )
+        # work around https://github.com/Instagram/LibCST/issues/911
+        try:
+            cst.parse_module(cst.Module([*nodes]).code)
+        except Exception:
+            return updated_node
         return cst.FlattenSentinel(nodes)
 
     # Remove unnecessary len() and bool() calls in tests
