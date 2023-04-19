@@ -8,11 +8,32 @@ nitpicks about typing unions and literals.
 import os
 import re
 from ast import literal_eval
+from functools import wraps
 from typing import List, Tuple
 
 import libcst as cst
 import libcst.matchers as m
 from libcst.codemod import VisitorBasedCodemodCommand
+
+
+def leave(matcher):
+    """Wrap `libcst.matchers.leave` for fixed behaviour.
+
+    This works around https://github.com/Instagram/LibCST/issues/888
+    by checking if the updated node matches the matcher.
+    """
+
+    def inner(fn):
+        @wraps(fn)
+        @m.leave(matcher)
+        def wrapped(self, original_node, updated_node):
+            if not m.matches(updated_node, matcher):
+                return updated_node
+            return fn(self, original_node, updated_node)
+
+        return wrapped
+
+    return inner
 
 
 def attempt_hypothesis_codemods(context, mod):  # pragma: no cover
@@ -134,12 +155,12 @@ class ShedFixers(VisitorBasedCodemodCommand):
             cst.Call(cst.Name("AssertionError"), args=[cst.Arg(updated_node.msg)])
         )
 
-    @m.leave(m.ComparisonTarget(comparator=m.Name("None"), operator=m.Equal()))
+    @leave(m.ComparisonTarget(comparator=m.Name("None"), operator=m.Equal()))
     def convert_none_cmp(self, _, updated_node):
         """Inspired by Pybetter."""
         return updated_node.with_changes(operator=cst.Is())
 
-    @m.leave(
+    @leave(
         m.UnaryOperation(
             operator=m.Not(),
             expression=m.Comparison(comparisons=[m.ComparisonTarget(operator=m.In())]),
@@ -155,7 +176,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             comparisons=[expr.comparisons[0].with_changes(operator=cst.NotIn())],
         )
 
-    @m.leave(
+    @leave(
         m.Call(
             lpar=[m.AtLeastN(n=1, matcher=m.LeftParen())],
             rpar=[m.AtLeastN(n=1, matcher=m.RightParen())],
@@ -174,7 +195,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         except SyntaxError:
             return updated_node
 
-    @m.leave(m.Call(func=oneof_names("dict", "list", "tuple"), args=[]))
+    @leave(m.Call(func=oneof_names("dict", "list", "tuple"), args=[]))
     def replace_builtin_with_literal(self, _, updated_node):
         if updated_node.func.value == "dict":
             return cst.Dict([])
@@ -184,7 +205,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             assert updated_node.func.value == "tuple"
             return cst.Tuple([])
 
-    @m.leave(
+    @leave(
         m.Call(
             func=oneof_names("dict", "list", "tuple"),
             args=[m.Arg(m.Dict([]) | m.List([]) | m.SimpleString() | m.Tuple([]))],
@@ -214,7 +235,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
 
     # The following methods fix https://pypi.org/project/flake8-comprehensions/
 
-    @m.leave(m.Call(func=m.Name("list"), args=[m.Arg(m.GeneratorExp())]))
+    @leave(m.Call(func=m.Name("list"), args=[m.Arg(m.GeneratorExp())]))
     def replace_generator_in_call_with_comprehension(self, _, updated_node):
         """Fix flake8-comprehensions C400-402 and 403-404.
 
@@ -225,7 +246,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             elt=updated_node.args[0].value.elt, for_in=updated_node.args[0].value.for_in
         )
 
-    @m.leave(
+    @leave(
         m.Call(func=m.Name("list"), args=[m.Arg(m.ListComp(), star="")])
         | m.Call(func=m.Name("set"), args=[m.Arg(m.SetComp(), star="")])
         | m.Call(
@@ -246,7 +267,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
     _sets = oneof_names("set", "frozenset")
     _seqs = oneof_names("list", "sorted", "tuple")
 
-    @m.leave(
+    @leave(
         m.Call(
             func=_sets,
             args=[m.Arg(m.Call(func=_sets | _seqs | m.Name("reversed")), star="")],
@@ -285,7 +306,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             + list(updated_node.args[1:]),
         )
 
-    @m.leave(
+    @leave(
         m.Call(
             func=oneof_names("reversed", "set", "sorted"),
             args=[m.Arg(m.Subscript(slice=[m.SubscriptElement(ALL_ELEMS_SLICE)]))],
@@ -300,7 +321,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             args=[cst.Arg(updated_node.args[0].value.value)],
         )
 
-    @m.leave(
+    @leave(
         multi(
             m.ListComp,
             m.SetComp,
@@ -320,7 +341,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return cst.Call(func=func, args=[cst.Arg(updated_node.for_in.iter)])
         return updated_node
 
-    @m.leave(m.Subscript(oneof_names("Union", "Literal")))
+    @leave(m.Subscript(oneof_names("Union", "Literal")))
     def reorder_union_literal_contents_none_last(self, _, updated_node):
         subscript = list(updated_node.slice)
         try:
@@ -332,7 +353,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         except Exception:  # Single-element literals are not slices, etc.
             return updated_node
 
-    @m.leave(
+    @leave(
         m.Subscript(
             m.Name("Optional"),
             [m.SubscriptElement(m.Index(m.Subscript(value=m.Name("Union"))))],
@@ -344,7 +365,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         return union.with_changes(slice=list(union.slice) + none)
 
     @m.call_if_inside(m.Annotation(annotation=m.BinaryOperation()))
-    @m.leave(
+    @leave(
         m.BinaryOperation(
             left=m.Name("None") | m.BinaryOperation(),
             operator=m.BitOr(),
@@ -366,7 +387,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         else:
             return updated_node
 
-    @m.leave(m.Subscript(value=m.Name("Literal")))
+    @leave(m.Subscript(value=m.Name("Literal")))
     def flatten_literal_subscript(self, _, updated_node):
         new_slice = []
         for item in updated_node.slice:
@@ -376,7 +397,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
                 new_slice.append(item)
         return updated_node.with_changes(slice=new_slice)
 
-    @m.leave(m.Subscript(value=m.Name("Union")))
+    @leave(m.Subscript(value=m.Name("Union")))
     def flatten_union_subscript(self, _, updated_node):
         new_slice = []
         has_none = False
@@ -396,7 +417,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             new_slice.append(cst.SubscriptElement(slice=cst.Index(cst.Name("None"))))
         return updated_node.with_changes(slice=new_slice)
 
-    @m.leave(m.Else(m.IndentedBlock([m.SimpleStatementLine([m.Pass()])])))
+    @leave(m.Else(m.IndentedBlock([m.SimpleStatementLine([m.Pass()])])))
     def discard_empty_else_blocks(self, _, updated_node):
         # An `else: pass` block can always simply be discarded, and libcst ensures
         # that an Else node can only ever occur attached to an If, While, For, or Try
@@ -405,7 +426,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return updated_node  # If there are any comments, keep the node
         return cst.RemoveFromParent()
 
-    @m.leave(
+    @leave(
         m.Lambda(
             params=m.MatchIfTrue(
                 lambda node: (
@@ -427,7 +448,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return cst.ensure_type(updated_node.body, cst.Call).func
         return updated_node
 
-    @m.leave(
+    @leave(
         m.BooleanOperation(
             left=m.Call(m.Name("isinstance"), [m.Arg(), m.Arg()]),
             operator=m.Or(),
@@ -546,7 +567,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         return nodes
 
     # split `assert a and b` into `assert a` and `assert b`
-    @m.leave(
+    @leave(
         m.SimpleStatementLine(
             body=[m.Assert(msg=None, test=m.BooleanOperation(operator=m.And()))]
         )
@@ -595,7 +616,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
     # complicated nested cases - so we have to split into different leave's
     # len/bool inside boolops (and/or) can only be removed if the boolop is inside a test
     # otherwise `print(False or bool(5))` changes functionality (prints `True` vs `5`)
-    @m.leave(
+    @leave(
         multi(
             m.If,
             m.IfExp,
@@ -608,7 +629,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
 
     # remove not:ed len/bool
     # `not len(foo)` -> `not foo`
-    @m.leave(m.UnaryOperation(operator=m.Not(), expression=_collapsible_expression()))
+    @leave(m.UnaryOperation(operator=m.Not(), expression=_collapsible_expression()))
     def remove_unnecessary_call_expression(self, _, updated_node):
         return self._collapse_attribute(updated_node, "expression")
 
@@ -616,6 +637,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
     @classmethod
     def _collapse_attribute(cls, node, attr):
         child_node = getattr(node, attr)
+
         # if the attribute is a boolop, recurse through it and replace len/bool that are
         # direct child nodes to (a chain of) boolops
         if isinstance(child_node, cst.BooleanOperation):
@@ -625,7 +647,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
 
     # remove len/bool inside bool()
     # `bool(len(foo))` or `bool(bool(foo))` -> `bool(foo)`
-    @m.leave(m.Call(func=m.Name("bool"), args=[m.Arg(value=_collapsible_expression())]))
+    @leave(m.Call(func=m.Name("bool"), args=[m.Arg(value=_collapsible_expression())]))
     def remove_unnecessary_call2(self, _, updated_node):
         collapse_node = updated_node.args[0].value
         if isinstance(collapse_node, cst.BooleanOperation):
