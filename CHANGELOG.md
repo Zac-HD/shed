@@ -1,6 +1,9 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+#### 2023.4.1 - 2023-04-19
+- Fixed some crash and incorrect-output bugs in `shed --refactor`
+
 #### 2023.3.1 - 2023-03-05
 - Fixed cases where `shed` took two passes to handle unordered and removable imports
 - Fixed cases where `--refactor` was making unintended semantic changes
