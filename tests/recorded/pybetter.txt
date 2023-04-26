@@ -5,10 +5,6 @@ a == False
 df[df.flag == True]  # doesn't break Pandas code
 
 with a:
-    with b:
-        pass
-
-with a:
     # comment
     with b:
         pass
@@ -20,10 +16,6 @@ z is None
 a == True
 a == False
 df[df.flag == True]  # doesn't break Pandas code
-
-with a:
-    with b:
-        pass
 
 with a:
     # comment

@@ -1,0 +1,13 @@
+# test nested with statement NOT get reformatted in 3.8 or below
+
+with make_context_manager(1) as cm1:
+  with make_context_manager(2) as cm2:
+    pass
+
+================================================================================
+
+# test nested with statement NOT get reformatted in 3.8 or below
+
+with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
