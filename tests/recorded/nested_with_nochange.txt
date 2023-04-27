@@ -30,6 +30,11 @@ with make_context_manager(
     with make_context_manager(2) as cm2:
         pass
 
+with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
+    a = "second statement blocks this refactor"
+
 ================================================================================
 
 with make_context_manager(1) as cm1:
@@ -63,3 +68,8 @@ with make_context_manager(
     ) as cm1:
     with make_context_manager(2) as cm2:
         pass
+
+with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
+    a = "second statement blocks this refactor"
