@@ -1,0 +1,75 @@
+with make_context_manager(1) as cm1:
+  pass
+
+# cannot mix `async with` and `with`
+async with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+      pass
+
+with make_context_manager(1) as cm1:
+    async with make_context_manager(2) as cm2:
+      pass
+
+# cannot have comments inside with statement
+with \
+     make_context_manager(1) as cm1, \
+     # comment in with statement
+     make_context_manager(2) as cm2 \
+:
+  with make_context_manager(3) as cm3:
+    pass
+
+with make_context_manager(1) as cm1:
+    # nested with
+    with make_context_manager(2) as cm2:
+        pass
+
+with make_context_manager(
+      1 # nested with
+    ) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
+
+with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
+    a = "second statement blocks this refactor"
+
+================================================================================
+
+with make_context_manager(1) as cm1:
+  pass
+
+# cannot mix `async with` and `with`
+async with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+      pass
+
+with make_context_manager(1) as cm1:
+    async with make_context_manager(2) as cm2:
+      pass
+
+# cannot have comments inside with statement
+with \
+     make_context_manager(1) as cm1, \
+     # comment in with statement
+     make_context_manager(2) as cm2 \
+:
+  with make_context_manager(3) as cm3:
+    pass
+
+with make_context_manager(1) as cm1:
+    # nested with
+    with make_context_manager(2) as cm2:
+        pass
+
+with make_context_manager(
+      1 # nested with
+    ) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
+
+with make_context_manager(1) as cm1:
+    with make_context_manager(2) as cm2:
+        pass
+    a = "second statement blocks this refactor"

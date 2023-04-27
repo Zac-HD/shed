@@ -1,6 +1,7 @@
 """Update and check saved examples of shed formatting."""
 
 import pathlib
+import re
 import warnings
 
 import pytest
@@ -29,6 +30,10 @@ def test_saved_examples(filename: pathlib.Path, min_version):
     You can therefore see what changed by examining the `git diff`
     and roll back with `git reset`.
     """
+    stem = filename.stem
+    if re.search(r"_3\d+$", stem) and not stem.endswith(f"_3{min_version[1]}"):
+        pytest.skip(reason="Requires a different min-version spec.")
+
     joiner = "\n\n" + "=" * 80 + "\n\n"
     input_, expected, *_ = map(str.strip, (filename.read_text() + joiner).split(joiner))
     if filename.suffix == ".py" and "invalid" not in filename.stem:

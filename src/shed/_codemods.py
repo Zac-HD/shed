@@ -9,7 +9,7 @@ import os
 import re
 from ast import literal_eval
 from functools import wraps
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import libcst as cst
 import libcst.matchers as m
@@ -70,7 +70,7 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
 
     if imports_hypothesis(code):  # pragma: no cover
         mod = attempt_hypothesis_codemods(context, mod)
-    mod = ShedFixers(context).transform_module(mod)
+    mod = ShedFixers(context, min_version).transform_module(mod)
     return mod.code
 
 
@@ -136,6 +136,10 @@ class ShedFixers(VisitorBasedCodemodCommand):
     """
 
     DESCRIPTION = "Fix a variety of style, performance, and correctness issues."
+
+    def __init__(self, context, min_version):
+        super().__init__(context)
+        self.min_version = min_version
 
     @m.call_if_inside(m.Raise(exc=m.Name(value="NotImplemented")))
     def leave_Name(self, _, updated_node):  # noqa
@@ -676,3 +680,66 @@ class ShedFixers(VisitorBasedCodemodCommand):
                     **{side: side_node.args[0]},
                 )
         return bool_node
+
+    # rewrite nested `with` statement - code source from https://github.com/lensvol/pybetter/blob/master/pybetter/transformers/nested_withs.py
+
+    @leave(m.With())
+    def remove_nested_with(self, _, updated_node):
+        if self.min_version < (3, 9):
+            return updated_node
+
+        candidate_with: cst.With = updated_node
+        compound_items: List[cst.WithItem] = []
+        final_body: cst.BaseSuite = candidate_with.body
+
+        def has_leading_comment(node: Union[cst.SimpleStatementLine, cst.With]) -> bool:
+            return any([line.comment is not None for line in node.leading_lines])
+
+        header = m.AllOf(
+            m.TrailingWhitespace(),
+            m.MatchIfTrue(lambda h: h.comment is not None),
+        )
+        footer = [m.ZeroOrMore(), m.EmptyLine(comment=m.Comment()), m.ZeroOrMore()]
+
+        def has_footer_comment(body):
+            return m.matches(body, m.IndentedBlock(footer=footer))
+
+        while not (
+            # There is no way to meaningfully represent comments inside
+            # multi-line `with` statements due to how Python grammar is
+            # written, so we do not try to transform such `with` statements
+            # lest we lose something important in the comments.
+            has_leading_comment(candidate_with)
+            or m.matches(candidate_with.body, m.IndentedBlock(header=header))
+            # There is no meaningful way `async with` can be merged into
+            # the compound `with` statement.
+            or candidate_with.asynchronous
+        ):
+            compound_items.extend(candidate_with.items)
+            final_body = candidate_with.body
+
+            if not (
+                isinstance(final_body.body[0], cst.With) and len(final_body.body) == 1
+            ):
+                break  # pragma: no cover  # only reachable on some Python versions
+
+            candidate_with = cst.ensure_type(final_body.body[0], cst.With)
+
+        if len(compound_items) <= 1:
+            return updated_node
+
+        final_body = cst.ensure_type(final_body, cst.IndentedBlock)
+        topmost_body = cst.ensure_type(updated_node.body, cst.IndentedBlock)
+
+        if has_footer_comment(topmost_body) and not has_footer_comment(final_body):
+            final_body = final_body.with_changes(
+                footer=(*final_body.footer, *topmost_body.footer)
+            )
+
+        return updated_node.with_changes(
+            body=final_body,
+            items=compound_items,
+            # Black will only format with parens if they're there to start, so:
+            lpar=cst.LeftParen(),
+            rpar=cst.RightParen(),
+        )
