@@ -721,7 +721,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
             if not (
                 isinstance(final_body.body[0], cst.With) and len(final_body.body) == 1
             ):
-                break
+                break  # pragma: no cover  # only reachable on some Python versions
 
             candidate_with = cst.ensure_type(final_body.body[0], cst.With)
 
