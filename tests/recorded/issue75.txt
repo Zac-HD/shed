@@ -21,7 +21,13 @@ print(
 
 ================================================================================
 
-from os import waitpid, waitstatus_to_exitcode, walk, write, writev
+from os import (
+    waitpid,
+    waitstatus_to_exitcode,
+    walk,
+    write,
+    writev,
+)
 
 print(
     waitpid,
