@@ -1,0 +1,41 @@
+'''
+We format valid code blocks and skip invalid ones.
+
+.. code:: python
+
+    This just isn't Python code at all, but we don't want to crash!
+
+.. code:: python
+
+    print(  # matched paren is fine
+    )
+
+```python
+This just isn't Python code at all, but we don't want to crash!
+```
+```python
+print(  # matched paren is fine
+)
+```
+'''
+
+================================================================================
+
+"""
+We format valid code blocks and skip invalid ones.
+
+.. code:: python
+
+    This just isn't Python code at all, but we don't want to crash!
+
+.. code:: python
+
+    print()  # matched paren is fine
+
+```python
+This just isn't Python code at all, but we don't want to crash!
+```
+```python
+print()  # matched paren is fine
+```
+"""
