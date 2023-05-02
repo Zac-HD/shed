@@ -1,0 +1,21 @@
+# Skip refactoring but still use Black on invalid syntax.
+
+from collections import defaultdict
+
+VALUES = defaultdict(
+    int, (i, i) for i in range(10)
+)
+
+groups = [[], [1, 2, 3]]
+sum(ls for ls in groups, [])
+
+================================================================================
+
+# Skip refactoring but still use Black on invalid syntax.
+
+from collections import defaultdict
+
+VALUES = defaultdict(int, (i, i) for i in range(10))
+
+groups = [[], [1, 2, 3]]
+sum(ls for ls in groups, [])
