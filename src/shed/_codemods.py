@@ -63,6 +63,17 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
     try:
         os.environ["LIBCST_PARSER_TYPE"] = "native"
         mod = cst.parse_module(code)
+    except cst.ParserSyntaxError:
+        try:
+            compile(code, "<string>", "exec")
+        except SyntaxError:
+            # We successfully parsed this code with lib2to3 for Black, but that
+            # sometimes permits invalid syntax which libcst does not.  We'll just
+            # skip refactoring here; see https://github.com/Zac-HD/shed/issues/93
+            return code
+        else:  # pragma: no cover  # This is only in case of libcst bugs
+            # If the `compile()` builtin is happy, we want to crash after all.
+            raise
     finally:
         os.environ.pop("LIBCST_PARSER_TYPE")
         if var is not None:
