@@ -22,6 +22,40 @@ def x(foo:int="bar"
 ```
 '''
 
+def foo():
+    """
+    aoeu
+    ```python
+    print(
+        'hello world'
+               )
+    ```
+    """
+    print(
+        'hello world'
+               )
+
+class bar:
+    """
+    aoeu
+    ```python
+    print(
+        'hello world'
+               )
+    ```
+    """
+    # don't modify non-docstring string
+    print(
+    """
+    aoeu
+    ```python
+    print(
+        'hello world'
+               )
+    ```
+    """
+    )
+
 ================================================================================
 
 """
@@ -41,3 +75,34 @@ def x(foo: int = "bar"):
     a.foo(b.bar())
 ```
 """
+
+
+def foo():
+    """
+    aoeu
+    ```python
+    print("hello world")
+    ```
+    """
+    print("hello world")
+
+
+class bar:
+    """
+    aoeu
+    ```python
+    print("hello world")
+    ```
+    """
+
+    # don't modify non-docstring string
+    print(
+        """
+    aoeu
+    ```python
+    print(
+        'hello world'
+               )
+    ```
+    """
+    )
