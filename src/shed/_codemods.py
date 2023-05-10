@@ -15,6 +15,8 @@ import libcst as cst
 import libcst.matchers as m
 from libcst.codemod import VisitorBasedCodemodCommand
 
+from . import docshed
+
 
 def leave(matcher):
     """Wrap `libcst.matchers.leave` for fixed behaviour.
@@ -754,3 +756,23 @@ class ShedFixers(VisitorBasedCodemodCommand):
             lpar=cst.LeftParen(),
             rpar=cst.RightParen(),
         )
+
+    # helpers for the matchers in _docshed_docstrings
+    __first_expr_docstring = [
+        m.SimpleStatementLine(body=[m.Expr(value=m.SimpleString())]),
+        m.ZeroOrMore(m.DoNotCare()),
+    ]
+    __first_expr_docstring_in_indent = m.IndentedBlock(body=__first_expr_docstring)
+
+    @m.leave(m.FunctionDef(body=__first_expr_docstring_in_indent))
+    @m.leave(m.ClassDef(body=__first_expr_docstring_in_indent))
+    @m.leave(m.Module(body=__first_expr_docstring))
+    def _docshed_docstrings(self, _, updated_node):
+        if isinstance(updated_node, (cst.FunctionDef, cst.ClassDef)):
+            first_line = updated_node.body
+        else:
+            first_line = updated_node
+
+        string_node = first_line.body[0].body[0].value
+        new_value = docshed(string_node.value, refactor=True)
+        return updated_node.with_deep_changes(string_node, value=new_value)
