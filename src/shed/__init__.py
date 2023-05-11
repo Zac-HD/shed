@@ -80,7 +80,8 @@ def shed(
     except Exception as err:
         msg = f"Could not parse {_location}\n    {type(err).__qualname__}: {err}"
         for pattern, blocktype in _SUGGESTIONS:
-            if re.search(pattern, source_code, flags=re.MULTILINE):
+            # TODO: write test for the below??
+            if re.search(pattern, source_code, flags=re.MULTILINE):  # pragma: no cover
                 msg += f"\n    Perhaps you should use a {blocktype!r} block instead?"
         try:
             compile(source_code, "<string>", "exec")
@@ -96,15 +97,8 @@ def shed(
         if "SHED_RAISE" in os.environ:  # pragma: no cover
             raise w
         warnings.warn(w, stacklevel=_location.count(" block in ") + 2)
-        # Even if the code itself has invalid syntax, we might be able to
-        # regex-match and therefore reformat code embedded in docstrings.
-        return docshed(
-            source_code,
-            refactor=refactor,
-            first_party_imports=first_party_imports,
-            min_version=min_version,
-            _location=_location,
-        )
+        return source_code
+
     target_versions &= set(black.detect_target_versions(parsed))
     assert target_versions
     min_version = max(
@@ -194,14 +188,6 @@ def shed(
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)
 
-    # Then shed.docshed (below) formats any code blocks in documentation
-    source_code = docshed(
-        source_code,
-        refactor=refactor,
-        first_party_imports=first_party_imports,
-        min_version=min_version,
-        _location=_location,
-    )
     # Remove any extra trailing whitespace
     return source_code.rstrip() + "\n"
 

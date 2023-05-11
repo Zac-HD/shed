@@ -1,5 +1,5 @@
 ```python
-1/ # invalid syntax
+1/ # invalid syntax causes nothing in the file to get formatted
 
 def f():
     """
@@ -20,15 +20,13 @@ def f():
 ================================================================================
 
 ```python
-1/ # invalid syntax
+1/ # invalid syntax causes nothing in the file to get formatted
 
 def f():
     """
     .. code-block:: python
 
-        1 / 0
-
-
+        1/0
         def f():
             """
             ```python
