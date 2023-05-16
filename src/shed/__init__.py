@@ -36,7 +36,7 @@ _version_map = {
 _default_min_version = min(_version_map.values())
 _SUGGESTIONS = (
     # If we fail on invalid syntax, check for detectable wrong-codeblock types
-    (r"^(>>> | In [\d+]: )", "pycon"),
+    (r"^(>>> | ?In \[\d+\]: )", "pycon"),
     (r"^Traceback \(most recent call last\):$", "python-traceback"),
 )
 
@@ -80,8 +80,7 @@ def shed(
     except Exception as err:
         msg = f"Could not parse {_location}\n    {type(err).__qualname__}: {err}"
         for pattern, blocktype in _SUGGESTIONS:
-            # TODO: write test for the below??
-            if re.search(pattern, source_code, flags=re.MULTILINE):  # pragma: no cover
+            if re.search(pattern, source_code, flags=re.MULTILINE):
                 msg += f"\n    Perhaps you should use a {blocktype!r} block instead?"
         try:
             compile(source_code, "<string>", "exec")
