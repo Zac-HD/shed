@@ -1,6 +1,9 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+#### 2023.5.2 - 2023-05-26
+- Require latest versions of `black` and `libcst` for bugfixes and perf improvements
+
 #### 2023.5.1 - 2023-05-01
 - `shed --refactor` now merges nested with-statements for Python 3.9+
 - Skip LibCST passes when it (correctly) objects to invalid code accepted by Black

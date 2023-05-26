@@ -114,7 +114,7 @@ example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 
     source_code="async def f(x): [[x async for x in ...] for y in ()]\n",
     **example_kwargs,
 )
-@settings(suppress_health_check=HealthCheck.all(), deadline=None)
+@settings(suppress_health_check=list(HealthCheck), deadline=None)
 def test_shed_is_idempotent(source_code, refactor, provides, min_version):
     check(source_code, refactor=refactor, min_version=min_version, provides=provides)
 

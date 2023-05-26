@@ -1,0 +1,12 @@
+@(lambda f: f)  # or other expressions, e.g. `@buttons[0].clicked.connect`
+def valid_on_py39():
+    # split by libcst
+    assert a and b
+
+================================================================================
+
+@(lambda f: f)  # or other expressions, e.g. `@buttons[0].clicked.connect`
+def valid_on_py39():
+    # split by libcst
+    assert a
+    assert b
