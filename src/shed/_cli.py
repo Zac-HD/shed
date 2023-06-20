@@ -66,7 +66,10 @@ def _rewrite_on_disk(
             on_disk = wrapper.read()
     except (OSError, UnicodeError) as err:
         # Permissions or encoding issue, or file deleted since last commit.
-        return f"skipping {fname!r} due to {err}"
+        err_msg = f"skipping {fname!r} due to {err}"
+        if "*" in fname:
+            err_msg += ", maybe due to unexpanded glob pattern?"
+        return err_msg
     if fname.endswith((".md", ".rst")):
         writer: Callable[..., str] = docshed
     elif fname.endswith(".pyi"):
