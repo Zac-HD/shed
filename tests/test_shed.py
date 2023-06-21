@@ -178,7 +178,6 @@ def test_rewrite_returns_error_message_for_nonexistent_file(fname, err_msg):
     with tempfile.TemporaryDirectory() as dirname:
         f = Path(dirname) / fname
         result = _rewrite_on_disk(str(f), **kwargs)
-        # assert isinstance(result, str)
         assert err_msg in result
         f.write_text("# comment\n")
         assert _rewrite_on_disk(str(f), **kwargs) is False
