@@ -166,12 +166,19 @@ def test_rewrite_on_disk(fname, contents, changed):
     assert changed == (contents != result)
 
 
-def test_rewrite_returns_error_message_for_nonexistent_file():
+@pytest.mark.parametrize(
+    "fname, err_msg",
+    [
+        ("nonexistent", "No such file or directory"),
+        ("*.nonexistent", "maybe due to unexpanded glob pattern?"),
+    ],
+)
+def test_rewrite_returns_error_message_for_nonexistent_file(fname, err_msg):
     kwargs = {"refactor": True, "first_party_imports": frozenset()}
     with tempfile.TemporaryDirectory() as dirname:
-        f = Path(dirname) / "nonexistent"
+        f = Path(dirname) / fname
         result = _rewrite_on_disk(str(f), **kwargs)
-        assert isinstance(result, str)
+        assert err_msg in result
         f.write_text("# comment\n")
         assert _rewrite_on_disk(str(f), **kwargs) is False
 
