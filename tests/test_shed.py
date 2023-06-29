@@ -103,7 +103,7 @@ example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 
     source_code="from.import(A)#",
     refactor=False,
     provides=frozenset(),
-    min_version=(3, 7),
+    min_version=_default_min_version,
 )
 # Minimum-version examples via https://github.com/jwilk/python-syntax-errors/
 @example(source_code="lambda: (x := 0)\n", **example_kwargs)

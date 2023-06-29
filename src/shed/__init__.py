@@ -21,7 +21,7 @@ from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 from isort.exceptions import FileSkipComment
 
-__version__ = "2023.5.2"
+__version__ = "2023.6.1"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
@@ -31,7 +31,7 @@ _run_codemods: Any = None
 _version_map = {
     k: (int(k.name[2]), int(k.name[3:]))
     for k in TargetVersion
-    if k.value >= TargetVersion.PY37.value
+    if k.value >= TargetVersion.PY38.value
 }
 _default_min_version = min(_version_map.values())
 _SUGGESTIONS = (
@@ -45,11 +45,7 @@ class ShedSyntaxWarning(SyntaxWarning):
     """Warns that shed has been called on something with invalid syntax."""
 
 
-def _fallback(source: str, **kw: object) -> Tuple[str, object]:
-    return source, None  # pragma: no cover
-
-
-@functools.lru_cache()
+@functools.lru_cache
 def shed(
     source_code: str,
     *,
@@ -114,18 +110,13 @@ def shed(
         global com2ann
         global _run_codemods
         if com2ann is None:
-            from ._codemods import _run_codemods  # type: ignore
+            from com2ann import com2ann
 
-            try:
-                from com2ann import com2ann
-            except ImportError:  # pragma: no cover  # on Python 3.8
-                assert sys.version_info < (3, 8)
-                com2ann = _fallback
-            # OK, everything's imported, back to the runtime logic!
+            from ._codemods import _run_codemods  # type: ignore
 
         # Some tools assume that the file is multi-line, but empty files are valid input.
         source_code += "\n"
-        # Use com2ann to comvert type comments to annotations on Python 3.8+
+        # Use com2ann to comvert type comments to annotations
         annotated = com2ann(
             source_code,
             drop_ellipsis=True,
@@ -191,7 +182,7 @@ def shed(
     return source_code.rstrip() + "\n"
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def docshed(
     source: str,
     *,

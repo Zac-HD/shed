@@ -63,10 +63,10 @@ adding the following to your `.pre-commit-config.yaml`:
 minimum_pre_commit_version: '2.9.0'
 repos:
 - repo: https://github.com/Zac-HD/shed
-  rev: 2023.5.2
+  rev: 2023.6.1
   hooks:
     - id: shed
-      # args: [--refactor, --py39-plus]
+      # args: [--refactor, --py311-plus]
       types_or: [python, pyi, markdown, rst]
 ```
 
