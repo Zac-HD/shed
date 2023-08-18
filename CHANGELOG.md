@@ -1,6 +1,11 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+#### 2023.6.1 - 2023-06-29
+- [Python 3.7 has reached end-of-life](https://devguide.python.org/versions/),
+  so `shed` targets and runs on Python 3.8 or later.
+- Clarify error when missing target file looks like an unexpanded glob pattern.
+
 #### 2023.5.2 - 2023-05-26
 - Require latest versions of `black` and `libcst` for bugfixes and perf improvements
 

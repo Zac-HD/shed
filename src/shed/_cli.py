@@ -22,7 +22,7 @@ from isort.api import place_module
 from . import ShedSyntaxWarning, _version_map, docshed, shed
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def _get_git_repo_root(cwd: Optional[str] = None) -> str:
     return subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
@@ -34,7 +34,7 @@ def _get_git_repo_root(cwd: Optional[str] = None) -> str:
     ).stdout.strip()
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
     """Guess the name of the current package for first-party imports."""
     try:

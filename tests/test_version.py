@@ -26,7 +26,7 @@ class Version(NamedTuple):
         return ".".join(map(str, self))
 
 
-@lru_cache()
+@lru_cache
 def get_releases():
     pattern = re.compile(r"^#### (\d+\.\d+\.\d+) - (\d\d\d\d-\d\d-\d\d)$")
     return tuple(
