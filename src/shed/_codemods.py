@@ -5,7 +5,6 @@ These are mostly based on flake8, flake8-comprehensions, and some personal
 nitpicks about typing unions and literals.
 """
 
-import os
 import re
 from ast import literal_eval
 from functools import wraps
@@ -59,11 +58,7 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
     """Run all Shed fixers on a code string."""
     context = cst.codemod.CodemodContext()
 
-    # Only the native parser supports Python 3.9 and later, but for now it's
-    # only active if you set an environment variable.  Very well then:
-    var = os.environ.get("LIBCST_PARSER_TYPE")
     try:
-        os.environ["LIBCST_PARSER_TYPE"] = "native"
         mod = cst.parse_module(code)
     except cst.ParserSyntaxError:
         try:
@@ -76,10 +71,6 @@ def _run_codemods(code: str, min_version: Tuple[int, int]) -> str:
         else:  # pragma: no cover  # This is only in case of libcst bugs
             # If the `compile()` builtin is happy, we want to crash after all.
             raise
-    finally:
-        os.environ.pop("LIBCST_PARSER_TYPE")
-        if var is not None:  # pragma: no cover  # version-dependent bug
-            os.environ["LIBCST_PARSER_TYPE"] = var
 
     if imports_hypothesis(code):  # pragma: no cover
         mod = attempt_hypothesis_codemods(context, mod)
@@ -706,7 +697,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         final_body: cst.BaseSuite = candidate_with.body
 
         def has_leading_comment(node: Union[cst.SimpleStatementLine, cst.With]) -> bool:
-            return any([line.comment is not None for line in node.leading_lines])
+            return any(line.comment is not None for line in node.leading_lines)
 
         header = m.AllOf(
             m.TrailingWhitespace(),
