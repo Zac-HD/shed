@@ -2,6 +2,7 @@
 
 import pathlib
 import re
+import sys
 import warnings
 
 import pytest
@@ -40,6 +41,8 @@ def test_saved_examples(filename: pathlib.Path, min_version):
         compile(input_, filename, "exec")  # check for SyntaxError
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", shed.ShedSyntaxWarning)
+        if sys.version_info[:2] >= (3, 12):
+            warnings.simplefilter("ignore", DeprecationWarning)
         result = check(
             source_code=input_, refactor=True, min_version=min_version, except_=...
         )

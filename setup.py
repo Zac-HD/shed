@@ -19,19 +19,18 @@ setuptools.setup(
     project_urls={
         "Source": "https://github.com/Zac-HD/shed/",
         "Changelog": "https://github.com/Zac-HD/shed/blob/master/CHANGELOG.md",
-        "Funding": "https://github.com/sponsors/Zac-HD",
     },
     license="AGPL-3.0",
     description="`shed` canonicalises Python code.",
     install_requires=[
         "autoflake >= 1.4",
-        "black >= 23.3.0",
+        "black >= 23.9.1",
         "com2ann >= 0.3.0",
         "isort >= 5.10.1",
-        "libcst >= 0.4.10",
-        "pyupgrade >= 3.0.0",
+        "libcst >= 1.1.0",
+        "pyupgrade >= 3.15.0",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU Affero General Public License v3",

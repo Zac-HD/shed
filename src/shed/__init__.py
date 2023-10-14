@@ -131,7 +131,7 @@ def shed(
     # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
     # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore run it
     # before other fixers, and then (if they made changes) again afterwards.
-    black_mode = black.Mode(target_versions=target_versions, is_pyi=is_pyi)  # type: ignore
+    black_mode = black.Mode(target_versions=target_versions, is_pyi=is_pyi)
     source_code = blackened = black.format_str(source_code, mode=black_mode)
 
     pyupgrade_min = min(min_version, max(pyupgrade._plugins.imports.REPLACE_EXACT))

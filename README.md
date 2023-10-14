@@ -21,11 +21,11 @@ or explicitly passed a list of files to format on the command-line.
 - Runs [`autoflake`](https://pypi.org/project/autoflake/),
   to remove unused imports and variables
 - Runs [`pyupgrade`](https://pypi.org/project/pyupgrade/),
-  with autodetected minimum version >= py37
+  with autodetected minimum version >= py38
 - Runs [`isort`](https://pypi.org/project/isort/),
   with autodetected first-party imports and `--ca --profile=black` args
 - Runs [`black`](https://pypi.org/project/black/),
-  with autodetected minimum version >= py37
+  with autodetected minimum version >= py38
 - Formats code blocks in docstrings, markdown, and restructured text docs
   (based on [`blacken-docs`](https://pypi.org/project/blacken-docs/)).
 - If `shed --refactor`, also runs [`com2ann`](https://pypi.org/project/com2ann/)
@@ -33,7 +33,7 @@ or explicitly passed a list of files to format on the command-line.
 
 The version detection logic is provided by `black`.  Because `shed` supports the same
 [versions of Python as upstream](https://devguide.python.org/#status-of-python-branches),
-it assumes that the minimum version is Python 3.7.
+it assumes that the minimum version is Python 3.8.
 
 If you run `shed` in a Git repository, the name of the root directory is assumed to be a
 first-party import.  [`src` layout](https://hynek.me/articles/testing-packaging/)

@@ -6,39 +6,39 @@
 #
 attrs==23.1.0
     # via hypothesis
-autoflake==2.1.1
+autoflake==2.2.1
     # via shed (setup.py)
-black==23.3.0
+black==23.9.1
     # via shed (setup.py)
-click==8.1.3
+click==8.1.7
     # via black
-com2ann==0.3.0 ; python_version >= "3.8"
+com2ann==0.3.0
     # via shed (setup.py)
-coverage[toml]==7.2.6
+coverage[toml]==7.3.2
     # via pytest-cov
-exceptiongroup==1.1.1
+exceptiongroup==1.1.3
     # via
     #   hypothesis
     #   pytest
-execnet==1.9.0
+execnet==2.0.2
     # via pytest-xdist
-flake8==6.0.0
+flake8==6.1.0
     # via flake8-comprehensions
-flake8-comprehensions==3.12.0
+flake8-comprehensions==3.14.0
     # via -r deps/test.in
-hypothesis[lark]==6.75.4
+hypothesis[lark]==6.87.4
     # via
     #   -r deps/test.in
     #   hypothesmith
-hypothesmith==0.2.3
+hypothesmith==0.3.0
     # via -r deps/test.in
 iniconfig==2.0.0
     # via pytest
 isort==5.12.0
     # via shed (setup.py)
-lark==1.1.5
+lark==1.1.7
     # via hypothesis
-libcst==1.0.0
+libcst==1.1.0
     # via
     #   hypothesmith
     #   shed (setup.py)
@@ -48,23 +48,23 @@ mypy-extensions==1.0.0
     # via
     #   black
     #   typing-inspect
-packaging==23.1
+packaging==23.2
     # via
     #   black
     #   pytest
-pathspec==0.11.1
+pathspec==0.11.2
     # via black
-platformdirs==3.5.1
+platformdirs==3.11.0
     # via black
-pluggy==1.0.0
+pluggy==1.3.0
     # via pytest
-pycodestyle==2.10.0
+pycodestyle==2.11.1
     # via flake8
-pyflakes==3.0.1
+pyflakes==3.1.0
     # via
     #   autoflake
     #   flake8
-pytest==7.3.1
+pytest==7.4.2
     # via
     #   -r deps/test.in
     #   pytest-cov
@@ -73,13 +73,13 @@ pytest-cov==4.1.0
     # via -r deps/test.in
 pytest-xdist==3.3.1
     # via -r deps/test.in
-pyupgrade==3.4.0
+pyupgrade==3.15.0
     # via shed (setup.py)
-pyyaml==6.0
+pyyaml==6.0.1
     # via libcst
 sortedcontainers==2.4.0
     # via hypothesis
-tokenize-rt==5.0.0
+tokenize-rt==5.2.0
     # via pyupgrade
 tomli==2.0.1
     # via
@@ -87,8 +87,9 @@ tomli==2.0.1
     #   black
     #   coverage
     #   pytest
-typing-extensions==4.6.2
+typing-extensions==4.8.0
     # via
+    #   black
     #   libcst
     #   typing-inspect
 typing-inspect==0.9.0
