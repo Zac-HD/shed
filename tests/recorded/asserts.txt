@@ -17,7 +17,7 @@ raise NotImplemented
 
 # regression test for https://github.com/Zac-HD/shed/issues/84
 assert (
-    "some very long                       string"
+    ~"some very long                       string"
     and "another long                     string"
     == "third long                        string"
 )
@@ -37,8 +37,8 @@ raise AssertionError("message")
 raise NotImplementedError
 
 # regression test for https://github.com/Zac-HD/shed/issues/84
+assert ~"some very long                       string"
 assert (
-    "some very long                       string"
-    and "another long                     string"
+    "another long                     string"
     == "third long                        string"
 )

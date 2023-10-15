@@ -37,7 +37,7 @@ set(iterable)
 sorted(iterable)
 sorted(iterable)
 sorted(iterable)
-sorted(reversed(iterable))
+sorted(iterable)
 
 sorted(iterable)
 sorted(iterable)

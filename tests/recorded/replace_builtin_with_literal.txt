@@ -10,6 +10,6 @@ dict(ENV_VAR=0)
 {}
 []
 ()
-dict(ENV_VAR="")
-dict(ENV_VAR="foo")
-dict(ENV_VAR=0)
+{"ENV_VAR": ""}
+{"ENV_VAR": "foo"}
+{"ENV_VAR": 0}

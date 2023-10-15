@@ -68,7 +68,6 @@ Summary line.
 ```python
 import a
 import b
-import c
 
 
 def x(foo: int = "bar"):

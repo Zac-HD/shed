@@ -145,10 +145,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         super().__init__(context)
         self.min_version = min_version
 
-    @m.call_if_inside(m.Raise(exc=m.Name(value="NotImplemented")))
-    def leave_Name(self, _, updated_node):  # noqa
-        return updated_node.with_changes(value="NotImplementedError")
-
     def leave_Assert(self, _, updated_node):  # noqa
         test_code = cst.Module("").code_for_node(updated_node.test)
         try:
@@ -161,27 +157,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return cst.Raise(cst.Name("AssertionError"))
         return cst.Raise(
             cst.Call(cst.Name("AssertionError"), args=[cst.Arg(updated_node.msg)])
-        )
-
-    @leave(m.ComparisonTarget(comparator=m.Name("None"), operator=m.Equal()))
-    def convert_none_cmp(self, _, updated_node):
-        """Inspired by Pybetter."""
-        return updated_node.with_changes(operator=cst.Is())
-
-    @leave(
-        m.UnaryOperation(
-            operator=m.Not(),
-            expression=m.Comparison(comparisons=[m.ComparisonTarget(operator=m.In())]),
-        )
-    )
-    def replace_not_in_condition(self, _, updated_node):
-        """Also inspired by Pybetter."""
-        expr = cst.ensure_type(updated_node.expression, cst.Comparison)
-        return cst.Comparison(
-            left=expr.left,
-            lpar=updated_node.lpar,
-            rpar=updated_node.rpar,
-            comparisons=[expr.comparisons[0].with_changes(operator=cst.NotIn())],
         )
 
     @leave(
@@ -202,16 +177,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
             return noparens
         except SyntaxError:
             return updated_node
-
-    @leave(m.Call(func=oneof_names("dict", "list", "tuple"), args=[]))
-    def replace_builtin_with_literal(self, _, updated_node):
-        if updated_node.func.value == "dict":
-            return cst.Dict([])
-        elif updated_node.func.value == "list":
-            return cst.List([])
-        else:
-            assert updated_node.func.value == "tuple"
-            return cst.Tuple([])
 
     @leave(
         m.Call(
@@ -240,19 +205,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
         else:
             assert updated_node.func.value == "tuple"
             return cst.Tuple([])
-
-    # The following methods fix https://pypi.org/project/flake8-comprehensions/
-
-    @leave(m.Call(func=m.Name("list"), args=[m.Arg(m.GeneratorExp())]))
-    def replace_generator_in_call_with_comprehension(self, _, updated_node):
-        """Fix flake8-comprehensions C400-402 and 403-404.
-
-        C400-402: Unnecessary generator - rewrite as a <list/set/dict> comprehension.
-        Note that set and dict conversions are handled by pyupgrade!
-        """
-        return cst.ListComp(
-            elt=updated_node.args[0].value.elt, for_in=updated_node.args[0].value.for_in
-        )
 
     @leave(
         m.Call(func=m.Name("list"), args=[m.Arg(m.ListComp(), star="")])

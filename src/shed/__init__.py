@@ -7,6 +7,7 @@ pass the names of specific files to format instead.
 import functools
 import os
 import re
+import subprocess
 import sys
 import textwrap
 import warnings
@@ -38,6 +39,51 @@ _SUGGESTIONS = (
     # If we fail on invalid syntax, check for detectable wrong-codeblock types
     (r"^(>>> | ?In \[\d+\]: )", "pycon"),
     (r"^Traceback \(most recent call last\):$", "python-traceback"),
+)
+_RUFF_RULES = (
+    # "I001"  # isort not yet configurable from ruff CLI
+    "F401"  # unused import
+    ",F901"  # raise NotImplemented -> NotImplementedError
+    ",E711"  # == None
+    ",E713"  # not x in y
+    ",E714"  # not x is y
+    ",E731"  # don't assign lambdas
+    ",B007"  # unused loop variable
+    ",B009"  # constant getattr
+    ",B010"  # constant setattr
+    ",B011"  # assert False -> raise
+    ",B013"  # catching 1-tuple
+    ",C400"  # flake8-comprehensions rules
+    ",C401"
+    ",C402"
+    ",C403"
+    ",C404"
+    ",C405"
+    ",C406"
+    ",C408"
+    ",C409"
+    ",C410"
+    ",C411"
+    ",C414"
+    ",C415"
+    ",C416"
+    ",C417"
+    ",C418"
+    ",C419"
+    ",PIE790"  # pointless `pass`
+    ",PIE807"  # reimplementing list
+    ",PIE810"  # repeated startswith/endswith
+    ",PT018"  # break up composite assertions
+    ",RSE102"  # Unnecessary parentheses on raised exception
+    ",RET502"  # `return None` if could return non-None
+    ",RET504"  # Unnecessary assignment before return statement
+    ",SIM110"  # Use any or all
+    ",TCH005"  # remove `if TYPE_CHECKING: pass`
+    ",PLR1711"  # remove useless trailing return
+    ",TRY201"  # `raise` without name
+    ",FLY002"  # static ''.join to f-string
+    ",NPY001"  # deprecated np type aliases
+    ",RUF010"  # f-string conversions
 )
 
 
@@ -174,6 +220,25 @@ def shed(
     # so we may need to re-sort its output.
     if source_code != pre_autoflake:
         source_code = run_isort()
+
+    # Run `ruff`, passing code to stdin and getting fixed results on stdout.
+    # See https://github.com/astral-sh/ruff/issues/659#issuecomment-1474446926
+    source_code = subprocess.run(
+        [
+            "ruff",
+            f"--target-version=py3{min_version[1]}",
+            "--ignore=ALL",
+            f"--select={_RUFF_RULES}",
+            "--isolated",
+            "--exit-zero",
+            "--fix-only",
+            "-",
+        ],
+        input=source_code,
+        encoding="utf-8",
+        check=True,
+        capture_output=True,
+    ).stdout
 
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)
