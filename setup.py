@@ -29,6 +29,7 @@ setuptools.setup(
         "isort >= 5.10.1",
         "libcst >= 1.1.0",
         "pyupgrade >= 3.15.0",
+        "ruff >= 0.1.2",  # egregious case of 0ver.org
     ],
     python_requires=">=3.8",
     classifiers=[

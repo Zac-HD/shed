@@ -7,19 +7,18 @@ pass the names of specific files to format instead.
 import functools
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import textwrap
 import warnings
+from contextlib import contextmanager
 from operator import attrgetter
-from typing import Any, FrozenSet, Match, Tuple
+from typing import Any, FrozenSet, Generator, Match, Tuple
 
-import autoflake
 import black
-import isort
-import pyupgrade._main
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
-from isort.exceptions import FileSkipComment
 
 __version__ = "2023.6.1"
 __all__ = ["shed", "docshed"]
@@ -39,6 +38,28 @@ _SUGGESTIONS = (
     (r"^(>>> | ?In \[\d+\]: )", "pycon"),
     (r"^Traceback \(most recent call last\):$", "python-traceback"),
 )
+
+_RUFF_TOML = """[lint]
+select = ["F", "UP", "I", "C400", "C405"]
+target_version = "{target_version}"
+
+[isort]
+force-single-line = false
+force-wrap-aliases = false
+lines-after-imports = false
+lines-between-types = false
+split-on-trailing-comma = false
+"""
+
+
+@contextmanager
+def _ruff_toml(target_version: str) -> Generator[str, None, None]:
+    """Context manager to temporarily write a ruff.toml file."""
+    # TODO: Use real ruff config file if present?
+
+    with tempfile.NamedTemporaryFile("w", suffix="_ruff.toml") as f:
+        f.write(_RUFF_TOML.format(target_version=target_version))
+        yield f.name
 
 
 class ShedSyntaxWarning(SyntaxWarning):
@@ -67,6 +88,7 @@ def shed(
     if source_code == "":
         return ""
 
+    # TODO: Find alternative for black to get target versions
     # Use black to autodetect our target versions
     target_versions = {k for k, v in _version_map.items() if v >= min_version}
     try:
@@ -128,55 +150,41 @@ def shed(
             # which is possible but rare after the parsing checks above.
             source_code, _ = annotated
 
-    # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
-    # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore run it
-    # before other fixers, and then (if they made changes) again afterwards.
-    black_mode = black.Mode(target_versions=target_versions, is_pyi=is_pyi)
-    source_code = blackened = black.format_str(source_code, mode=black_mode)
+    with _ruff_toml(f"py3{min_version[1]}") as ruff_toml:
+        # run ruff format
+        source_code = subprocess.run(
+            [
+                "ruff",
+                "format",
+                "--config",
+                ruff_toml,
+                "-",
+            ],
+            input=source_code,
+            encoding="utf-8",
+            check=True,
+            capture_output=True,
+        ).stdout
 
-    pyupgrade_min = min(min_version, max(pyupgrade._plugins.imports.REPLACE_EXACT))
-    pu_settings = pyupgrade._main.Settings(min_version=pyupgrade_min)
-    source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
-    if source_code != blackened:
-        # Second step to converge: without this we have f-string problems.
-        # Upstream issue: https://github.com/asottile/pyupgrade/issues/703
-        source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
-    source_code = pyupgrade._main._fix_tokens(source_code)
+        # Run ruff fixes
+        source_code = subprocess.run(
+            [
+                "ruff",
+                "check",
+                "--fix-only",
+                "--unsafe-fixes",
+                "--config",
+                ruff_toml,
+                "-",
+            ],
+            input=source_code,
+            encoding="utf-8",
+            check=True,
+            capture_output=True,
+        ).stdout
 
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
-
-    def run_isort() -> str:
-        try:
-            return isort.code(
-                source_code,
-                known_first_party=first_party_imports,
-                known_local_folder={"tests"},
-                profile="black",
-                combine_as_imports=True,
-            )
-        except FileSkipComment:
-            return source_code
-
-    # Autoflake cannot always correctly resolve imports it can remove until
-    # they have been properly formatted, so we have to run isort first so that
-    # it gets well formatted imports.
-    pre_autoflake = source_code = run_isort()
-
-    source_code = autoflake.fix_code(
-        source_code,
-        expand_star_imports=True,
-        remove_all_unused_imports=_remove_unused_imports,
-    )
-
-    # Until https://github.com/PyCQA/autoflake/issues/229 is fixed, autoflake
-    # may reorder imports in a way that is incompatible with isort's ordering,
-    # so we may need to re-sort its output.
-    if source_code != pre_autoflake:
-        source_code = run_isort()
-
-    if source_code != blackened:
-        source_code = black.format_str(source_code, mode=black_mode)
 
     # Remove any extra trailing whitespace
     return source_code.rstrip() + "\n"
