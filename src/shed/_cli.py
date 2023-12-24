@@ -17,7 +17,8 @@ from pathlib import Path
 from typing import Callable, FrozenSet, Optional, Union
 
 import autoflake
-from isort.api import Config, place_module
+from isort.api import place_module
+from isort.settings import Config
 
 from . import ShedSyntaxWarning, _version_map, docshed, shed
 
