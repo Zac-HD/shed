@@ -8,7 +8,7 @@ attrs==23.1.0
     # via hypothesis
 autoflake==2.2.1
     # via shed (setup.py)
-black==23.9.1
+black==24.1.0
     # via shed (setup.py)
 click==8.1.7
     # via black
