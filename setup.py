@@ -24,7 +24,7 @@ setuptools.setup(
     description="`shed` canonicalises Python code.",
     install_requires=[
         "autoflake >= 1.4",
-        "black >= 23.9.1",
+        "black >= 24.1.0",
         "com2ann >= 0.3.0",
         "isort >= 5.10.1",
         "libcst >= 1.1.0",
