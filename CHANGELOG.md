@@ -1,6 +1,9 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+#### 2024.1.1 - 2024-01-26
+- Require `black >= 24.1.0`, with their [updated code style](https://black.readthedocs.io/en/stable/change_log.html)
+
 #### 2023.6.1 - 2023-06-29
 - [Python 3.7 has reached end-of-life](https://devguide.python.org/versions/),
   so `shed` targets and runs on Python 3.8 or later.

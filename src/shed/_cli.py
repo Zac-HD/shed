@@ -85,7 +85,7 @@ def _rewrite_on_disk(
         if "SHED_RAISE" in os.environ:
             raise
         return (
-            f"Internal error formatting {fname!r}: {type(err).__name__}: {err}\n"
+            f"Skipping {fname!r} due to an internal error: {type(err).__name__}: {err}\n"
             "    Please report this to https://github.com/Zac-HD/shed/issues"
         )
     else:

@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=deps/test.txt deps/test.in setup.py
 #
-attrs==23.1.0
+attrs==23.2.0
     # via hypothesis
 autoflake==2.2.1
     # via shed (setup.py)
@@ -14,29 +14,31 @@ click==8.1.7
     # via black
 com2ann==0.3.0
     # via shed (setup.py)
-coverage[toml]==7.3.2
-    # via pytest-cov
-exceptiongroup==1.1.3
+coverage[toml]==7.4.1
+    # via
+    #   coverage
+    #   pytest-cov
+exceptiongroup==1.2.0
     # via
     #   hypothesis
     #   pytest
 execnet==2.0.2
     # via pytest-xdist
-flake8==6.1.0
+flake8==7.0.0
     # via flake8-comprehensions
 flake8-comprehensions==3.14.0
     # via -r deps/test.in
-hypothesis[lark]==6.87.4
+hypothesis[lark]==6.97.0
     # via
     #   -r deps/test.in
     #   hypothesmith
-hypothesmith==0.3.0
+hypothesmith==0.3.2
     # via -r deps/test.in
 iniconfig==2.0.0
     # via pytest
-isort==5.12.0
+isort==5.13.2
     # via shed (setup.py)
-lark==1.1.7
+lark==1.1.9
     # via hypothesis
 libcst==1.1.0
     # via
@@ -52,26 +54,26 @@ packaging==23.2
     # via
     #   black
     #   pytest
-pathspec==0.11.2
+pathspec==0.12.1
     # via black
-platformdirs==3.11.0
+platformdirs==4.1.0
     # via black
-pluggy==1.3.0
+pluggy==1.4.0
     # via pytest
 pycodestyle==2.11.1
     # via flake8
-pyflakes==3.1.0
+pyflakes==3.2.0
     # via
     #   autoflake
     #   flake8
-pytest==7.4.2
+pytest==7.4.4
     # via
     #   -r deps/test.in
     #   pytest-cov
     #   pytest-xdist
 pytest-cov==4.1.0
     # via -r deps/test.in
-pytest-xdist==3.3.1
+pytest-xdist==3.5.0
     # via -r deps/test.in
 pyupgrade==3.15.0
     # via shed (setup.py)
@@ -87,7 +89,7 @@ tomli==2.0.1
     #   black
     #   coverage
     #   pytest
-typing-extensions==4.8.0
+typing-extensions==4.9.0
     # via
     #   black
     #   libcst
