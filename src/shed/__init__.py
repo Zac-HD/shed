@@ -7,19 +7,17 @@ pass the names of specific files to format instead.
 import functools
 import os
 import re
+import subprocess
 import sys
 import textwrap
 import warnings
 from operator import attrgetter
 from typing import Any, FrozenSet, Match, Tuple
 
-import autoflake
 import black
-import isort
 import pyupgrade._main
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
-from isort.exceptions import FileSkipComment
 
 __version__ = "2024.1.1"
 __all__ = ["shed", "docshed"]
@@ -59,6 +57,8 @@ def shed(
     """Process the source code of a single module."""
     assert isinstance(source_code, str)
     assert isinstance(refactor, bool)
+    # TODO: I guess this required frozenset because of isort compatibility
+    # but we can probably relax that to an iterable[str]
     assert isinstance(first_party_imports, frozenset)
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)
@@ -68,6 +68,7 @@ def shed(
         return ""
 
     # Use black to autodetect our target versions
+    # TODO: we don't want to rely on black
     target_versions = {k for k, v in _version_map.items() if v >= min_version}
     try:
         parsed = lib2to3_parse(source_code.lstrip(), target_versions)
@@ -146,34 +147,31 @@ def shed(
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
-    def run_isort() -> str:
-        try:
-            return isort.code(
-                source_code,
-                known_first_party=first_party_imports,
-                known_local_folder={"tests"},
-                profile="black",
-                combine_as_imports=True,
-            )
-        except FileSkipComment:
-            return source_code
+    def run_ruff() -> str:
+        # sort imports
+        select = "I,PIE790"
+        if _remove_unused_imports:
+            select += ",F401"
+        sub = subprocess.run(
+            [
+                "ruff",
+                "check",
+                f"--select={select}",
+                "--fix-only",
+                f"--target-version=py3{min_version[1]}",
+                "--isolated",
+                "--config=lint.isort.combine-as-imports=true",
+                f"--config=lint.isort.known-first-party={list(first_party_imports)}",
+                "-",  # pass code on stdin
+            ],
+            input=source_code,
+            encoding="utf-8",
+            check=True,
+            capture_output=True,
+        )
+        return sub.stdout
 
-    # Autoflake cannot always correctly resolve imports it can remove until
-    # they have been properly formatted, so we have to run isort first so that
-    # it gets well formatted imports.
-    pre_autoflake = source_code = run_isort()
-
-    source_code = autoflake.fix_code(
-        source_code,
-        expand_star_imports=True,
-        remove_all_unused_imports=_remove_unused_imports,
-    )
-
-    # Until https://github.com/PyCQA/autoflake/issues/229 is fixed, autoflake
-    # may reorder imports in a way that is incompatible with isort's ordering,
-    # so we may need to re-sort its output.
-    if source_code != pre_autoflake:
-        source_code = run_isort()
+    source_code = run_ruff()
 
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)

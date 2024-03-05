@@ -240,3 +240,24 @@ def test_on_site_code(py_file):
                 min_version=min_version,
                 except_=lambda: pytest.xfail(reason="Black can't handle that"),
             )
+
+
+def test_first_party_imports() -> None:
+    no_first_party = """import mymod
+import othermod
+
+print(mymod, othermod)
+"""
+    first_party_mymod = """import othermod
+
+import mymod
+
+print(mymod, othermod)
+"""
+
+    assert shed(no_first_party) == no_first_party
+
+    assert (
+        shed(no_first_party, first_party_imports=frozenset(("mymod",)))
+        == first_party_mymod
+    )

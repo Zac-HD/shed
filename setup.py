@@ -26,9 +26,9 @@ setuptools.setup(
         "autoflake >= 1.4",
         "black >= 24.1.0",
         "com2ann >= 0.3.0",
-        "isort >= 5.10.1",
         "libcst >= 1.1.0",
         "pyupgrade >= 3.15.0",
+        "ruff",
     ],
     python_requires=">=3.8",
     classifiers=[

@@ -37,6 +37,7 @@ def _get_git_repo_root(cwd: Optional[str] = None) -> str:
 @functools.lru_cache
 def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
     """Guess the name of the current package for first-party imports."""
+    # Note: this fails inside git worktrees
     try:
         base = _get_git_repo_root(cwd)
     except (subprocess.SubprocessError, FileNotFoundError):
@@ -51,6 +52,7 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
 
 @functools.lru_cache(maxsize=None)
 def _should_format(fname: str) -> bool:
+    # TODO: usage of autoflake
     return fname.endswith((".md", ".rst", ".pyi")) or autoflake.is_python_file(fname)
 
 
