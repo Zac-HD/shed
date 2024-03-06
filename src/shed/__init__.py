@@ -149,9 +149,11 @@ def shed(
 
     _RUFF_RULES = (
             "I",
-            "PIE790",
-            "F841",
-            "F901",
+            # F401 # unused-import # added dynamically
+            "F841",  # unused-variable # was enabled in autoflake
+
+            # many of these are direct replacements of codemods
+            "F901", # raise NotImplemented -> raise NotImplementedError
             "E711", # == None -> is None
             "E713", # not x in y-> x not in y
             "E714", # not x is y -> x is not y
@@ -173,6 +175,28 @@ def shed(
             "C417", # unnecessary-map
             "C418", # unnecessary-literal-within-dict-call
             "C419", # unnecessary-comprehension-any-all
+            "PIE790",  # pointless pass/...
+
+            # These are new fixes that Zac had enabled in his branch
+            #"E731", # don't assign lambdas
+            #"B007",  # unused loop variable
+            #"B009",  # constant getattr
+            #"B010",  # constant setattr
+            #"B011",  # assert False -> raise
+            #"B013",  # catching 1-tuple
+            #"PIE807"  # reimplementing list
+            #"PIE810",  # repeated startswith/endswith
+            #"PT018",  # break up composite assertions
+            #"RSE102",  # Unnecessary parentheses on raised exception
+            #"RET502",  # `return None` if could return non-None
+            #"RET504",  # Unnecessary assignment before return statement
+            #"SIM110",  # Use any or all
+            #"TCH005",  # remove `if TYPE_CHECKING: pass`
+            #"PLR1711",  # remove useless trailing return
+            #"TRY201",  # `raise` without name
+            #"FLY002",  # static ''.join to f-string
+            #"NPY001",  # deprecated np type aliases
+            #"RUF010",  # f-string conversions
             )
     _RUFF_EXTEND_SAFE_FIXES = (
             'F841', # unused variable
@@ -214,7 +238,8 @@ def shed(
                 f"--select={select}",
                 "--fix-only",
                 f"--target-version=py3{min_version[1]}",
-                "--isolated",
+                "--isolated", # ignore configuration files
+                "--exit-zero", # Exit with 0, even upon detecting lint violations.
                 "--config=lint.isort.combine-as-imports=true",
                 f"--config=lint.isort.known-first-party={list(first_party_imports)}",
                 f"--config=lint.extend-safe-fixes={list(_RUFF_EXTEND_SAFE_FIXES)}",
