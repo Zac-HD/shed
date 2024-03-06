@@ -48,7 +48,7 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
         # a fraction of the functionality. So best approach, if we still need
         # the ability to exclude stdlib modules here, is probably to generate a list of
         # known stdlib modules - either dynamically or store in a file.
-        if p.isidentifier() # and place_module(p) != "STDLIB"
+        if p.isidentifier()  # and place_module(p) != "STDLIB"
     )
 
 

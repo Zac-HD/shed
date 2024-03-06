@@ -2,10 +2,10 @@
 
 import ast
 import os
-import tempfile
-from pathlib import Path
 import re
 import subprocess
+import tempfile
+from pathlib import Path
 
 import black
 import blib2to3
@@ -129,10 +129,13 @@ def _check_if_in_shed_worktree() -> bool:
         capture_output=True,
         text=True,
     ).stdout.strip()
-    return bool(re.search(re.escape('/shed/.git/worktrees/'), output
-                         ))
+    return bool(re.search(re.escape("/shed/.git/worktrees/"), output))
 
-@pytest.mark.skipif(_check_if_in_shed_worktree(), reason="_guess_first_party_modules does not work inside git worktree")
+
+@pytest.mark.xfail(
+    _check_if_in_shed_worktree(),
+    reason="_guess_first_party_modules does not work inside git worktree",
+)
 def test_guesses_shed_is_first_party():
     assert _guess_first_party_modules() == frozenset(["shed"])
 
