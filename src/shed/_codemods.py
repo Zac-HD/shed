@@ -145,17 +145,20 @@ class ShedFixers(VisitorBasedCodemodCommand):
         self.min_version = min_version
 
     def leave_Assert(self, _, updated_node):  # noqa
-        # Ruff only has a check for assert always False -> raise AssertionError
-        # But no specific check for assert-always-true
+        # Ruff only has a check for `assert False` -> raise AssertionError
+        # But no check for falsy or truthy literals
         test_code = cst.Module("").code_for_node(updated_node.test)
         try:
             test_literal = literal_eval(test_code)
         except Exception:
-            pass
-        else:
-            if test_literal:
-                return cst.RemovalSentinel.REMOVE
-        return updated_node
+            return updated_node
+        if test_literal:
+            return cst.RemovalSentinel.REMOVE
+        if updated_node.msg is None:
+            return cst.Raise(cst.Name("AssertionError"))
+        return cst.Raise(
+            cst.Call(cst.Name("AssertionError"), args=[cst.Arg(updated_node.msg)])
+        )
 
     @leave(
         m.Call(

@@ -38,6 +38,91 @@ _SUGGESTIONS = (
     (r"^Traceback \(most recent call last\):$", "python-traceback"),
 )
 
+_RUFF_RULES = (
+    "I",
+    # F401 # unused-import # added dynamically
+    "F841",  # unused-variable # was enabled in autoflake
+    # many of these are direct replacements of codemods
+    "F901",  # raise NotImplemented -> raise NotImplementedError
+    "E711",  # == None -> is None
+    "E713",  # not x in y-> x not in y
+    "E714",  # not x is y -> x is not y
+    "C400",  # unnecessary generator -> list comprehension
+    "C401",  # unnecessary generator -> set comprehension
+    "C402",  # unnecessary generator -> dict comprehension
+    "C403",  # unnecessary list comprehension -> set comprehension
+    "C404",  # unnecessary list comprehension -> dict comprehension
+    "C405",  # set(...) -> {...}
+    "C406",  # dict(...) -> {...}
+    "C408",  # empty dict/list/tuple call -> {}/[]/()
+    "C409",  # unnecessary-literal-within-tuple-call
+    "C410",  # unnecessary-literal-within-list-call
+    "C411",  # unnecessary-list-call
+    "C413",  # unnecessary-call-around-sorted
+    # C415 # fix is not available
+    "C416",  # unnecessary-comprehension
+    "C417",  # unnecessary-map
+    "C418",  # unnecessary-literal-within-dict-call
+    "C419",  # unnecessary-comprehension-any-all
+    "PIE790",  # pointless pass/...
+    "SIM101",  # duplicate-isinstance-call # Replacing `collapse_isinstance_checks`
+    # partially replaces assert codemod
+    "B011",  # assert False -> raise
+    # ** Codemods that could be replaced once ruffs implementation improves
+    # "PT018",  # break up composite assertions # codemod: `split_assert_and`
+    # Ruff implementation gives up when reaching end of line regardless of python version.
+    # "SIM117", # multiple-with-statement # codemod: `remove_nested_with`
+    # https://github.com/astral-sh/ruff/issues/10245
+    # ruff replaces `sorted(reversed(iterable))` with `sorted(iterable)`
+    # "C414", # unnecessary-double-cast # codemod: `replace_unnecessary_nested_calls`
+    # ** These are new fixes that Zac had enabled in his branch
+    # "E731", # don't assign lambdas
+    # "B007",  # unused loop variable
+    # "B009",  # constant getattr
+    # "B010",  # constant setattr
+    # "B013",  # catching 1-tuple
+    # "PIE807"  # reimplementing list
+    # "PIE810",  # repeated startswith/endswith
+    # "RSE102",  # Unnecessary parentheses on raised exception
+    # "RET502",  # `return None` if could return non-None
+    # "RET504",  # Unnecessary assignment before return statement
+    # "SIM110",  # Use any or all
+    # "TCH005",  # remove `if TYPE_CHECKING: pass`
+    # "PLR1711",  # remove useless trailing return
+    # "TRY201",  # `raise` without name
+    # "FLY002",  # static ''.join to f-string
+    # "NPY001",  # deprecated np type aliases
+    # "RUF010",  # f-string conversions
+)
+_RUFF_EXTEND_SAFE_FIXES = (
+    "F841",  # unused variable
+    # Several of C4xx rules are marked unsafe:
+    # This rule's fix is marked as unsafe, as it may occasionally drop comments when rewriting the call. In most cases, though, comments will be preserved.
+    "C400",
+    "C401",
+    "C402",
+    "C403",
+    "C404",
+    "C405",
+    "C406",
+    "C408",
+    "C409",
+    "C410",
+    "C411",
+    # 'C414',
+    "C416",
+    "C417",
+    "C418",
+    "C419",
+    # not stated as unsafe by docs, but actually requires --unsafe-fixes
+    "SIM101",
+    "E711",
+    # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
+    "C413",
+    # This rule's fix is marked as unsafe, as changing an assert to a raise will change the behavior of your program when running in optimized mode (python -O).
+    "B011",
+)
+
 
 class ShedSyntaxWarning(SyntaxWarning):
     """Warns that shed has been called on something with invalid syntax."""
@@ -147,99 +232,6 @@ def shed(
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
-    _RUFF_RULES = (
-            "I",
-            # F401 # unused-import # added dynamically
-            "F841",  # unused-variable # was enabled in autoflake
-
-            # many of these are direct replacements of codemods
-            "F901", # raise NotImplemented -> raise NotImplementedError
-            "E711", # == None -> is None
-            "E713", # not x in y-> x not in y
-            "E714", # not x is y -> x is not y
-            "C400", # unnecessary generator -> list comprehension
-            "C401", # unnecessary generator -> set comprehension
-            "C402", # unnecessary generator -> dict comprehension
-            "C403", # unnecessary list comprehension -> set comprehension
-            "C404", # unnecessary list comprehension -> dict comprehension
-            "C405", # set(...) -> {...}
-            "C406", # dict(...) -> {...}
-            "C408", # empty dict/list/tuple call -> {}/[]/()
-            "C409", # unnecessary-literal-within-tuple-call
-            "C410", # unnecessary-literal-within-list-call
-            "C411",  # unnecessary-list-call
-            "C413", # unnecessary-call-around-sorted
-            # C415 # fix is not available
-            "C416", # unnecessary-comprehension
-            "C417", # unnecessary-map
-            "C418", # unnecessary-literal-within-dict-call
-            "C419", # unnecessary-comprehension-any-all
-            "PIE790",  # pointless pass/...
-
-            "SIM101", # duplicate-isinstance-call # Replacing `collapse_isinstance_checks`
-
-            # partially replaces assert codemod
-            "B011",  # assert False -> raise
-
-            # ** Codemods that could be replaced once ruffs implementation improves
-            #"PT018",  # break up composite assertions # codemod: `split_assert_and`
-
-            # Ruff implementation gives up when reaching end of line regardless of python version.
-            # "SIM117", # multiple-with-statement # codemod: `remove_nested_with`
-
-            # https://github.com/astral-sh/ruff/issues/10245
-            # ruff replaces `sorted(reversed(iterable))` with `sorted(iterable)`
-            # "C414", # unnecessary-double-cast # codemod: `replace_unnecessary_nested_calls`
-
-            # ** These are new fixes that Zac had enabled in his branch
-            #"E731", # don't assign lambdas
-            #"B007",  # unused loop variable
-            #"B009",  # constant getattr
-            #"B010",  # constant setattr
-            #"B013",  # catching 1-tuple
-            #"PIE807"  # reimplementing list
-            #"PIE810",  # repeated startswith/endswith
-            #"RSE102",  # Unnecessary parentheses on raised exception
-            #"RET502",  # `return None` if could return non-None
-            #"RET504",  # Unnecessary assignment before return statement
-            #"SIM110",  # Use any or all
-            #"TCH005",  # remove `if TYPE_CHECKING: pass`
-            #"PLR1711",  # remove useless trailing return
-            #"TRY201",  # `raise` without name
-            #"FLY002",  # static ''.join to f-string
-            #"NPY001",  # deprecated np type aliases
-            #"RUF010",  # f-string conversions
-            )
-    _RUFF_EXTEND_SAFE_FIXES = (
-            'F841', # unused variable
-            # Several of C4xx rules are marked unsafe:
-            # This rule's fix is marked as unsafe, as it may occasionally drop comments when rewriting the call. In most cases, though, comments will be preserved.
-            'C400',
-            'C401',
-            'C402',
-            'C403',
-            'C404',
-            'C405',
-            'C406',
-            'C408',
-            'C409',
-            'C410',
-            'C411',
-            # 'C414',
-            "C416",
-            "C417",
-            "C418",
-            "C419",
-            # not stated as unsafe by docs, but actually requires --unsafe-fixes
-            "SIM101",
-            "E711",
-            # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
-            'C413',
-            # This rule's fix is marked as unsafe, as changing an assert to a raise will change the behavior of your program when running in optimized mode (python -O).
-            'B011',
-            )
-
-
     def run_ruff() -> str:
         # I; isort; sort imports
         # PIE790; unnecessary-placeholder; unnecessary pass/... statement
@@ -254,8 +246,8 @@ def shed(
                 f"--select={select}",
                 "--fix-only",
                 f"--target-version=py3{min_version[1]}",
-                "--isolated", # ignore configuration files
-                "--exit-zero", # Exit with 0, even upon detecting lint violations.
+                "--isolated",  # ignore configuration files
+                "--exit-zero",  # Exit with 0, even upon detecting lint violations.
                 "--config=lint.isort.combine-as-imports=true",
                 f"--config=lint.isort.known-first-party={list(first_party_imports)}",
                 f"--config=lint.extend-safe-fixes={list(_RUFF_EXTEND_SAFE_FIXES)}",
