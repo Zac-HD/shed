@@ -176,6 +176,8 @@ def shed(
             "C419", # unnecessary-comprehension-any-all
             "PIE790",  # pointless pass/...
 
+            "SIM101", # duplicate-isinstance-call # Replacing `collapse_isinstance_checks`
+
             # partially replaces assert codemod
             "B011",  # assert False -> raise
 
@@ -228,7 +230,8 @@ def shed(
             "C417",
             "C418",
             "C419",
-            # stated as safe by docs, but actually requires --unsafe-fixes
+            # not stated as unsafe by docs, but actually requires --unsafe-fixes
+            "SIM101",
             "E711",
             # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
             'C413',
