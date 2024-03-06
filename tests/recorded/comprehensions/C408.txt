@@ -2,7 +2,7 @@
 # It’s slower to call e.g. dict() than using the empty literal, because the name dict must be looked up in the global scope in case it has been rebound. Same for the other two basic types here. For example:
 
 dict()
-dict(a=1, b=2)
+dict(a=1, b=2)  # now handled by C406
 list()
 tuple()
 
@@ -12,6 +12,6 @@ tuple()
 # It’s slower to call e.g. dict() than using the empty literal, because the name dict must be looked up in the global scope in case it has been rebound. Same for the other two basic types here. For example:
 
 {}
-dict(a=1, b=2)
+{"a": 1, "b": 2}  # now handled by C406
 []
 ()

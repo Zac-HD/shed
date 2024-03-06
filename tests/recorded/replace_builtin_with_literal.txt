@@ -1,6 +1,7 @@
 dict()
 list()
 tuple()
+# handled by ruff
 dict(ENV_VAR="")
 dict(ENV_VAR="foo")
 dict(ENV_VAR=0)
@@ -10,6 +11,7 @@ dict(ENV_VAR=0)
 {}
 []
 ()
-dict(ENV_VAR="")
-dict(ENV_VAR="foo")
-dict(ENV_VAR=0)
+# handled by ruff
+{"ENV_VAR": ""}
+{"ENV_VAR": "foo"}
+{"ENV_VAR": 0}

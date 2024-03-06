@@ -1,5 +1,6 @@
 # C413: Unnecessary <list/reversed> call around sorted().
 # It’s unnecessary to use list() around sorted()
+# Several of these cases were not handled by shed codemods, but are by ruff
 
 list(sorted([2, 3, 1]))
 reversed(sorted([2, 3, 1]))
@@ -21,16 +22,17 @@ sorted(frozenset('abc'))
 
 # C413: Unnecessary <list/reversed> call around sorted().
 # It’s unnecessary to use list() around sorted()
+# Several of these cases were not handled by shed codemods, but are by ruff
 
 sorted([2, 3, 1])
-reversed(sorted([2, 3, 1]))
-reversed(sorted([2, 3, 1], reverse=True))
+sorted([2, 3, 1], reverse=True)
+sorted([2, 3, 1], reverse=False)
 
 sorted([2, 3, 1], reverse=False)
-reversed(sorted([2, 3, 1], reverse=False))
-reversed(sorted([2, 3, 1], reverse="abc"))
-reversed(sorted([2, 3, 1], reverse=1 + 2 + c))
-reversed(sorted([2, 3, 1], reverse=1 or 2))
+sorted([2, 3, 1], reverse=True)
+sorted([2, 3, 1], reverse=not "abc")
+sorted([2, 3, 1], reverse=not 1 + 2 + c)
+sorted([2, 3, 1], reverse=not 1 or 2)
 
 sorted(set("aabc"))
 

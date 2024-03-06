@@ -13,12 +13,20 @@ set(reversed(iterable))
 sorted(list(iterable))
 sorted(tuple(iterable))
 sorted(sorted(iterable))
+
+# not handled by ruff: https://github.com/astral-sh/ruff/issues/10245
 sorted(reversed(iterable))
 
+# cases handled by our codemod, but not by ruff
 sorted(sorted(iterable, reverse=True))
 sorted(sorted(iterable, reverse=True))
 sorted(sorted(iterable, reverse=True), reverse=False)
 sorted(sorted(iterable, reverse=False), reverse=True)
+
+# unsafe to fix
+sorted(sorted(iterable), key=int)
+sorted(sorted(iterable, key=bool))
+sorted(sorted(iterable, key=bool), key=int)
 
 ================================================================================
 
@@ -37,9 +45,17 @@ set(iterable)
 sorted(iterable)
 sorted(iterable)
 sorted(iterable)
+
+# not handled by ruff: https://github.com/astral-sh/ruff/issues/10245
 sorted(reversed(iterable))
 
+# cases handled by our codemod, but not by ruff
 sorted(iterable)
 sorted(iterable)
 sorted(iterable, reverse=False)
 sorted(iterable, reverse=True)
+
+# unsafe to fix
+sorted(sorted(iterable), key=int)
+sorted(sorted(iterable, key=bool))
+sorted(sorted(iterable, key=bool), key=int)

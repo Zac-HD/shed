@@ -147,11 +147,64 @@ def shed(
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
+    _RUFF_RULES = (
+            "I",
+            "PIE790",
+            "F841",
+            "F901",
+            "E711", # == None -> is None
+            "E713", # not x in y-> x not in y
+            "E714", # not x is y -> x is not y
+            "C400", # unnecessary generator -> list comprehension
+            "C401", # unnecessary generator -> set comprehension
+            "C402", # unnecessary generator -> dict comprehension
+            "C403", # unnecessary list comprehension -> set comprehension
+            "C404", # unnecessary list comprehension -> dict comprehension
+            "C405", # set(...) -> {...}
+            "C406", # dict(...) -> {...}
+            "C408", # empty dict/list/tuple call -> {}/[]/()
+            "C409", # unnecessary-literal-within-tuple-call
+            "C410", # unnecessary-literal-within-list-call
+            "C411",  # unnecessary-list-call
+            "C413", # unnecessary-call-around-sorted
+            # "C414", # https://github.com/astral-sh/ruff/issues/10245
+            # C415 # fix is not available
+            "C416", # unnecessary-comprehension
+            "C417", # unnecessary-map
+            "C418", # unnecessary-literal-within-dict-call
+            "C419", # unnecessary-comprehension-any-all
+            )
+    _RUFF_EXTEND_SAFE_FIXES = (
+            'F841', # unused variable
+            # Several of C4xx rules are marked unsafe:
+            # This rule's fix is marked as unsafe, as it may occasionally drop comments when rewriting the call. In most cases, though, comments will be preserved.
+            'C400',
+            'C401',
+            'C402',
+            'C403',
+            'C404',
+            'C405',
+            'C406',
+            'C408',
+            'C409',
+            'C410',
+            'C411',
+            # 'C414',
+            "C416",
+            "C417",
+            "C418",
+            "C419",
+            "E711", # docs state it to be safe, but it's not
+            # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
+            'C413',
+            )
+
+
     def run_ruff() -> str:
         # I; isort; sort imports
         # PIE790; unnecessary-placeholder; unnecessary pass/... statement
         # F841; unused-variable
-        select = "I,PIE790,F841"
+        select = ",".join(_RUFF_RULES)
         if _remove_unused_imports:
             select += ",F401"
         sub = subprocess.run(
@@ -164,8 +217,7 @@ def shed(
                 "--isolated",
                 "--config=lint.isort.combine-as-imports=true",
                 f"--config=lint.isort.known-first-party={list(first_party_imports)}",
-                # F841 is considered unsafe
-                "--config=lint.extend-safe-fixes=['F841']",
+                f"--config=lint.extend-safe-fixes={list(_RUFF_EXTEND_SAFE_FIXES)}",
                 "-",  # pass code on stdin
             ],
             input=source_code,
