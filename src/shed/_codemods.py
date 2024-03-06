@@ -515,8 +515,9 @@ class ShedFixers(VisitorBasedCodemodCommand):
         return cst.FlattenSentinel(nodes)
 
     # Remove unnecessary len() and bool() calls in tests
+    # No check for this in ruff. SIM103 needless-bool is specifically about returns.
     # we can't use call_if_inside since it matches on any parents, which breaks on
-    # complicated nested cases - so we have to split into different leave's
+    # complicated nested cases - so we have to split into different leave's.
     # len/bool inside boolops (and/or) can only be removed if the boolop is inside a test
     # otherwise `print(False or bool(5))` changes functionality (prints `True` vs `5`)
     @leave(
