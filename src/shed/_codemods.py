@@ -132,7 +132,7 @@ def _collapsible_expression():
 class ShedFixers(VisitorBasedCodemodCommand):
     """Fix a variety of small problems.
 
-    Converts always-failing assert statements to explicit `raise` statements.
+    Removes always-truthy assert statements.
 
     Also includes code closely modelled on pybetter's fixers, because it's
     considerably faster to run all transforms in a single pass if possible.
@@ -145,18 +145,17 @@ class ShedFixers(VisitorBasedCodemodCommand):
         self.min_version = min_version
 
     def leave_Assert(self, _, updated_node):  # noqa
+        # Ruff only has a check for assert always False -> raise AssertionError
+        # But no specific check for assert-always-true
         test_code = cst.Module("").code_for_node(updated_node.test)
         try:
             test_literal = literal_eval(test_code)
         except Exception:
-            return updated_node
-        if test_literal:
-            return cst.RemovalSentinel.REMOVE
-        if updated_node.msg is None:
-            return cst.Raise(cst.Name("AssertionError"))
-        return cst.Raise(
-            cst.Call(cst.Name("AssertionError"), args=[cst.Arg(updated_node.msg)])
-        )
+            pass
+        else:
+            if test_literal:
+                return cst.RemovalSentinel.REMOVE
+        return updated_node
 
     @leave(
         m.Call(
@@ -234,6 +233,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         """Fix flake8-comprehensions C415.
 
         Unnecessary subscript reversal of iterable within <reversed/set/sorted>().
+        This is not supported by ruff autofix.
         """
         return updated_node.with_changes(
             args=[cst.Arg(updated_node.args[0].value.value)],

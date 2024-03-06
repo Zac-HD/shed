@@ -177,12 +177,14 @@ def shed(
             "C419", # unnecessary-comprehension-any-all
             "PIE790",  # pointless pass/...
 
+            # partially replaces assert codemod
+            "B011",  # assert False -> raise
+
             # These are new fixes that Zac had enabled in his branch
             #"E731", # don't assign lambdas
             #"B007",  # unused loop variable
             #"B009",  # constant getattr
             #"B010",  # constant setattr
-            #"B011",  # assert False -> raise
             #"B013",  # catching 1-tuple
             #"PIE807"  # reimplementing list
             #"PIE810",  # repeated startswith/endswith
@@ -221,6 +223,8 @@ def shed(
             "E711", # docs state it to be safe, but it's not
             # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
             'C413',
+            # This rule's fix is marked as unsafe, as changing an assert to a raise will change the behavior of your program when running in optimized mode (python -O).
+            'B011',
             )
 
 
