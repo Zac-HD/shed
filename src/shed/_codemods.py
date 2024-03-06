@@ -612,7 +612,7 @@ class ShedFixers(VisitorBasedCodemodCommand):
         elif comments:
             nodes.append(
                 cst.SimpleStatementLine(
-                    [cst.Pass()],  # pointless-pass is removed by autoflake later
+                    [cst.Pass()],  # pointless-pass is removed by ruff later
                     [cst.EmptyLine(comment=c) for c in comments],
                     cst.TrailingWhitespace(whitespace=cst.SimpleWhitespace(" ")),
                 )

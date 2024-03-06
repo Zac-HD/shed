@@ -148,8 +148,10 @@ def shed(
         source_code = _run_codemods(source_code, min_version=min_version)
 
     def run_ruff() -> str:
-        # sort imports
-        select = "I,PIE790"
+        # I; isort; sort imports
+        # PIE790; unnecessary-placeholder; unnecessary pass/... statement
+        # F841; unused-variable
+        select = "I,PIE790,F841"
         if _remove_unused_imports:
             select += ",F401"
         sub = subprocess.run(
@@ -162,6 +164,8 @@ def shed(
                 "--isolated",
                 "--config=lint.isort.combine-as-imports=true",
                 f"--config=lint.isort.known-first-party={list(first_party_imports)}",
+                # F841 is considered unsafe
+                "--config=lint.extend-safe-fixes=['F841']",
                 "-",  # pass code on stdin
             ],
             input=source_code,

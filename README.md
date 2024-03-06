@@ -18,7 +18,7 @@ or explicitly passed a list of files to format on the command-line.
 ## Features
 `shed`...
 
-- Runs [`autoflake`](https://pypi.org/project/autoflake/),
+- Runs [`ruff`](https://pypi.org/project/ruff/),
   to remove unused imports and variables
 - Runs [`pyupgrade`](https://pypi.org/project/pyupgrade/),
   with autodetected minimum version >= py38

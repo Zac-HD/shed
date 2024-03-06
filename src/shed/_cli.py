@@ -16,10 +16,8 @@ import warnings
 from pathlib import Path
 from typing import Callable, FrozenSet, Optional, Union
 
-import autoflake
-from isort.api import place_module
-
 from . import ShedSyntaxWarning, _version_map, docshed, shed
+from ._is_python_file import is_python_file
 
 
 @functools.lru_cache
@@ -46,14 +44,17 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
     return frozenset(
         p
         for p in {Path(base).name} | provides
-        if p.isidentifier() and place_module(p) != "STDLIB"
+        # TODO: isort.place_module is horrendously complicated, but we only use
+        # a fraction of the functionality. So best approach, if we still need
+        # the ability to exclude stdlib modules here, is probably to generate a list of
+        # known stdlib modules - either dynamically or store in a file.
+        if p.isidentifier() # and place_module(p) != "STDLIB"
     )
 
 
 @functools.lru_cache(maxsize=None)
 def _should_format(fname: str) -> bool:
-    # TODO: usage of autoflake
-    return fname.endswith((".md", ".rst", ".pyi")) or autoflake.is_python_file(fname)
+    return fname.endswith((".md", ".rst", ".pyi")) or is_python_file(fname)
 
 
 def _rewrite_on_disk(
