@@ -29,7 +29,9 @@ def leave(matcher):
         @m.leave(matcher)
         def wrapped(self, original_node, updated_node):
             if not m.matches(updated_node, matcher):
-                return updated_node
+                # given that this doesn't trigger... can we delete it or do we need a new
+                # test case with one of the remaining codemods?
+                return updated_node  # pragma: no cover
             return fn(self, original_node, updated_node)
 
         return wrapped
