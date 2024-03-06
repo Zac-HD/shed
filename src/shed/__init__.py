@@ -169,7 +169,6 @@ def shed(
             "C410", # unnecessary-literal-within-list-call
             "C411",  # unnecessary-list-call
             "C413", # unnecessary-call-around-sorted
-            # "C414", # https://github.com/astral-sh/ruff/issues/10245
             # C415 # fix is not available
             "C416", # unnecessary-comprehension
             "C417", # unnecessary-map
@@ -180,10 +179,17 @@ def shed(
             # partially replaces assert codemod
             "B011",  # assert False -> raise
 
-            # The PT018 autofix in ruff is significantly worse than ours
-            #"PT018",  # break up composite assertions
+            # ** Codemods that could be replaced once ruffs implementation improves
+            #"PT018",  # break up composite assertions # codemod: `split_assert_and`
 
-            # These are new fixes that Zac had enabled in his branch
+            # Ruff implementation gives up when reaching end of line regardless of python version.
+            # "SIM117", # multiple-with-statement # codemod: `remove_nested_with`
+
+            # https://github.com/astral-sh/ruff/issues/10245
+            # ruff replaces `sorted(reversed(iterable))` with `sorted(iterable)`
+            # "C414", # unnecessary-double-cast # codemod: `replace_unnecessary_nested_calls`
+
+            # ** These are new fixes that Zac had enabled in his branch
             #"E731", # don't assign lambdas
             #"B007",  # unused loop variable
             #"B009",  # constant getattr
@@ -224,7 +230,6 @@ def shed(
             "C419",
             # stated as safe by docs, but actually requires --unsafe-fixes
             "E711",
-            # "PT018",  # worse than split_assert_and codemod
             # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
             'C413',
             # This rule's fix is marked as unsafe, as changing an assert to a raise will change the behavior of your program when running in optimized mode (python -O).
