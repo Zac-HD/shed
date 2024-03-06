@@ -180,6 +180,9 @@ def shed(
             # partially replaces assert codemod
             "B011",  # assert False -> raise
 
+            # The PT018 autofix in ruff is significantly worse than ours
+            #"PT018",  # break up composite assertions
+
             # These are new fixes that Zac had enabled in his branch
             #"E731", # don't assign lambdas
             #"B007",  # unused loop variable
@@ -188,7 +191,6 @@ def shed(
             #"B013",  # catching 1-tuple
             #"PIE807"  # reimplementing list
             #"PIE810",  # repeated startswith/endswith
-            #"PT018",  # break up composite assertions
             #"RSE102",  # Unnecessary parentheses on raised exception
             #"RET502",  # `return None` if could return non-None
             #"RET504",  # Unnecessary assignment before return statement
@@ -220,7 +222,9 @@ def shed(
             "C417",
             "C418",
             "C419",
-            "E711", # docs state it to be safe, but it's not
+            # stated as safe by docs, but actually requires --unsafe-fixes
+            "E711",
+            # "PT018",  # worse than split_assert_and codemod
             # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
             'C413',
             # This rule's fix is marked as unsafe, as changing an assert to a raise will change the behavior of your program when running in optimized mode (python -O).
