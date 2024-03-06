@@ -29,9 +29,9 @@ assert not True
 assert not True, "message"
 
 # changed to `raise` statements because literal is falsey
-raise AssertionError()
-assert None
-assert "", "message"
+raise AssertionError
+raise AssertionError
+raise AssertionError("message")
 
 # not an exception, replaced with NotImplementedError
 raise NotImplementedError
