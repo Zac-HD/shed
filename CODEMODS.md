@@ -2,7 +2,7 @@ This document attempts to document all codemods that shed does.
 
 
 ## `leave_Assert`
-Remove redundant `assert x` where x is a literal that always evaluate to `True`.
+Remove redundant `assert x` where x is a literal that always evaluate to `True`.  
 Replace `assert y` where y is a literal that always evaluates to `False`.
 
 ### Examples
@@ -46,6 +46,7 @@ Full test data in `tests/recorded/parens.txt` and `tests/recorded/parens_with_co
 ([].append(1))
 (["foo"].append("bar"))
 (["foo"].append("bar"))
+foo((list("abc")))
 ```
 
 #### output
@@ -54,6 +55,7 @@ list("abc")
 [].append(1)
 ["foo"].append("bar")
 ["foo"].append("bar")
+foo(list("abc"))
 ```
 
 
@@ -127,8 +129,9 @@ set(iterable)
 
 
 ## `reorder_union_literal_contents_none_last`
-Test data in tests/recorded/flatten_literal.txt and tests/recorded/reorder_none.txt
 Puts `None` last in a subscript of `Union` or `Literal`
+
+Test data in tests/recorded/flatten_literal.txt and tests/recorded/reorder_none.txt
 
 #### input
 ```py
@@ -147,9 +150,9 @@ foo: set[int, None]
 ```
 
 ## `reorder_merge_optional_union`
-Test data in tests/recorded/flatten_union.txt
 Turn `Union[..., None]` into `Optional[Union[...]]`. 
 
+Test data in tests/recorded/flatten_union.txt
 #### input
 ```py
 Union[int, str, None]
@@ -161,10 +164,10 @@ Optional[Union[int, str]]
 Optional[Union[int, str]]
 ```
 
-##`reorder_union_operator_contents_none_last`
-Test data in tests/recorded/union_op_none_last.txt
-
+## `reorder_union_operator_contents_none_last`
 Reorders binary-operator type unions to have `None` last.
+
+Test data in tests/recorded/union_op_none_last.txt
 #### input
 ```py
 None | int  # not a type annotation
@@ -180,11 +183,29 @@ var2: bool | float | None
 var3: float | bool | None
 ```
 
-Note: I (jakkdl) also wanted a check that straight up sorts all types in a union, but it was deemed to controversial and shed does not allow partially enabling checks. I would love to have it in ruff though.
+## [Not Implemented] sort union types
+Fully sort types in union/optional, so as to standardize their ordering and make it easier to see if two type annotations are in fact the same. This was never implemented, it was deemed to controversial as shed does not allow disabling specific checks, but may be of interest to ruff.
 
+#### input
+```py
+k: Union[int, float]
+l: Union[int, float]
+m: float | bool
+n: Optional[str, MyOtherType, bool]
+```
+
+#### output
+```py
+k: Union[float, int]
+l: Union[float, int]
+m: bool | float
+n: Optional[MyOtherType, bool, str]
+```
 
 ## `flatten_literal_subscript`
-tests/recorded/flatten_literal.txt
+Flattens a `Literal` inside a `Literal`.
+
+Test data in tests/recorded/flatten_literal.txt
 #### input
 ```py
 Literal[1, Literal[2, 3]]
@@ -195,7 +216,9 @@ Literal[1, 2, 3]
 ```
 
 ## `flatten_union_subscript`
-tests/recorded/flatten_literal.txt
+Flattens an `Optional`/`Union` inside a `Union`.
+
+Test data in tests/recorded/flatten_literal.txt
 #### input
 ```py
 Union[int, Optional[str], bool]
@@ -290,9 +313,10 @@ Split `assert a and b` into `assert a` and `assert b`. This is supported by ruff
 
 Test data in tests/recorded/split_assert.txt
 
-## `remove_unnecessary_call_test` / `remove_unnecessary_call_expression` / `remove_unnecessary_call2`
-Removes unnecessary len/bool calls in tests. autofixes PIE787
-No check for this in ruff. SIM103 needless-bool is specifically about returns.
+## `remove_unnecessary_call_*`
+Removes unnecessary len/bool calls in tests, autofixes PIE787.
+
+No check for this in ruff; SIM103 needless-bool is specifically about returns.
 
 Test data in tests/recorded/pie788_no_bool.txt and tests/recorded/pie788_no_len.txt
 
