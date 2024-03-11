@@ -48,18 +48,20 @@ flake8-print==5.0.0
     # via -r deps/check.in
 flake8-simplify==0.21.0
     # via -r deps/check.in
-libcst==1.1.0
-    # via shed (setup.py)
+libcst==1.1.0 ; python_version < "3.9"
+    # via
+    #   -r deps/check.in
+    #   shed (setup.py)
 mccabe==0.7.0
     # via flake8
-mypy==1.8.0
+mypy==1.9.0
     # via -r deps/check.in
 mypy-extensions==1.0.0
     # via
     #   black
     #   mypy
     #   typing-inspect
-packaging==23.2
+packaging==24.0
     # via black
 pathspec==0.12.1
     # via black
@@ -79,7 +81,7 @@ pyupgrade==3.15.1
     # via shed (setup.py)
 pyyaml==6.0.1
     # via libcst
-ruff==0.3.0
+ruff==0.3.2
     # via shed (setup.py)
 snowballstemmer==2.2.0
     # via pydocstyle

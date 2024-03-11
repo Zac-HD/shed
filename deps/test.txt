@@ -24,7 +24,7 @@ flake8==7.0.0
     # via flake8-comprehensions
 flake8-comprehensions==3.14.0
     # via -r deps/test.in
-hypothesis[lark]==6.98.17
+hypothesis[lark]==6.99.2
     # via
     #   -r deps/test.in
     #   hypothesmith
@@ -44,7 +44,7 @@ mypy-extensions==1.0.0
     # via
     #   black
     #   typing-inspect
-packaging==23.2
+packaging==24.0
     # via
     #   black
     #   pytest
@@ -58,7 +58,7 @@ pycodestyle==2.11.1
     # via flake8
 pyflakes==3.2.0
     # via flake8
-pytest==8.0.2
+pytest==8.1.1
     # via
     #   -r deps/test.in
     #   pytest-cov
@@ -71,7 +71,7 @@ pyupgrade==3.15.1
     # via shed (setup.py)
 pyyaml==6.0.1
     # via libcst
-ruff==0.3.0
+ruff==0.3.2
     # via shed (setup.py)
 sortedcontainers==2.4.0
     # via hypothesis

@@ -33,7 +33,7 @@ raise AssertionError("this is the only case handled by ruff")
 
 Full test data in tests/recorded/asserts.txt
 
-Ruff supports autofixing B011, but that only covers the precise case of exactly replacing `assert False` with `raise AssertionError`. It does
+Ruff supports autofixing B011, but that only covers the precise case of exactly replacing `assert False` with `raise AssertionError`.
 
 ## `remove_pointless_parens_around_call`
 Removes pointless parentheses wrapping a call.
@@ -60,7 +60,7 @@ foo(list("abc"))
 
 
 ## `replace_unnecessary_nested_calls`
-Resolves flake8-comprehension C414. Ruffs implementation currently breaks sorting stabilityin one case.
+Resolves flake8-comprehension C414. Ruffs implementation currently breaks sorting stability in one case.
 
 ### Examples
 Full test data in `tests/recorded/comprehensions/C414.txt`
@@ -76,10 +76,11 @@ sorted(sorted(iterable, reverse=True))
 sorted(sorted(iterable, reverse=True), reverse=False)
 sorted(sorted(iterable, reverse=False), reverse=True)
 
-# unsafe to fix
+# unsafe to fix, even if both have the same key function (it might have side-effects)
 sorted(sorted(iterable), key=int)
 sorted(sorted(iterable, key=bool))
 sorted(sorted(iterable, key=bool), key=int)
+sorted(sorted(iterable, key=bool), key=bool)
 ```
 #### output
 ```py
@@ -97,6 +98,7 @@ sorted(iterable, reverse=True)
 sorted(sorted(iterable), key=int)
 sorted(sorted(iterable, key=bool))
 sorted(sorted(iterable, key=bool), key=int)
+sorted(sorted(iterable, key=bool), key=bool)
 ```
 
 
@@ -261,6 +263,8 @@ else:
 
 try:
     1 / 0
+except Exception:
+    ...
 else:
     pass
 
@@ -283,6 +287,8 @@ for _ in range(10):
 
 try:
     1 / 0
+except Exception:
+    ...
 
 if foo:
     ...
@@ -350,6 +356,7 @@ with make_context_manager(1) as cm1:
 with make_context_manager(1) as cm1, make_context_manager(2) as cm2:
     with make_context_manager(3) as cm3:
         pass
+
 with make_context_manager(1) as cm1:
     with make_context_manager(2) as cm2:
         with make_context_manager(3) as cm3:
@@ -362,6 +369,7 @@ with make_context_manager(1) as cm1:
 with make_context_manager(1) as cm1, make_context_manager(2) as cm2:
     pass
     # Preserve this comment
+
 with (
     make_context_manager(1) as cm1,
     make_context_manager(2) as cm2,

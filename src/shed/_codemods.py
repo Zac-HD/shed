@@ -22,6 +22,9 @@ def leave(matcher):
 
     This works around https://github.com/Instagram/LibCST/issues/888
     by checking if the updated node matches the matcher.
+
+    It's possible this problem is no longer possible with the current set of codemods
+    after removing ones that are implemented by ruff.
     """
 
     def inner(fn):
@@ -29,8 +32,7 @@ def leave(matcher):
         @m.leave(matcher)
         def wrapped(self, original_node, updated_node):
             if not m.matches(updated_node, matcher):
-                # given that this doesn't trigger... can we delete it or do we need a new
-                # test case with one of the remaining codemods?
+                # remove this pragma if a test is found&written that triggers the issue
                 return updated_node  # pragma: no cover
             return fn(self, original_node, updated_node)
 
