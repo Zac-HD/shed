@@ -7,10 +7,10 @@ Replace `assert y` where y is a literal that always evaluates to `False`.
 
 ### Examples
 #### input
-```python
+```py
 # truthy statements removed, with corresponding comments
 assert True
-assert "message" # rip
+assert "message"  # rip
 assert (1, 2)
 
 # false statements replaced with raise AssertionError
@@ -19,10 +19,9 @@ assert ""
 assert 0, "hello"
 
 assert False, "this is the only case handled by ruff"
-
 ```
 #### output
-```python
+```py
 # false statements replaced with raise AssertionError
 raise AssertionError
 raise AssertionError
@@ -37,25 +36,32 @@ Ruff supports autofixing B011, but that only covers the precise case of exactly 
 
 ## `remove_pointless_parens_around_call`
 Removes pointless parentheses wrapping a call.
+Ruff has UP034, but that only handles a subset of the cases shed handles.
 
 ### Examples
 Full test data in `tests/recorded/parens.txt` and `tests/recorded/parens_with_comment.txt`
 #### input
 ```py
 (list("abc"))
-([].append(1))
 (["foo"].append("bar"))
 (["foo"].append("bar"))
-foo((list("abc")))
+foo((list("abc")))  # only one handled by ruff
+
+# handled by the codemod after shed runs black on it
+(
+    []
+    .append(1))
+)
 ```
 
 #### output
 ```py
 list("abc")
+["foo"].append("bar")
+["foo"].append("bar")
+foo(list("abc"))  # only one handled by ruff
+# handled by the codemod after shed runs black on it
 [].append(1)
-["foo"].append("bar")
-["foo"].append("bar")
-foo(list("abc"))
 ```
 
 
@@ -68,7 +74,7 @@ Full test data in `tests/recorded/comprehensions/C414.txt`
 ```py
 list(tuple(iterable))
 set(reversed(iterable))
-sorted(reversed(iterable)) # unsafe to fix, but ruff does
+sorted(reversed(iterable))  # unsafe to fix, but ruff does
 
 # cases handled by our codemod, but not by ruff
 sorted(sorted(iterable, reverse=True))
@@ -86,7 +92,7 @@ sorted(sorted(iterable, key=bool), key=bool)
 ```py
 list(iterable)
 set(iterable)
-sorted(reversed(iterable)) # unsafe to fix, but ruff does
+sorted(reversed(iterable))  # unsafe to fix, but ruff does
 
 # cases handled by our codemod, but not by ruff
 sorted(iterable)
@@ -139,7 +145,7 @@ Test data in tests/recorded/flatten_literal.txt and tests/recorded/reorder_none.
 ```py
 var3: Optional[None, int, float]
 def g(x: Union[None, float] = None):
-     pass
+    pass
 foo: set[None, int]
 
 ```
@@ -180,7 +186,7 @@ var3: float | None | bool
 #### output
 ```py
 None | int  # not a type annotation
-var: int | None 
+var: int | None
 var2: bool | float | None
 var3: float | bool | None
 ```
@@ -329,9 +335,9 @@ Test data in tests/recorded/pie788_no_bool.txt and tests/recorded/pie788_no_len.
 #### input
 ```py
 if len(foo):
-  ...
+    ...
 while bool(foo):
-  ...
+    ...
 print(5 if len(foo) else 7)
 ```
 #### output

@@ -38,8 +38,8 @@ _SUGGESTIONS = (
 )
 
 _RUFF_RULES = (
-    "I", # isort; sort imports
-    "UP", # pyupgrade
+    "I",  # isort; sort imports
+    "UP",  # pyupgrade
     # F401 # unused-import # added dynamically
     "F841",  # unused-variable # was enabled in autoflake
     # many of these are direct replacements of codemods
@@ -64,7 +64,7 @@ _RUFF_RULES = (
     "C417",  # unnecessary-map
     "C418",  # unnecessary-literal-within-dict-call
     "C419",  # unnecessary-comprehension-any-all
-    "PIE790", # unnecessary-placeholder; unnecessary pass/... statement
+    "PIE790",  # unnecessary-placeholder; unnecessary pass/... statement
     "SIM101",  # duplicate-isinstance-call # Replacing `collapse_isinstance_checks`
     # partially replaces assert codemod
     "B011",  # assert False -> raise
