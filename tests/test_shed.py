@@ -2,6 +2,8 @@
 
 import ast
 import os
+import re
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -119,6 +121,21 @@ def test_shed_is_idempotent(source_code, refactor, provides, min_version):
     check(source_code, refactor=refactor, min_version=min_version, provides=provides)
 
 
+def _check_if_in_shed_worktree() -> bool:
+    output = subprocess.run(
+        ["git", "rev-parse", "--git-dir"],
+        check=True,
+        timeout=10,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    return bool(re.search(re.escape("/shed/.git/worktrees/"), output))
+
+
+@pytest.mark.xfail(
+    _check_if_in_shed_worktree(),
+    reason="_guess_first_party_modules does not work inside git worktree",
+)
 def test_guesses_shed_is_first_party():
     assert _guess_first_party_modules() == frozenset(["shed"])
 
@@ -240,3 +257,24 @@ def test_on_site_code(py_file):
                 min_version=min_version,
                 except_=lambda: pytest.xfail(reason="Black can't handle that"),
             )
+
+
+def test_first_party_imports() -> None:
+    no_first_party = """import mymod
+import othermod
+
+print(mymod, othermod)
+"""
+    first_party_mymod = """import othermod
+
+import mymod
+
+print(mymod, othermod)
+"""
+
+    assert shed(no_first_party) == no_first_party
+
+    assert (
+        shed(no_first_party, first_party_imports=frozenset(("mymod",)))
+        == first_party_mymod
+    )

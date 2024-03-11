@@ -1,4 +1,5 @@
 not (x in y)
+not (x is y)  # ruff E714
 z == None
 a == True
 a == False
@@ -12,6 +13,7 @@ with a:
 ================================================================================
 
 x not in y
+x is not y  # ruff E714
 z is None
 a == True
 a == False

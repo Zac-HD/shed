@@ -1,0 +1,15 @@
+# Assure autoflake->ruff transition works wrt to removing unused variables
+
+def foo():
+    used = 0
+    unused = 1
+    print(used)
+
+================================================================================
+
+# Assure autoflake->ruff transition works wrt to removing unused variables
+
+
+def foo():
+    used = 0
+    print(used)

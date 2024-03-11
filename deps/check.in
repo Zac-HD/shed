@@ -12,3 +12,6 @@ flake8-print
 flake8-simplify
 mypy
 pep8-naming
+
+# libcst 1.2 drops support for 3.8
+libcst<1.2; python_version < "3.9"

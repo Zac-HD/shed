@@ -1,3 +1,6 @@
+# ruff does not handle empty string, nor list({}) and tuple({})
+# in general they don't special-case the empty-collection, and flake8-comprehensions
+# doesn't raise warnings for the cases not supported by ruff.
 list({})
 list([])
 list("")
@@ -23,25 +26,28 @@ tuple({"foo": 0, "bar": 1})
 
 ================================================================================
 
+# ruff does not handle empty string, nor list({}) and tuple({})
+# in general they don't special-case the empty-collection, and flake8-comprehensions
+# doesn't raise warnings for the cases not supported by ruff.
+list({})
 []
-[]
-[]
+list("")
 []
 
 {}
 {}
-{}
+dict("")
 {}
 
+tuple({})
 ()
-()
-()
+tuple("")
 ()
 
 # Make sure non-empty collections aren't affected
 list({"a": "b"})
-list([1, 2, 3])
+[1, 2, 3]
 list("test")
-list((1, 2, 3))
+[1, 2, 3]
 tuple("abc")
 tuple({"foo": 0, "bar": 1})

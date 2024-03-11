@@ -217,7 +217,6 @@ class Click:
     def __init__(self, pos, btn):
         self.position = pos
         self.button = btn
-        ...
 
 
 match event.get():

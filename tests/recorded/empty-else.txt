@@ -5,6 +5,11 @@ else:
 
 if coinflip:
     ...
+else:  # removing this is not currently supported
+    ...
+
+if coinflip:
+    ...
 elif coinflip:
     ...
 else:
@@ -46,6 +51,11 @@ else:
 ================================================================================
 
 if coinflip:
+    ...
+
+if coinflip:
+    ...
+else:  # removing this is not currently supported
     ...
 
 if coinflip:

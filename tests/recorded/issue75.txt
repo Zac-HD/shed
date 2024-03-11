@@ -1,3 +1,12 @@
+# The original issue was about shed requiring two passes to format this:
+# on first run autoflake would remove imports, and second run isort would collapse
+# to a single line of imports.
+# Now we have slightly different behaviour: black will add a trailing comma to the
+# import list, which ruff then will respect when removing imports, such that it doesn't
+# collapse the imports to a single line.
+# If removing the trailing comma from the original import, we should be back to getting
+# it collapsed - when we replace black with ruff, or run black after ruff.
+
 from os import (
     wait,
     wait3,
@@ -8,7 +17,7 @@ from os import (
     waitstatus_to_exitcode,
     walk,
     write,
-    writev,
+    write
 )
 
 print(
@@ -21,7 +30,21 @@ print(
 
 ================================================================================
 
-from os import waitpid, waitstatus_to_exitcode, walk, write, writev
+# The original issue was about shed requiring two passes to format this:
+# on first run autoflake would remove imports, and second run isort would collapse
+# to a single line of imports.
+# Now we have slightly different behaviour: black will add a trailing comma to the
+# import list, which ruff then will respect when removing imports, such that it doesn't
+# collapse the imports to a single line.
+# If removing the trailing comma from the original import, we should be back to getting
+# it collapsed - when we replace black with ruff, or run black after ruff.
+
+from os import (
+    waitpid,
+    waitstatus_to_exitcode,
+    walk,
+    write,
+)
 
 print(
     waitpid,

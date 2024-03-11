@@ -1,0 +1,12 @@
+# check that lint.isort.combine-as-imports is set
+from os import getpid
+from os import wait as mywait
+
+print(getpid, mywait)
+
+================================================================================
+
+# check that lint.isort.combine-as-imports is set
+from os import getpid, wait as mywait
+
+print(getpid, mywait)
