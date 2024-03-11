@@ -15,7 +15,6 @@ from operator import attrgetter
 from typing import Any, FrozenSet, Match, Tuple
 
 import black
-import pyupgrade._main
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 
@@ -39,7 +38,8 @@ _SUGGESTIONS = (
 )
 
 _RUFF_RULES = (
-    "I",
+    "I", # isort; sort imports
+    "UP", # pyupgrade
     # F401 # unused-import # added dynamically
     "F841",  # unused-variable # was enabled in autoflake
     # many of these are direct replacements of codemods
@@ -64,7 +64,7 @@ _RUFF_RULES = (
     "C417",  # unnecessary-map
     "C418",  # unnecessary-literal-within-dict-call
     "C419",  # unnecessary-comprehension-any-all
-    "PIE790",  # pointless pass/...
+    "PIE790", # unnecessary-placeholder; unnecessary pass/... statement
     "SIM101",  # duplicate-isinstance-call # Replacing `collapse_isinstance_checks`
     # partially replaces assert codemod
     "B011",  # assert False -> raise
@@ -97,7 +97,7 @@ _RUFF_RULES = (
 _RUFF_EXTEND_SAFE_FIXES = (
     "F841",  # unused variable
     # Several of C4xx rules are marked unsafe:
-    # This rule's fix is marked as unsafe, as it may occasionally drop comments when rewriting the call. In most cases, though, comments will be preserved.
+    # "This rule's fix is marked as unsafe, as it may occasionally drop comments when rewriting the call. In most cases, though, comments will be preserved."
     "C400",
     "C401",
     "C402",
@@ -109,7 +109,7 @@ _RUFF_EXTEND_SAFE_FIXES = (
     "C409",
     "C410",
     "C411",
-    # 'C414',
+    # 'C414',  # currently disabled
     "C416",
     "C417",
     "C418",
@@ -117,6 +117,7 @@ _RUFF_EXTEND_SAFE_FIXES = (
     # not stated as unsafe by docs, but actually requires --unsafe-fixes
     "SIM101",
     "E711",
+    "UP031",
     # This rule's fix is marked as unsafe, as reversed and reverse=True will yield different results in the event of custom sort keys or equality functions. Specifically, reversed will reverse the order of the collection, while sorted with reverse=True will perform a stable reverse sort, which will preserve the order of elements that compare as equal.
     "C413",
     # This rule's fix is marked as unsafe, as changing an assert to a raise will change the behavior of your program when running in optimized mode (python -O).
@@ -214,54 +215,46 @@ def shed(
             # which is possible but rare after the parsing checks above.
             source_code, _ = annotated
 
-    # One tricky thing: running `isort` or `autoflake` can "unlock" further fixes
-    # for `black`, e.g. "pass;#" -> "pass\n#\n" -> "#\n".  We therefore run it
-    # before other fixers, and then (if they made changes) again afterwards.
+    # ***Black***
+    # Run black first to unlock `remove_pointless_parens_around_call` fixes.
+    # Running it first  unfortunately breaks comment association for `split_assert_and`
+    # and adds a trailing comma in imports in tests/recorded/issue75.txt
     black_mode = black.Mode(target_versions=target_versions, is_pyi=is_pyi)
     source_code = blackened = black.format_str(source_code, mode=black_mode)
 
-    pyupgrade_min = min(min_version, max(pyupgrade._plugins.imports.REPLACE_EXACT))
-    pu_settings = pyupgrade._main.Settings(min_version=pyupgrade_min)
-    source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
-    if source_code != blackened:
-        # Second step to converge: without this we have f-string problems.
-        # Upstream issue: https://github.com/asottile/pyupgrade/issues/703
-        source_code = pyupgrade._main._fix_plugins(source_code, settings=pu_settings)
-    source_code = pyupgrade._main._fix_tokens(source_code)
-
+    # ***Shed Codemods***
+    # codemods need to run before ruff, since `split_assert` relies on it to remove
+    # needless `pass` statements.
     if refactor and not is_pyi:
         source_code = _run_codemods(source_code, min_version=min_version)
 
-    def run_ruff() -> str:
-        # I; isort; sort imports
-        # PIE790; unnecessary-placeholder; unnecessary pass/... statement
-        # F841; unused-variable
-        select = ",".join(_RUFF_RULES)
-        if _remove_unused_imports:
-            select += ",F401"
-        sub = subprocess.run(
-            [
-                "ruff",
-                "check",
-                f"--select={select}",
-                "--fix-only",
-                f"--target-version=py3{min_version[1]}",
-                "--isolated",  # ignore configuration files
-                "--exit-zero",  # Exit with 0, even upon detecting lint violations.
-                "--config=lint.isort.combine-as-imports=true",
-                f"--config=lint.isort.known-first-party={list(first_party_imports)}",
-                f"--config=lint.extend-safe-fixes={list(_RUFF_EXTEND_SAFE_FIXES)}",
-                "-",  # pass code on stdin
-            ],
-            input=source_code,
-            encoding="utf-8",
-            check=True,
-            capture_output=True,
-        )
-        return sub.stdout
+    # ***Ruff***
+    select = ",".join(_RUFF_RULES)
+    if _remove_unused_imports:
+        select += ",F401"
+    source_code = subprocess.run(
+        [
+            "ruff",
+            "check",
+            f"--select={select}",
+            "--fix-only",
+            f"--target-version=py3{min_version[1]}",
+            "--isolated",  # ignore configuration files
+            "--exit-zero",  # Exit with 0, even upon detecting lint violations.
+            "--config=lint.isort.combine-as-imports=true",
+            f"--config=lint.isort.known-first-party={list(first_party_imports)}",
+            f"--config=lint.extend-safe-fixes={list(_RUFF_EXTEND_SAFE_FIXES)}",
+            "-",  # pass code on stdin
+        ],
+        input=source_code,
+        encoding="utf-8",
+        check=True,
+        capture_output=True,
+    ).stdout
 
-    source_code = run_ruff()
-
+    # ***Black***
+    # Run formatter again last, if codemods/ruff did any changes, since they tend to
+    # leave dirty code
     if source_code != blackened:
         source_code = black.format_str(source_code, mode=black_mode)
 

@@ -133,7 +133,7 @@ print(bool(foo) and bool(foo))
 len(bool(foo))
 
 k = bool
-k = bool()
+k = False
 k = bool(foo)
 
 bool(foo)

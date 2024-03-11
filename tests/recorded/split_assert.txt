@@ -1,4 +1,5 @@
-# this will fail since black reformats it
+# this fails to associate comments to the correct assert statements due
+# to black collapsing the line & comments before codemod runs
 assert (
 a # a
 and b # b
@@ -211,7 +212,8 @@ b # 7
 
 ================================================================================
 
-# this will fail since black reformats it
+# this fails to associate comments to the correct assert statements due
+# to black collapsing the line & comments before codemod runs
 assert a  # a  # b
 assert b
 
