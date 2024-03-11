@@ -21,7 +21,7 @@ assert 0, "hello"
 assert False, "this is the only case handled by ruff"
 ```
 #### output
-```py
+```python
 # false statements replaced with raise AssertionError
 raise AssertionError
 raise AssertionError
@@ -50,16 +50,17 @@ foo((list("abc")))  # only one handled by ruff
 # handled by the codemod after shed runs black on it
 (
     []
-    .append(1))
+    .append(1)
 )
 ```
 
 #### output
-```py
+```python
 list("abc")
 ["foo"].append("bar")
 ["foo"].append("bar")
 foo(list("abc"))  # only one handled by ruff
+
 # handled by the codemod after shed runs black on it
 [].append(1)
 ```
@@ -71,7 +72,7 @@ Resolves flake8-comprehension C414. Ruffs implementation currently breaks sortin
 ### Examples
 Full test data in `tests/recorded/comprehensions/C414.txt`
 #### input
-```py
+```python
 list(tuple(iterable))
 set(reversed(iterable))
 sorted(reversed(iterable))  # unsafe to fix, but ruff does
@@ -89,7 +90,7 @@ sorted(sorted(iterable, key=bool), key=int)
 sorted(sorted(iterable, key=bool), key=bool)
 ```
 #### output
-```py
+```python
 list(iterable)
 set(iterable)
 sorted(reversed(iterable))  # unsafe to fix, but ruff does
@@ -115,7 +116,7 @@ Unnecessary subscript reversal of iterable within `[reversed/set/sorted]()`.
 ruff does not support autofixing of C415
 
 #### input
-```py
+```python
 set(iterable[::-1])
 sorted(iterable[::-1])
 reversed(iterable[::-1])
@@ -125,7 +126,7 @@ set(iterable[:None:1])
 set(iterable[None:None:])
 ```
 #### output
-```py
+```python
 set(iterable)
 sorted(iterable)
 reversed(iterable)
@@ -142,18 +143,21 @@ Puts `None` last in a subscript of `Union` or `Literal`
 Test data in tests/recorded/flatten_literal.txt and tests/recorded/reorder_none.txt
 
 #### input
-```py
-var3: Optional[None, int, float]
+```python
 def g(x: Union[None, float] = None):
     pass
-foo: set[None, int]
 
+
+var3: Optional[None, int, float]
+foo: set[None, int]
 ```
 #### output
-```py
-var3: Optional[int, float, None]
+```python
 def g(x: Union[int, None] = None):
     pass
+
+
+var3: Optional[int, float, None]
 foo: set[int, None]
 ```
 
@@ -162,12 +166,12 @@ Turn `Union[..., None]` into `Optional[Union[...]]`.
 
 Test data in tests/recorded/flatten_union.txt
 #### input
-```py
+```python
 Union[int, str, None]
 Union[int, None, str]
 ```
 #### output
-```py
+```python
 Optional[Union[int, str]]
 Optional[Union[int, str]]
 ```
@@ -177,14 +181,14 @@ Reorders binary-operator type unions to have `None` last.
 
 Test data in tests/recorded/union_op_none_last.txt
 #### input
-```py
+```python
 None | int  # not a type annotation
 var: None | int
 var2: bool | None | float
 var3: float | None | bool
 ```
 #### output
-```py
+```python
 None | int  # not a type annotation
 var: int | None
 var2: bool | float | None
@@ -195,7 +199,7 @@ var3: float | bool | None
 Fully sort types in union/optional, so as to standardize their ordering and make it easier to see if two type annotations are in fact the same. This was never implemented, it was deemed to controversial as shed does not allow disabling specific checks, but may be of interest to ruff.
 
 #### input
-```py
+```python
 k: Union[int, float]
 l: Union[int, float]
 m: float | bool
@@ -203,7 +207,7 @@ n: Optional[str, MyOtherType, bool]
 ```
 
 #### output
-```py
+```python
 k: Union[float, int]
 l: Union[float, int]
 m: bool | float
@@ -215,11 +219,11 @@ Flattens a `Literal` inside a `Literal`.
 
 Test data in tests/recorded/flatten_literal.txt
 #### input
-```py
+```python
 Literal[1, Literal[2, 3]]
 ```
 #### output
-```py
+```python
 Literal[1, 2, 3]
 ```
 
@@ -228,7 +232,7 @@ Flattens an `Optional`/`Union` inside a `Union`.
 
 Test data in tests/recorded/flatten_literal.txt
 #### input
-```py
+```python
 Union[int, Optional[str], bool]
 Union[int, Optional[str], None]
 Union[Union[int, float], str]
@@ -237,7 +241,7 @@ Union[int, Literal[1, 2], Optional[str]]
 Union[int, str, None]
 ```
 #### output
-```py
+```python
 Union[int, str, bool, None]
 Union[int, str, None]
 Union[int, float, str]
@@ -251,7 +255,7 @@ An `else: pass` block can always simply be discarded. This should also remove `e
 
 Test data in tests/recorded/empty-else.txt
 #### input
-```py
+```python
 if foo:
     ...
 else:
@@ -281,7 +285,7 @@ else:
 ```
 
 #### output
-```py
+```python
 if foo:
     ...
 
@@ -307,14 +311,14 @@ Removes useless lambda wrapper.
 
 Test data in tests/recorded/lambda-unwrapping.txt
 #### input
-```py
+```python
 lambda: self.func()
 lambda x: foo(x)
 lambda x, y, z: (t + u).math_call(x, y, z)
 ```
 
 #### output
-```py
+```python
 self.func
 foo
 (t + u).math_call
@@ -333,7 +337,7 @@ No check for this in ruff; SIM103 needless-bool is specifically about returns.
 Test data in tests/recorded/pie788_no_bool.txt and tests/recorded/pie788_no_len.txt
 
 #### input
-```py
+```python
 if len(foo):
     ...
 while bool(foo):
@@ -341,7 +345,7 @@ while bool(foo):
 print(5 if len(foo) else 7)
 ```
 #### output
-```py
+```python
 if foo:
     ...
 while foo:
@@ -353,7 +357,7 @@ print(5 if foo else 7)
 Ruff does this, but only if it wouldn't turn it into a multi-line with.
 
 #### input
-```py
+```python
 with make_context_manager(1) as cm1:
     with make_context_manager(2) as cm2:
         pass
@@ -371,7 +375,7 @@ with make_context_manager(1) as cm1:
 ```
 
 #### output
-```py
+```python
 with make_context_manager(1) as cm1, make_context_manager(2) as cm2:
     pass
     # Preserve this comment
