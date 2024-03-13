@@ -24,7 +24,7 @@ flake8==7.0.0
     # via flake8-comprehensions
 flake8-comprehensions==3.14.0
     # via -r deps/test.in
-hypothesis[lark]==6.99.2
+hypothesis[lark]==6.99.5
     # via
     #   -r deps/test.in
     #   hypothesmith
