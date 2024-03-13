@@ -26,6 +26,7 @@ elif sys.version_info[:2] == (3, 9):  # pragma: no cover
 else:  # pragma: no cover
     from ._stdlib_module_names.py38 import stdlib_module_names
 
+
 @functools.lru_cache
 def _get_git_repo_root(cwd: Optional[str] = None) -> str:
     return subprocess.run(

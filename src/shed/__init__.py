@@ -75,8 +75,8 @@ _RUFF_RULES = (
     # https://github.com/astral-sh/ruff/issues/10245
     # ruff replaces `sorted(reversed(iterable))` with `sorted(iterable)`
     # "C414", # unnecessary-double-cast # codemod: `replace_unnecessary_nested_calls`
-
-
+    #
+    #
     # ** These are new fixes that Zac had enabled in his branch
     # "E731", # don't assign lambdas
     # "B007",  # unused loop variable
