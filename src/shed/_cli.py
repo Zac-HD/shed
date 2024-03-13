@@ -19,11 +19,11 @@ from typing import Callable, FrozenSet, Optional, Union
 from . import ShedSyntaxWarning, _version_map, docshed, shed
 from ._is_python_file import is_python_file
 
-if sys.version_info > (3, 9):
+if sys.version_info[:2] > (3, 9):  # pragma: no cover
     from sys import stdlib_module_names
-elif sys.version_info[:2] == (3, 9):
+elif sys.version_info[:2] == (3, 9):  # pragma: no cover
     from ._stdlib_module_names.py39 import stdlib_module_names
-else:
+else:  # pragma: no cover
     from ._stdlib_module_names.py38 import stdlib_module_names
 
 @functools.lru_cache

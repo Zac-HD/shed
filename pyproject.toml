@@ -1,0 +1,8 @@
+[tool.coverage.run]
+# not possible to specify as a flag to pytest-cov, and while coverage seems like it
+# should read from tox.ini it didn't seem to work for me.
+omit = [
+    "*/shed/_stdlib_module_names/*",
+]
+
+# other configuration for pytest, flake8 & mypy is made in tox.ini
