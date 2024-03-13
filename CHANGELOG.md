@@ -1,6 +1,9 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+#### 2024.3.1 - 2024-03-13
+- Replace usage of Autoflake, PyUpgrade and isort with ruff.
+
 #### 2024.1.1 - 2024-01-26
 - Require `black >= 24.1.0`, with their [updated code style](https://black.readthedocs.io/en/stable/change_log.html)
 

@@ -19,6 +19,12 @@ from typing import Callable, FrozenSet, Optional, Union
 from . import ShedSyntaxWarning, _version_map, docshed, shed
 from ._is_python_file import is_python_file
 
+if sys.version_info > (3, 9):
+    from sys import stdlib_module_names
+elif sys.version_info[:2] == (3, 9):
+    from ._stdlib_module_names.py39 import stdlib_module_names
+else:
+    from ._stdlib_module_names.py38 import stdlib_module_names
 
 @functools.lru_cache
 def _get_git_repo_root(cwd: Optional[str] = None) -> str:
@@ -48,7 +54,7 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
         # a fraction of the functionality. So best approach, if we still need
         # the ability to exclude stdlib modules here, is probably to generate a list of
         # known stdlib modules - either dynamically or store in a file.
-        if p.isidentifier()  # and place_module(p) != "STDLIB"
+        if p.isidentifier() and p not in stdlib_module_names
     )
 
 
