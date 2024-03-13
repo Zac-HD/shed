@@ -18,7 +18,7 @@ import black
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 
-__version__ = "2024.1.1"
+__version__ = "2024.3.1"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
@@ -75,6 +75,8 @@ _RUFF_RULES = (
     # https://github.com/astral-sh/ruff/issues/10245
     # ruff replaces `sorted(reversed(iterable))` with `sorted(iterable)`
     # "C414", # unnecessary-double-cast # codemod: `replace_unnecessary_nested_calls`
+    #
+    #
     # ** These are new fixes that Zac had enabled in his branch
     # "E731", # don't assign lambdas
     # "B007",  # unused loop variable
@@ -143,8 +145,6 @@ def shed(
     """Process the source code of a single module."""
     assert isinstance(source_code, str)
     assert isinstance(refactor, bool)
-    # TODO: I guess this required frozenset because of isort compatibility
-    # but we can probably relax that to an iterable[str]
     assert isinstance(first_party_imports, frozenset)
     assert all(isinstance(name, str) for name in first_party_imports)
     assert all(name.isidentifier() for name in first_party_imports)

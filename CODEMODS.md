@@ -395,3 +395,48 @@ with (
 ):
     pass
 ```
+
+## `replace_builtin_empty_collection` [removed]
+A codemod that was removed in favor of ruffs C406/C409/C410/C418, but that also covered some cases that ruff currently raises no errors for.
+
+#### input
+```py
+# handled by ruff
+list([])  # C410
+list(())  # C410
+
+dict({})  # C418
+dict([])  # C406
+dict(())  # C406
+
+tuple([])  # C409
+tuple(())  # C409
+
+# not handled by ruff, but was handled by our codemod
+list({})
+list("")
+dict("")
+tuple({})
+tuple("")
+```
+
+#### output
+```py
+# handled by ruff
+[]  # C410
+[]  # C410
+
+{}  # C418
+{}  # C406
+{}  # C406
+
+()  # C409
+()  # C409
+
+# not handled by ruff, but was handled by our codemod
+[]
+[]
+{}
+()
+()
+```
