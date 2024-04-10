@@ -79,7 +79,7 @@ sorted(reversed(iterable))  # unsafe to fix, but ruff does
 
 # cases handled by our codemod, but not by ruff
 sorted(sorted(iterable, reverse=True))
-sorted(sorted(iterable, reverse=True))
+sorted(sorted(iterable), reverse=True)
 sorted(sorted(iterable, reverse=True), reverse=False)
 sorted(sorted(iterable, reverse=False), reverse=True)
 
@@ -97,7 +97,7 @@ sorted(reversed(iterable))  # unsafe to fix, but ruff does
 
 # cases handled by our codemod, but not by ruff
 sorted(iterable)
-sorted(iterable)
+sorted(iterable, reverse=True)
 sorted(iterable, reverse=False)
 sorted(iterable, reverse=True)
 
