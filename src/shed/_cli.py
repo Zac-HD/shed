@@ -84,6 +84,8 @@ def _rewrite_on_disk(
         writer: Callable[..., str] = docshed
     elif fname.endswith(".pyi"):
         writer = functools.partial(shed, is_pyi=True)
+    elif Path(fname).name == "__init__.py":
+        writer = functools.partial(shed, _remove_unused_imports=False)
     else:
         writer = shed
 
