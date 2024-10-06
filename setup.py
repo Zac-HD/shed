@@ -29,7 +29,7 @@ setuptools.setup(
         "pyupgrade >= 3.15.0",
         "ruff",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU Affero General Public License v3",

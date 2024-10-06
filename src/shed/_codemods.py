@@ -570,9 +570,6 @@ class ShedFixers(VisitorBasedCodemodCommand):
 
     @leave(m.With())
     def remove_nested_with(self, _, updated_node):
-        if self.min_version < (3, 9):
-            return updated_node
-
         candidate_with: cst.With = updated_node
         compound_items: List[cst.WithItem] = []
         final_body: cst.BaseSuite = candidate_with.body

@@ -59,7 +59,7 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
     )
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _should_format(fname: str) -> bool:
     return fname.endswith((".md", ".rst", ".pyi")) or is_python_file(fname)
 

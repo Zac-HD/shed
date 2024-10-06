@@ -89,7 +89,7 @@ def check(
     return result
 
 
-example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 8)}
+example_kwargs = {"refactor": True, "provides": frozenset(), "min_version": (3, 9)}
 
 
 @given(
