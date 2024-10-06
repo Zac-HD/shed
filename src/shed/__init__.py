@@ -18,7 +18,7 @@ import black
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 
-__version__ = "2024.3.1"
+__version__ = "2024.4.1"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
@@ -64,7 +64,8 @@ _RUFF_RULES = (
     "C417",  # unnecessary-map
     "C418",  # unnecessary-literal-within-dict-call
     "C419",  # unnecessary-comprehension-any-all
-    "PIE790",  # unnecessary-placeholder; unnecessary pass/... statement
+    # Disabled pending https://github.com/astral-sh/ruff/issues/10538
+    # "PIE790",  # unnecessary-placeholder; unnecessary pass/... statement
     "SIM101",  # duplicate-isinstance-call # Replacing `collapse_isinstance_checks`
     # partially replaces assert codemod
     "B011",  # assert False -> raise

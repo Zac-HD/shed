@@ -1,6 +1,8 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
+- Disable `PIE790` fix due to [ruff issue #10538](https://github.com/astral-sh/ruff/issues/10538)
+
 #### 2024.3.1 - 2024-03-13
 - Replace usage of Autoflake, PyUpgrade and isort with ruff.
 
