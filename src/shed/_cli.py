@@ -61,7 +61,7 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
                     provides |= _walk_path(p)
                 else:
                     provides |= _walk_path(p)
-        except Exception:
+        except Exception:  # pragma: no cover
             pass
 
         return provides
