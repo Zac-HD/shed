@@ -1,7 +1,7 @@
 # Changelog
 *`shed` uses [calendar versioning](https://calver.org/), with a year.month.patch scheme.*
 
-#### 2025.6.4 - 2025-06-04-
+#### 2025.6.4 - 2025-06-04
 - Improve performance in large repositories, by skipping directories that start with `.` during an internal check.
 
 #### 2024.10.1 - 2024-04-27
