@@ -47,7 +47,26 @@ def _guess_first_party_modules(cwd: Optional[str] = None) -> FrozenSet[str]:
         base = _get_git_repo_root(cwd)
     except (subprocess.SubprocessError, FileNotFoundError):
         return frozenset()
-    provides = {init.parent.name for init in Path(base).glob("**/src/*/__init__.py")}
+
+    def _walk_path(path: Path) -> set[str]:
+        provides = set()
+        try:
+            for p in path.iterdir():
+                if p.name.startswith(".") or not p.is_dir():
+                    continue
+                if p.name == "src":
+                    provides |= {init.parent.name for init in p.glob("*/__init__.py")}
+                    # in case of nested src/ directories, like
+                    #   src/tools/src/helper/__init__.py
+                    provides |= _walk_path(p)
+                else:
+                    provides |= _walk_path(p)
+        except Exception:  # pragma: no cover
+            pass
+
+        return provides
+
+    provides = _walk_path(Path(base))
     return frozenset(
         p
         for p in {Path(base).name} | provides

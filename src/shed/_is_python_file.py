@@ -72,7 +72,7 @@ def _detect_encoding(
 
 
 def _inner_detect_encoding(
-    readline: Callable[[], bytes | bytearray]
+    readline: Callable[[], bytes | bytearray],
 ) -> str:  # pragma: no cover
     """Return file encoding."""
     try:
