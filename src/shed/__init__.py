@@ -19,7 +19,7 @@ import black
 from black.mode import TargetVersion
 from black.parsing import lib2to3_parse
 
-__version__ = "2025.6.4"
+__version__ = "2025.6.1"
 __all__ = ["shed", "docshed"]
 
 # Conditionally imported in refactor mode to reduce startup latency in the common case
